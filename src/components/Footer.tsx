@@ -33,7 +33,7 @@ export default function Footer() {
                 {/* Right - Social & Reserve */}
                 <div className="flex flex-col justify-center items-center p-7 gap-3">
                     <div className="flex flex-row gap-4 items-center">
-                        <img src='/assets/artisanal_logo_high_res(2)_txtwhite.jpeg' className="h-10" />
+                        <img src='src/assets/artisanal_logo_high_res(2)_txtwhite.jpeg' className="h-10" />
                     </div>
                 </div>
             </div>
