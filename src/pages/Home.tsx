@@ -55,12 +55,12 @@ export default function Home() {
                                 }}
                             />
                         </svg>
-                        <img src="src\assets\artisanal_logo_high_res_nobg.jpeg" className="h-80 w-80 object-contain" />
+                        <img src="/assets/artisanal_logo_high_res_nobg.jpeg" className="h-80 w-80 object-contain" />
                     </div>
                 </div>
             )}
             <img
-                src="src\assets\artisanal_full_restraunt_pic.jpg"
+                src="/assets/artisanal_full_restraunt_pic.jpg"
                 ref={bgImgRef}
                 className="w-screen scale-130 absolute top-0 -z-4 brightness-50 transition-all duration-1000"
             />
@@ -72,7 +72,7 @@ export default function Home() {
             />
             <Navbar />
             <div className="flex flex-col gap-5 justify-center items-center h-screen">
-                <img src='src\assets\artisanal_logo_high_res_nobg.jpeg' className="h-30" />
+                <img src='/assets/artisanal_logo_high_res_nobg.jpeg' className="h-30" />
                 <LinkBar />
             </div>
             <Footer />
