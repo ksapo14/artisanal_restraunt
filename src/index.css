@@ -10,3 +10,7 @@
     stroke-dashoffset: 0;
   }
 }
+
+body {
+  scroll-behavior: smooth;
+}
