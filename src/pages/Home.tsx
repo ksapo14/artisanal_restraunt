@@ -3,6 +3,8 @@ import LinkBar from "../components/LinkBar";
 import Navbar from "../components/Navbar";
 import "../index.css";
 import Footer from "../components/Footer";
+import bgImg from '../assets/artisanal_full_restraunt_pic.jpg';
+import logoNoBg from '../assets/artisanal_logo_high_res_nobg.jpeg';
 
 export default function Home() {
     const bgImgRef = useRef<HTMLImageElement>(null);
@@ -55,12 +57,12 @@ export default function Home() {
                                 }}
                             />
                         </svg>
-                        <img src="src/assets/artisanal_logo_high_res_nobg.jpeg" className="h-80 w-80 object-contain" />
+                        <img src={logoNoBg} className="h-80 w-80 object-contain" />
                     </div>
                 </div>
             )}
             <img
-                src="/assets/artisanal_full_restraunt_pic.jpg"
+                src={bgImg}
                 ref={bgImgRef}
                 className="w-screen scale-130 absolute top-0 -z-4 brightness-50 transition-all duration-1000"
             />
@@ -72,7 +74,7 @@ export default function Home() {
             />
             <Navbar />
             <div className="flex flex-col gap-5 justify-center items-center h-screen">
-                <img src='src/assets/artisanal_logo_high_res_nobg.jpeg' className="h-30" />
+                <img src={logoNoBg} className="h-30" />
                 <LinkBar />
             </div>
             <Footer />
