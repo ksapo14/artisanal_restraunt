@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import bgImg1 from '../assets/artisanal_full_restraunt_pic.jpg';
 import bgImg2 from '../assets/restraunt_2.png';
 import bgImg3 from '../assets/restraunt_3.png';
