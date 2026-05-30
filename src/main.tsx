@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider, useLocation, useOutlet } from 'rea
 import { AnimatePresence } from 'framer-motion';
 import Home from './pages/Home.tsx'
 import Menu from './pages/Menu.tsx';
+import Admin from './pages/Admin.tsx';
 
 function AnimatedLayout() {
   const location = useLocation();
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "/menu",
         element: <Menu />
+      },
+      {
+        path: "/admin",
+        element: <Admin />
       },
     ]
   },

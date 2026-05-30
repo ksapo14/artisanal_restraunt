@@ -54,6 +54,8 @@ export default function MenuItemModal({ item, sectionTitle, accentColor, onClose
                     <img
                         src={item.image}
                         alt={item.name}
+                        loading="eager"
+                        decoding="async"
                         className="w-full h-full object-cover"
                     />
                 </div>
