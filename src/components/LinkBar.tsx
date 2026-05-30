@@ -1,21 +1,31 @@
-
 export default function LinkBar() {
     const links = {
         "Home": "/",
-        "Menu": "/",
+        "Menu": "/menu",
         "About": "/",
-        "Contact": "/",
     }
 
     return (
-        <div className="flex justify-center items-center gap-3 py-5">
-            <span className="w-2 h-2 bg-[#dac464] rounded-full"></span>
+        <div className="flex justify-center items-center gap-6 py-10">
             {Object.entries(links).map(([name, url]) => (
-                <>
-                    <a href={url} className="text-4xl font-display transition-all duration-300 text-[#ffe6ac] relative hover:text-[#dac464] after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:transition-all after:duration-300 after:bg-[#dac464]">{name}</a>
-                    <span className="w-2 h-2 bg-[#dac464] rounded-full"></span>
-                </>
+                <div key={name} className="flex items-center gap-6">
+                    <a 
+                        href={url} 
+                        className="inline-block text-7xl font-display text-[var(--color-theme-secondary)] transition-all duration-500 ease-out hover:text-[var(--color-theme-primary)] hover:scale-110"
+                    >
+                        {name}
+                    </a>
+                    <span className="w-2 h-2 bg-[var(--color-theme-primary)] rounded-full transition-colors duration-500"></span>
+                </div>
             ))}
+            <div className="flex items-center gap-6">
+                <a
+                    href="/"
+                    className="inline-block text-7xl font-display text-[var(--color-theme-secondary)] transition-all duration-500 ease-out hover:text-[var(--color-theme-primary)] hover:scale-110"
+                >
+                    Contact
+                </a>
+            </div>
         </div>
     );
 }

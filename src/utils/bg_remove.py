@@ -49,4 +49,4 @@ def replace_black_with_white(input_path, output_path, threshold=15):
 
     Image.fromarray(data).save(output_path, "PNG")
 
-replace_black_with_white(r"C:\Users\kcsap\OneDrive\Desktop\artisanal_restraunt\src\assets\artisanal_logo_high_res_nobg.jpeg", r"C:\Users\kcsap\OneDrive\Desktop\artisanal_restraunt\src\assets\artisanal_logo_high_res_nobg.jpeg", threshold=100)
+remove_white_pixels_fast(r"C:\Users\kcsap\OneDrive\Desktop\artisanal_restraunt\src\assets\random_logo.jpg", r"C:\Users\kcsap\OneDrive\Desktop\artisanal_restraunt\src\assets\random_logo.jpg", threshold=225)

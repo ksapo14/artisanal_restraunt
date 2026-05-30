@@ -2,7 +2,7 @@
 
 @theme {
   --font-display: 'Cormorant', Georgia, serif;
-  --font-body: 'Lato', sans-serif;
+  --font-body: 'Poppins', sans-serif;
 }
 
 @keyframes fillCircle {

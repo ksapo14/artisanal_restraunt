@@ -1,13 +1,43 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import LinkBar from "../components/LinkBar";
 import Navbar from "../components/Navbar";
 import "../index.css";
 import Footer from "../components/Footer";
-import bgImg from '../assets/artisanal_full_restraunt_pic.jpg';
+import bgImg1 from '../assets/artisanal_full_restraunt_pic.jpg';
+import bgImg2 from '../assets/restraunt_2.png';
+import bgImg3 from '../assets/restraunt_3.png';
 import logoNoBg from '../assets/artisanal_logo_high_res_nobg.jpeg';
 
+const themes = [
+    {
+        // Theme 1: Warm Champagne Gold & Soft Sand
+        primary: "#dac464",
+        secondary: "#ffe6ac",
+        bg: "#1c170a",
+        link: "#ffe6ac",
+        arrow: "rgba(255, 230, 172, 0.5)"
+    },
+    {
+        // Theme 2: Deep Espresso & Warm Cream
+        primary: "#a68a7b",
+        secondary: "#f5f0ed",
+        bg: "#1b1412",
+        link: "#d7ccc8",
+        arrow: "rgba(215, 204, 200, 0.6)"
+    },
+    {
+        // Theme 3: Muted Rose Crimson & Soft Blush
+        primary: "#d48888",
+        secondary: "rgba(238, 192, 192, 1)",
+        bg: "#1a0f0f",
+        link: "#e5baba", // slight shade of red
+        arrow: "rgba(219, 162, 162, 0.6)" // slight shade of red
+    }
+];
+
 export default function Home() {
-    const bgImgRef = useRef<HTMLImageElement>(null);
+    const bgImages = [bgImg1, bgImg2, bgImg3];
+    const [bgIndex, setBgIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const [sliding, setSliding] = useState(false);
 
@@ -22,17 +52,41 @@ export default function Home() {
             setLoading(false);
         }, 2000);
 
+        // Auto-switch images every 10 seconds
+        const autoSwitchInterval = setInterval(() => {
+            setBgIndex((prev) => (prev === bgImages.length - 1 ? 0 : prev + 1));
+        }, 10000);
+
         return () => {
             clearTimeout(slideTimeout);
             clearTimeout(removeTimeout);
+            clearInterval(autoSwitchInterval);
         };
-    }, []);
+    }, [bgImages.length]);
+
+    const handlePrev = () => {
+        setBgIndex((prev) => (prev === 0 ? bgImages.length - 1 : prev - 1));
+    };
+
+    const handleNext = () => {
+        setBgIndex((prev) => (prev === bgImages.length - 1 ? 0 : prev + 1));
+    };
+
+    const currentTheme = themes[bgIndex];
+
+    const themeStyles = {
+        '--color-theme-primary': currentTheme.primary,
+        '--color-theme-secondary': currentTheme.secondary,
+        '--color-theme-bg': currentTheme.bg,
+        '--color-theme-link': currentTheme.link,
+        '--color-theme-arrow': currentTheme.arrow,
+    } as React.CSSProperties;
 
     return (
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden" style={themeStyles}>
             {loading && (
                 <div
-                    className={`fixed inset-0 z-50 flex justify-center items-center bg-[#ffe6ac] transition-transform duration-500 ${sliding ? '-translate-y-full' : 'translate-y-0'
+                    className={`fixed inset-0 z-[200] flex justify-center items-center bg-[#ffe6ac] transition-transform duration-500 ${sliding ? '-translate-y-full' : 'translate-y-0'
                         }`}
                 >
                     <div className="relative flex items-center justify-center">
@@ -52,6 +106,7 @@ export default function Home() {
                                 stroke="#a07830"
                                 strokeWidth="3"
                                 strokeLinecap="round"
+                                strokeLinejoin="round"
                                 strokeDasharray="1504"
                                 strokeDashoffset="1504"
                                 style={{
@@ -63,21 +118,68 @@ export default function Home() {
                     </div>
                 </div>
             )}
-            <img
-                src={bgImg}
-                ref={bgImgRef}
-                className="w-screen scale-130 absolute top-0 -z-4 brightness-50 transition-all duration-1000"
-            />
-            {/* Fade overlay */}
-            <div className="absolute top-0 left-0 w-full h-screen -z-4 pointer-events-none"
+            
+            {/* Dynamic Stacked Background Cross-Fade */}
+            {bgImages.map((src, index) => (
+                <img
+                    key={src}
+                    src={src}
+                    className={`w-screen scale-130 absolute top-0 -z-4 brightness-50 transition-all duration-1000 ${
+                        index === bgIndex ? 'opacity-100' : 'opacity-0'
+                    }`}
+                />
+            ))}
+
+            {/* Adaptive Fade overlay */}
+            <div className="absolute top-0 left-0 w-full h-screen -z-4 pointer-events-none transition-all duration-1000"
                 style={{
-                    background: 'linear-gradient(to bottom, transparent 70%, #2a230f 100%)'
+                    background: 'linear-gradient(to bottom, transparent 65%, var(--color-theme-bg) 100%)'
                 }}
             />
             <Navbar />
-            <div className="flex flex-col gap-5 justify-center items-center h-screen">
-                <img src={logoNoBg} className="h-30" />
-                <LinkBar />
+            <div className="flex justify-center items-center h-screen w-full relative">
+                <div className="flex items-center justify-between w-full px-4 md:px-8">
+                    {/* Left Arrow Button */}
+                    <button 
+                        onClick={handlePrev}
+                        aria-label="Previous Slide"
+                        className="group flex items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 hover:scale-115 cursor-pointer"
+                    >
+                        <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            strokeWidth="3.5" 
+                            stroke="currentColor" 
+                            className="w-12 h-12 stroke-linecap-round stroke-linejoin-round transform transition-transform duration-300"
+                        >
+                            <path d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    {/* Centered LinkBar */}
+                    <div className="flex-1 flex justify-center">
+                        <LinkBar />
+                    </div>
+
+                    {/* Right Arrow Button */}
+                    <button 
+                        onClick={handleNext}
+                        aria-label="Next Slide"
+                        className="group flex items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 hover:scale-115 cursor-pointer"
+                    >
+                        <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            strokeWidth="3.5" 
+                            stroke="currentColor" 
+                            className="w-12 h-12 stroke-linecap-round stroke-linejoin-round transform transition-transform duration-300"
+                        >
+                            <path d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
             </div>
             <Footer />
         </div>
