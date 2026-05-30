@@ -13,7 +13,7 @@ function readApiKey(): string | undefined {
 export const firebaseApiKey = readApiKey();
 
 const firebaseConfig = {
-    apiKey: "",
+    apiKey: import.meta.env.FIREBASE_API_KEY,
     authDomain: "artisanal-restraunt.firebaseapp.com",
     projectId: "artisanal-restraunt",
     storageBucket: "artisanal-restraunt.firebasestorage.app",
