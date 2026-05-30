@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import LinkBar from "../components/LinkBar";
 import Navbar from "../components/Navbar";
 import "../index.css";
@@ -83,7 +84,17 @@ export default function Home() {
     } as React.CSSProperties;
 
     return (
-        <div className="relative overflow-hidden" style={themeStyles}>
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="relative overflow-hidden min-h-screen" 
+            style={themeStyles}
+        >
+            {/* Solid Theme Background layer */}
+            <div className="absolute inset-0 -z-10 bg-[var(--color-theme-bg)] transition-colors duration-1000" />
+            
             {loading && (
                 <div
                     className={`fixed inset-0 z-[200] flex justify-center items-center bg-[#ffe6ac] transition-transform duration-500 ${sliding ? '-translate-y-full' : 'translate-y-0'
@@ -148,12 +159,12 @@ export default function Home() {
                         <svg 
                             xmlns="http://www.w3.org/2000/svg" 
                             fill="none" 
-                            viewBox="0 0 24 24" 
-                            strokeWidth="3.5" 
+                            viewBox="0 0 80 24" 
+                            strokeWidth="2" 
                             stroke="currentColor" 
-                            className="w-12 h-12 stroke-linecap-round stroke-linejoin-round transform transition-transform duration-300"
+                            className="w-20 h-8"
                         >
-                            <path d="M15 19l-7-7 7-7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M76 12H4M4 12L11 5M4 12L11 19" />
                         </svg>
                     </button>
 
@@ -171,17 +182,17 @@ export default function Home() {
                         <svg 
                             xmlns="http://www.w3.org/2000/svg" 
                             fill="none" 
-                            viewBox="0 0 24 24" 
-                            strokeWidth="3.5" 
+                            viewBox="0 0 80 24" 
+                            strokeWidth="2" 
                             stroke="currentColor" 
-                            className="w-12 h-12 stroke-linecap-round stroke-linejoin-round transform transition-transform duration-300"
+                            className="w-20 h-8"
                         >
-                            <path d="M9 5l7 7-7 7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 12H76M76 12L69 5M76 12L69 19" />
                         </svg>
                     </button>
                 </div>
             </div>
             <Footer />
-        </div>
+        </motion.div>
     );
 }

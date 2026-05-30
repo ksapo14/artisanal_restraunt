@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, Link } from 'react-router';
+import { Link } from 'react-router';
 import SiteMap from './SiteMap';
 import '../index.css';
 import txtWhite from '../assets/artisanal_logo_high_res(2)_txtwhite.jpeg';
@@ -7,14 +7,12 @@ import txtWhite from '../assets/artisanal_logo_high_res(2)_txtwhite.jpeg';
 export default function Navbar() {
     const [open, setOpen] = useState(false);
     const [hovering, setHovering] = useState(false);
-    const location = useLocation();
-    const isHome = location.pathname === "/";
 
     return (
         <>
             <nav className="flex justify-between items-center w-screen absolute top-0 h-10 px-10 py-15 z-[100]">
                 <Link to="/">
-                    <img src={txtWhite} className={`transition-all duration-500 object-contain ${isHome ? 'h-13' : 'h-8'}`} />
+                    <img src={txtWhite} className="transition-all duration-500 object-contain h-10" />
                 </Link>
                 <div className='flex flex-row justify-between items-center gap-6'>
                     <button className="border-solid text-white border-white border px-6 py-4 font-display transition-all duration-300 hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)] hover:text-black hover:rounded-4xl cursor-pointer">RESERVE A TABLE</button>

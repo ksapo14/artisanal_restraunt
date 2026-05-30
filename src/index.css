@@ -11,6 +11,14 @@
   }
 }
 
+html,
+body,
+#root {
+  height: 100%;
+}
+
 body {
   scroll-behavior: smooth;
+  background-color: #1a0f0f;
+  margin: 0;
 }
