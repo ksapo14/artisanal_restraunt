@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import txtWite from '../assets/artisanal_logo_high_res(2)_txtwhite.jpeg';
 
 export default function Footer() {
@@ -60,13 +61,13 @@ export default function Footer() {
                                 { name: "Reservations", url: "/reservations" },
                                 { name: "Contact", url: "/contact" }
                             ].map((link) => (
-                                <a 
+                                <Link 
                                     key={link.name}
-                                    href={link.url} 
+                                    to={link.url} 
                                     className="font-display text-base font-light text-white/70 hover:text-[var(--color-theme-primary)] hover:scale-105 transition-all duration-300 ease-out inline-block tracking-wide"
                                 >
                                     {link.name}
-                                </a>
+                                </Link>
                             ))}
                         </nav>
                     </div>

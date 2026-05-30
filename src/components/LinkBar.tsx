@@ -1,3 +1,5 @@
+import { Link } from 'react-router';
+
 export default function LinkBar() {
     const links = {
         "Home": "/",
@@ -9,22 +11,22 @@ export default function LinkBar() {
         <div className="flex justify-center items-center gap-6 py-10">
             {Object.entries(links).map(([name, url]) => (
                 <div key={name} className="flex items-center gap-6">
-                    <a 
-                        href={url} 
+                    <Link 
+                        to={url} 
                         className="inline-block text-7xl font-display text-[var(--color-theme-secondary)] transition-all duration-500 ease-out hover:text-[var(--color-theme-primary)] hover:scale-110"
                     >
                         {name}
-                    </a>
+                    </Link>
                     <span className="w-2 h-2 bg-[var(--color-theme-primary)] rounded-full transition-colors duration-500"></span>
                 </div>
             ))}
             <div className="flex items-center gap-6">
-                <a
-                    href="/"
+                <Link
+                    to="/"
                     className="inline-block text-7xl font-display text-[var(--color-theme-secondary)] transition-all duration-500 ease-out hover:text-[var(--color-theme-primary)] hover:scale-110"
                 >
                     Contact
-                </a>
+                </Link>
             </div>
         </div>
     );
