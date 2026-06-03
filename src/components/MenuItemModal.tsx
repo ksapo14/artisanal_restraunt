@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { resolveMenuImage } from "../utils/imageResolver";
 
 export type MenuItemDetail = {
     name: string;
@@ -52,7 +53,7 @@ export default function MenuItemModal({ item, sectionTitle, accentColor, onClose
                 <div className="pointer-events-auto w-full md:w-[48%] aspect-square max-h-[50vh] md:max-h-[65vh] overflow-hidden relative shrink-0">
                     <div className="absolute inset-0 border border-white/10 z-10" />
                     <img
-                        src={item.image}
+                        src={resolveMenuImage(item.image)}
                         alt={item.name}
                         loading="eager"
                         decoding="async"

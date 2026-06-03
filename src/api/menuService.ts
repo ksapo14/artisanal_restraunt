@@ -6,7 +6,16 @@ import { normalizeMenu } from "../lib/menuNormalization";
 import { validateMenu } from "../lib/menuValidation";
 import type { MenuSection } from "../types/menu";
 
-const MENU_REF = doc(db, "menu", "current");
+let menuRefCache: any = null;
+function getMenuRef() {
+    if (!db) {
+        throw new Error("Firebase Firestore is not configured.");
+    }
+    if (!menuRefCache) {
+        menuRefCache = doc(db, "menu", "current");
+    }
+    return menuRefCache;
+}
 
 export { validateMenu };
 
@@ -25,10 +34,9 @@ export async function fetchMenuDetailed(): Promise<MenuFetchResult> {
             message: "Firebase API key missing. Set FIREBASE_API_KEY in .env and restart npm run dev.",
         };
     }
-
     try {
         const snapshot = await Promise.race([
-            getDoc(MENU_REF),
+            getDoc(getMenuRef()),
             new Promise<never>((_, reject) => {
                 setTimeout(() => reject(new Error("Menu fetch timed out after 15s")), FETCH_TIMEOUT_MS);
             }),
@@ -41,8 +49,8 @@ export async function fetchMenuDetailed(): Promise<MenuFetchResult> {
             };
         }
 
-        const data = snapshot.data();
-        const sections = data.sections;
+        const data = snapshot.data() as any;
+        const sections = data?.sections;
 
         if (validateMenu(sections)) {
             return { status: "ok", sections };
@@ -76,7 +84,7 @@ export async function fetchMenu(): Promise<MenuSection[] | null> {
 }
 
 export async function saveMenu(sections: MenuSection[]): Promise<void> {
-    await setDoc(MENU_REF, {
+    await setDoc(getMenuRef(), {
         sections,
         updatedAt: new Date().toISOString(),
     });

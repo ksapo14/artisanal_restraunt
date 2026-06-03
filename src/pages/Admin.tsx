@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
-import { auth } from "../api/firebase-config";
+import { auth, isFirebaseConfigured } from "../api/firebase-config";
 import { createId, fetchMenuDetailed, publishDefaultMenu, saveMenu } from "../api/menuService";
+import { resolveMenuImage } from "../utils/imageResolver";
 import { formatFirebaseError } from "../lib/firebaseErrors";
 import { uploadMenuImage } from "../api/storageService";
 import { defaultMenuData } from "../data/defaultMenu";
@@ -34,6 +35,10 @@ export default function Admin() {
     const [menuPublished, setMenuPublished] = useState(true);
 
     useEffect(() => {
+        if (!isFirebaseConfigured || !auth) {
+            setAuthLoading(false);
+            return;
+        }
         return onAuthStateChanged(auth, (nextUser) => {
             setUser(nextUser);
             setAuthLoading(false);
@@ -64,6 +69,10 @@ export default function Admin() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setAuthError(null);
+        if (!isFirebaseConfigured || !auth) {
+            setAuthError("Firebase Authentication is not configured.");
+            return;
+        }
         try {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (err) {
@@ -71,7 +80,10 @@ export default function Admin() {
         }
     };
 
-    const handleLogout = () => signOut(auth);
+    const handleLogout = () => {
+        if (!isFirebaseConfigured || !auth) return;
+        signOut(auth);
+    };
 
     const updateSection = (sectionId: string, patch: Partial<MenuSection>) => {
         setMenu((prev) => prev.map((s) => (s.id === sectionId ? { ...s, ...patch } : s)));
@@ -186,6 +198,12 @@ export default function Admin() {
             <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-6 font-body">
                 <form onSubmit={handleLogin} className="w-full max-w-sm bg-white border border-neutral-200 rounded-lg p-6 space-y-4">
                     <h1 className="text-lg font-semibold text-neutral-900">Menu Admin</h1>
+                    {!isFirebaseConfigured && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm space-y-1">
+                            <p className="font-semibold">Firebase Not Configured</p>
+                            <p>Please add <strong>FIREBASE_API_KEY</strong> to your Vercel project environment variables and redeploy.</p>
+                        </div>
+                    )}
                     <p className="text-sm text-neutral-600">Sign in with your Firebase admin account.</p>
                     {authError && <p className="text-sm text-red-600">{authError}</p>}
                     <label className="block text-sm">
@@ -343,7 +361,7 @@ export default function Admin() {
                                             </div>
 
                                             {item.image && (
-                                                <img src={item.image} alt="" className="w-20 h-20 object-cover rounded border border-neutral-200" />
+                                                <img src={resolveMenuImage(item.image)} alt="" className="w-20 h-20 object-cover rounded border border-neutral-200" />
                                             )}
 
                                             <label className="block text-sm">

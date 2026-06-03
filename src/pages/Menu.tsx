@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import MenuItemModal, { type MenuItemDetail } from "../components/MenuItemModal";
 import { useMenuData } from "../hooks/useMenuData";
 import { useUI } from "../context/UIContext";
+import { resolveMenuImage } from "../utils/imageResolver";
 import bgImg1 from "../assets/artisanal_full_restraunt_pic.jpg";
 
 type SelectedMenuItem = {
@@ -266,7 +267,7 @@ export default function Menu() {
                                                 />
                                                 {activeIndex === sIdx + 1 && item.image ? (
                                                     <motion.img
-                                                        src={item.image}
+                                                        src={resolveMenuImage(item.image)}
                                                         alt={item.name}
                                                         loading="lazy"
                                                         decoding="async"
