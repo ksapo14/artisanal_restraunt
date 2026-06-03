@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useLocation } from "react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useUI } from "../context/UIContext";
 import "../index.css";
 import logoNoBg from '../assets/artisanal_logo_high_res_nobg.jpeg';
 import bgImg from '../assets/artisanal_full_restraunt_pic.jpg';
@@ -10,15 +11,13 @@ import giving1 from '../assets/giving_1_nobg.png';
 import giving2 from '../assets/giving_2_nobg.png';
 import giving3 from '../assets/giving_3_nobg.png';
 
-const MAX_SECTION_INDEX = 5;
+const MAX_SECTION_INDEX = 3;
 
 const SECTION_MAP: Record<string, number> = {
     "#hero": 0,
     "#about": 1,
     "#founders": 2,
     "#community": 3,
-    "#faq": 4,
-    "#events": 5,
 };
 
 const sectionConfig = [
@@ -26,15 +25,13 @@ const sectionConfig = [
     { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" }, // About
     { bg: "#1b1412", primary: "#a68a7b", secondary: "#f5f0ed" }, // Owners
     { bg: "#1a0f0f", primary: "#d48888", secondary: "#f5f0ed" }, // Community
-    { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" }, // FAQ
-    { bg: "#1b1412", primary: "#a68a7b", secondary: "#f5f0ed" }, // Events
 ];
 
 export default function About() {
     const location = useLocation();
+    const { isSiteMapOpen, isMobile } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
     const [ownerOpen, setOwnerOpen] = useState<number | null>(0); // Default first one open
-    const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({});
 
     const isNavigating = useRef(false);
     const activeIndexRef = useRef(activeIndex);
@@ -72,13 +69,6 @@ export default function About() {
         setOwnerOpen(ownerOpen === index ? null : index);
     };
 
-    const toggleFaq = (index: number) => {
-        setFaqOpen((prev) => ({
-            ...prev,
-            [index]: !prev[index],
-        }));
-    };
-
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -109,25 +99,6 @@ export default function About() {
             window.removeEventListener("keydown", onKeyDown);
         };
     }, [navigateSection]);
-
-    const faqItems = [
-        {
-            q: "What are your restaurant hours?",
-            a: "We're open Tuesday through Saturday, 5:00 PM to 9:30 PM. Closed Sundays and Mondays. Reservations are recommended, walk-ins welcome based on availability."
-        },
-        {
-            q: "Do you accommodate dietary restrictions?",
-            a: "Absolutely. We accommodate vegetarian, vegan, gluten-free, and other dietary needs. Please inform your server, and our chefs will create something special for you."
-        },
-        {
-            q: "Can I make a reservation online?",
-            a: "You can call us directly at 828-898-5395 or visit our contact page to submit an inquiry. We recommend calling to discuss your preferences and ensure we have the perfect experience ready."
-        },
-        {
-            q: "Do you offer wine pairings?",
-            a: "Yes, our sommelier curates wine pairings to complement our tasting menus. Ask your server about our wine selection and pairing options on your visit."
-        }
-    ];
 
     const owners = [
         {
@@ -194,8 +165,10 @@ export default function About() {
             />
 
             <div
-                className={`transition-all duration-700 ${
-                    activeIndex > 0 ? "opacity-0 pointer-events-none -translate-y-10" : "opacity-100"
+                className={`relative transition-all duration-700 ease-out ${
+                    activeIndex > 0 && !isSiteMapOpen
+                        ? "opacity-0 pointer-events-none -translate-y-10 z-0"
+                        : "opacity-100 pointer-events-auto translate-y-0 z-[1000]"
                 }`}
             >
                 <Navbar />
@@ -247,7 +220,8 @@ export default function About() {
                                     src={bgImg}
                                     alt="Restaurant"
                                     className="w-full h-auto rounded-lg relative z-10 border border-white/5"
-                                    whileHover={{ scale: 1.05 }}
+                                    whileHover={!isMobile ? { scale: 1.05 } : undefined}
+                                    whileTap={isMobile ? { scale: 0.98 } : undefined}
                                     transition={{ duration: 0.6 }}
                                 />
                             </motion.div>
@@ -292,8 +266,9 @@ export default function About() {
                                         viewport={{ once: true }}
                                         className="border border-[var(--color-theme-primary)]/20 rounded-lg overflow-hidden relative group"
                                     >
-                                        <button
+                                        <motion.button
                                             onClick={() => toggleOwner(idx)}
+                                            whileTap={{ scale: 0.98 }}
                                             className="w-full p-6 bg-transparent hover:bg-white/5 transition-colors duration-300 text-left relative z-10"
                                         >
                                             <div className="flex items-center gap-6">
@@ -318,7 +293,7 @@ export default function About() {
                                                     +
                                                 </motion.span>
                                             </div>
-                                        </button>
+                                        </motion.button>
 
                                         <motion.div
                                             initial={false}
@@ -347,7 +322,7 @@ export default function About() {
                     </div>
 
                     {/* Section 3: Community */}
-                    <div className="h-screen w-screen flex justify-center items-center px-8 md:px-16">
+                    <div className="h-screen w-screen relative flex justify-center items-center px-8 md:px-16 pb-40 md:pb-20">
                         <div className="max-w-5xl w-full">
                             <motion.h2
                                 className="text-5xl font-display text-[var(--color-theme-primary)] mb-6 text-center"
@@ -372,7 +347,8 @@ export default function About() {
                                         src={giving1}
                                         alt="Local Partner 1"
                                         className="max-w-full max-h-full object-contain brightness-90 hover:brightness-100 transition-all duration-700"
-                                        whileHover={{ scale: 1.1 }}
+                                        whileHover={!isMobile ? { scale: 1.1 } : undefined}
+                                        whileTap={isMobile ? { scale: 0.95 } : undefined}
                                     />
                                 </motion.div>
 
@@ -388,7 +364,8 @@ export default function About() {
                                         src={giving2}
                                         alt="Local Partner 2"
                                         className="max-w-full max-h-full object-contain"
-                                        whileHover={{ scale: 1.1 }}
+                                        whileHover={!isMobile ? { scale: 1.1 } : undefined}
+                                        whileTap={isMobile ? { scale: 0.95 } : undefined}
                                     />
                                 </motion.div>
 
@@ -404,95 +381,13 @@ export default function About() {
                                         src={giving3}
                                         alt="Local Partner 3"
                                         className="max-w-full max-h-full object-contain brightness-90 hover:brightness-100 transition-all duration-700"
-                                        whileHover={{ scale: 1.1 }}
+                                        whileHover={!isMobile ? { scale: 1.1 } : undefined}
+                                        whileTap={isMobile ? { scale: 0.95 } : undefined}
                                     />
                                 </motion.div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Section 4: FAQ */}
-                    <div className="h-screen w-screen flex justify-center items-center px-8 md:px-16 overflow-y-auto">
-                        <div className="max-w-3xl w-full py-12">
-                            <motion.h2
-                                className="text-5xl font-display text-[var(--color-theme-primary)] mb-12 text-center"
-                            >
-                                Frequently Asked
-                            </motion.h2>
-                            <div className="space-y-4">
-                                {faqItems.map((item, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-                                        whileInView={{ opacity: 1, x: 0 }}
-                                        transition={{ duration: 0.6, delay: idx * 0.1 }}
-                                        viewport={{ once: true }}
-                                        className="border border-white/10 rounded-lg overflow-hidden relative group"
-                                    >
-                                        <button
-                                            onClick={() => toggleFaq(idx)}
-                                            className="w-full p-5 bg-transparent hover:bg-white/5 transition-colors duration-300 text-left flex justify-between items-center relative z-10"
-                                        >
-                                            <h3 className="text-lg font-display text-[var(--color-theme-secondary)] tracking-wide">{item.q}</h3>
-                                            <motion.span
-                                                animate={{ rotate: faqOpen[idx] ? 180 : 0 }}
-                                                className="text-[var(--color-theme-primary)] text-xl"
-                                            >
-                                                {faqOpen[idx] ? "−" : "+"}
-                                            </motion.span>
-                                        </button>
-
-                                        <motion.div
-                                            initial={false}
-                                            animate={{
-                                                height: faqOpen[idx] ? "auto" : 0,
-                                                opacity: faqOpen[idx] ? 1 : 0
-                                            }}
-                                            transition={{ duration: 0.4, ease: "easeInOut" }}
-                                            className="overflow-hidden relative z-10"
-                                        >
-                                            <div className="px-5 pb-5 bg-white/5 text-[var(--color-theme-secondary)] border-t border-white/5">
-                                                <p className="pt-4 font-body leading-relaxed opacity-80">{item.a}</p>
-                                            </div>
-                                        </motion.div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section 5: Events + Footer */}
-                    <div className="h-screen w-screen relative">
-                        <div className="h-full w-full flex justify-center items-center px-8 md:px-16 pb-20">
-                            <div className="max-w-2xl text-center">
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.8 }}
-                                    viewport={{ once: true }}
-                                >
-                                    <motion.h2
-                                        className="text-5xl font-display text-[var(--color-theme-primary)] mb-8"
-                                    >
-                                        Private Events
-                                    </motion.h2>
-                                    <p className="text-lg text-[var(--color-theme-secondary)] leading-relaxed mb-8">
-                                        Celebrate your special moments at Artisanal. From intimate gatherings to sophisticated
-                                        corporate dinners, our private event spaces offer the protect backdrop for unforgettable
-                                        occasions.
-                                    </p>
-                                    <motion.button
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        className="px-8 py-4 bg-[var(--color-theme-primary)] text-black font-display text-xl rounded-lg hover:brightness-110 transition-all duration-300 tracking-wider"
-                                    >
-                                        Inquire About Events
-                                    </motion.button>
-                                </motion.div>
-                            </div>
-                        </div>
-                        
-                        {/* Absolutely positioned footer */}
                         <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
                             <Footer embedded />
                         </div>
@@ -501,11 +396,12 @@ export default function About() {
             </div>
 
             {/* Navigation Dots */}
-            <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4">
+            <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex-col gap-4">
                 {[...Array(MAX_SECTION_INDEX + 1)].map((_, i) => (
-                    <button
+                    <motion.button
                         key={i}
                         onClick={() => setActiveIndex(i)}
+                        whileTap={{ scale: 0.8 }}
                         className={`w-2 h-2 rounded-full transition-all duration-500 ${
                             activeIndex === i ? "bg-[var(--color-theme-primary)] scale-150" : "bg-white/20 hover:bg-white/40"
                         }`}
@@ -515,7 +411,7 @@ export default function About() {
             </div>
 
             {/* Scroll indicator */}
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40">
+            <div className="absolute bottom-24 md:bottom-8 left-1/2 transform -translate-x-1/2 z-40">
                 <motion.div
                     animate={{ y: [0, 8, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}

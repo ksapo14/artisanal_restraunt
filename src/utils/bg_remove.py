@@ -48,5 +48,3 @@ def replace_black_with_white(input_path, output_path, threshold=15):
     data[black_mask, 2] = 255  # B
 
     Image.fromarray(data).save(output_path, "PNG")
-
-remove_white_pixels_fast(r"C:\Users\kcsap\OneDrive\Desktop\artisanal_restraunt\src\assets\random_logo.jpg", r"C:\Users\kcsap\OneDrive\Desktop\artisanal_restraunt\src\assets\random_logo.jpg", threshold=225)

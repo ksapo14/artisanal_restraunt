@@ -6,26 +6,39 @@ import { motion } from 'framer-motion';
 import { useUI } from '../context/UIContext';
 import SiteMap from './SiteMap';
 
-export default function Navbar() {
-    const { isSiteMapOpen, toggleSiteMap } = useUI();
+type NavbarProps = {
+    compactMobile?: boolean;
+};
+
+export default function Navbar({ compactMobile = false }: NavbarProps) {
+    const { isSiteMapOpen, isMobile, toggleSiteMap, closeSiteMap } = useUI();
     const [hovering, setHovering] = useState(false);
 
     return (
         <>
-            <nav className="flex justify-between items-center w-screen fixed top-0 h-10 px-10 py-15 z-[100]">
-                <Link to="/">
-                    <img src={txtWhite} className="transition-all duration-500 object-contain h-10" />
+            <nav
+                className="flex justify-between items-center w-screen fixed h-10 px-4 sm:px-5 md:px-10 py-8 sm:py-10 md:py-15 transition-all duration-500 z-[1000] top-0"
+            >
+                <Link to="/" onClick={closeSiteMap}>
+                    <img src={txtWhite} className="transition-all duration-500 object-contain h-8 sm:h-9 md:h-10" />
                 </Link>
-                <div className='flex flex-row justify-between items-center gap-8'>
-                    <Link to="/contact">
-                        <button className="border-solid text-white border-white border px-6 py-4 font-display transition-all duration-300 hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)] hover:text-black hover:rounded-4xl cursor-pointer">RESERVE A TABLE</button>
-                    </Link>
+                <div className='flex flex-row justify-between items-center gap-3 sm:gap-5 md:gap-8'>
+                    <motion.div
+                        whileTap={isMobile ? { scale: 0.95 } : { scale: 0.98 }}
+                    >
+                        <Link to="/about" onClick={closeSiteMap}>
+                            <button className={`border-solid text-white border-white border px-4 sm:px-5 md:px-6 py-3 md:py-4 font-display text-xs sm:text-sm md:text-base transition-all duration-300 hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)] hover:text-black hover:rounded-4xl cursor-pointer ${
+                                compactMobile ? "hidden sm:block" : ""
+                            }`}>RESERVE A TABLE</button>
+                        </Link>
+                    </motion.div>
 
-                    <div 
+                    <motion.div 
                         className="flex items-center gap-4 cursor-pointer group"
                         onClick={toggleSiteMap}
                         onMouseEnter={() => setHovering(true)}
                         onMouseLeave={() => setHovering(false)}
+                        whileTap={{ scale: 0.9 }}
                     >
                         <motion.span 
                             animate={{ 
@@ -68,7 +81,7 @@ export default function Navbar() {
                                 }}
                             />
                         </svg>
-                    </div>
+                    </motion.div>
                 </div>
             </nav>
 

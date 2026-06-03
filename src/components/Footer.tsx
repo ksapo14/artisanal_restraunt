@@ -9,33 +9,34 @@ export default function Footer({ embedded = false }: FooterProps) {
 
     return (
         <footer
-            className={`relative text-white/70 transition-all duration-500 ${
-                embedded ? 'h-full flex items-center bg-transparent px-8 md:px-16' : 'py-8 bg-[#1c170a] px-8 md:px-16 border-t border-white/5'
+            className={`relative text-white/65 transition-all duration-500 ${
+                embedded
+                    ? 'h-full flex items-center bg-transparent px-4 md:px-16'
+                    : 'h-24 flex items-center bg-transparent px-4 md:px-16'
             }`}
         >
-            <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                {/* Left Side: Copyright & Site Map */}
-                <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
-                    <p className="font-body text-[10px] md:text-xs tracking-wider opacity-60">
+            <div className="w-full max-w-7xl mx-auto flex flex-row justify-between items-center gap-3 min-w-0">
+                <div className="flex flex-row items-center gap-3 md:gap-6 min-w-0 whitespace-nowrap">
+                    <p className="font-body text-[9px] md:text-xs tracking-[0.16em] text-white/55 uppercase truncate">
                         © 2026 ARTISANAL | ALL RIGHTS RESERVED
                     </p>
-                    <div className="hidden md:block w-px h-3 bg-white/10" />
+                    <div className="w-px h-3 bg-[var(--color-theme-primary,#dac464)]/25 shrink-0" />
                     <button 
                         onClick={toggleSiteMap}
-                        className="font-body text-[10px] md:text-xs tracking-widest hover:text-[var(--color-theme-primary)] transition-colors duration-300 uppercase opacity-60 hover:opacity-100 cursor-pointer"
+                        className="font-body text-[9px] md:text-xs tracking-[0.22em] text-[var(--color-theme-secondary,#ffe6ac)]/70 hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300 uppercase cursor-pointer shrink-0"
                     >
                         Site Map
                     </button>
                 </div>
 
-                {/* Right Side: Social Media */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 shrink-0">
+                    <span className="hidden sm:block w-10 h-px bg-[var(--color-theme-primary,#dac464)]/25" />
                     <a 
                         href="https://instagram.com" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         aria-label="Instagram"
-                        className="text-white/40 hover:text-[var(--color-theme-primary)] transition-all duration-300 hover:scale-110"
+                        className="text-[var(--color-theme-secondary,#ffe6ac)]/55 hover:text-[var(--color-theme-primary,#dac464)] transition-all duration-300 hover:scale-110"
                     >
                         <InstagramIcon />
                     </a>

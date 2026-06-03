@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LinkBar from "../components/LinkBar";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import "../index.css";
 import bgImg1 from '../assets/artisanal_full_restraunt_pic.jpg';
 import bgImg2 from '../assets/restraunt_2.png';
 import bgImg3 from '../assets/restraunt_3.png';
 import logoNoBg from '../assets/artisanal_logo_high_res_nobg.jpeg';
+import { useUI } from "../context/UIContext";
 
 const themes = [
     {
@@ -33,6 +35,7 @@ const themes = [
 ];
 
 export default function Home() {
+    const { isMobile } = useUI();
     const bgImages = [bgImg1, bgImg2, bgImg3];
     const [bgIndex, setBgIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -84,19 +87,19 @@ export default function Home() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="h-screen w-screen overflow-hidden flex flex-col relative"
+            className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative"
             style={themeStyles}
         >
             <div className="fixed inset-0 -z-10 bg-[var(--color-theme-bg)] transition-colors duration-1000" />
 
             {loading && (
                 <div
-                    className={`fixed inset-0 z-[200] flex justify-center items-center bg-[#ffe6ac] transition-transform duration-500 ${
+                    className={`fixed inset-0 z-[3000] flex justify-center items-center bg-[#ffe6ac] transition-transform duration-500 ${
                         sliding ? "-translate-y-full" : "translate-y-0"
                     }`}
                 >
                     <div className="relative flex items-center justify-center">
-                        <svg className="absolute" width="380" height="380" viewBox="0 0 380 380">
+                        <svg className="absolute w-72 h-72 md:w-[380px] md:h-[380px]" viewBox="0 0 380 380">
                             <rect x="2" y="2" width="376" height="376" fill="none" stroke="#e5c97a" strokeWidth="3" />
                             <rect
                                 x="2"
@@ -113,7 +116,7 @@ export default function Home() {
                                 style={{ animation: "fillCircle 1.4s ease-out forwards" }}
                             />
                         </svg>
-                        <img src={logoNoBg} className="h-80 w-80 object-contain" alt="" />
+                        <img src={logoNoBg} className="h-60 w-60 md:h-80 md:w-80 object-contain" alt="" />
                     </div>
                 </div>
             )}
@@ -123,7 +126,7 @@ export default function Home() {
                     key={src}
                     src={src}
                     alt=""
-                    className={`fixed w-screen scale-130 top-0 -z-[4] brightness-50 transition-all duration-1000 pointer-events-none ${
+                    className={`fixed inset-0 h-screen w-screen object-cover scale-110 md:scale-130 -z-[4] brightness-50 transition-all duration-1000 pointer-events-none ${
                         index === bgIndex ? "opacity-100" : "opacity-0"
                     }`}
                 />
@@ -136,52 +139,56 @@ export default function Home() {
                 }}
             />
 
-            <Navbar />
+            <Navbar compactMobile />
 
             <div className="flex-1 relative overflow-hidden">
-                <div className="h-full w-full flex justify-center items-center relative">
-                    <div className="flex items-center justify-between w-full px-4 md:px-8">
-                        <button
-                            type="button"
-                            onClick={handlePrevBg}
-                            aria-label="Previous background"
-                            className="group flex items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 hover:scale-115 cursor-pointer"
+                <div className="h-full w-full flex justify-center items-center relative px-4 md:px-8 pt-20 pb-36 md:py-0">
+                    <motion.button
+                        type="button"
+                        onClick={handlePrevBg}
+                        aria-label="Previous background"
+                        whileHover={!isMobile ? { scale: 1.15 } : undefined}
+                        whileTap={{ scale: 0.85 }}
+                        className={`group absolute left-5 bottom-32 md:bottom-auto md:left-8 z-10 flex h-12 w-16 md:h-auto md:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 80 24"
+                            strokeWidth="2"
+                            stroke="currentColor"
+                            className="w-14 h-6 md:w-20 md:h-8"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 80 24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                className="w-20 h-8"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M76 12H4M4 12L11 5M4 12L11 19" />
-                            </svg>
-                        </button>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M76 12H4M4 12L11 5M4 12L11 19" />
+                        </svg>
+                    </motion.button>
 
-                        <div className="flex-1 flex justify-center">
-                            <LinkBar />
-                        </div>
+                    <LinkBar />
 
-                        <button
-                            type="button"
-                            onClick={handleNextBg}
-                            aria-label="Next background"
-                            className="group flex items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 hover:scale-115 cursor-pointer"
+                    <motion.button
+                        type="button"
+                        onClick={handleNextBg}
+                        aria-label="Next background"
+                        whileHover={!isMobile ? { scale: 1.15 } : undefined}
+                        whileTap={{ scale: 0.85 }}
+                        className={`group absolute right-5 bottom-32 md:bottom-auto md:right-8 z-10 flex h-12 w-16 md:h-auto md:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 80 24"
+                            strokeWidth="2"
+                            stroke="currentColor"
+                            className="w-14 h-6 md:w-20 md:h-8"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 80 24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                className="w-20 h-8"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 12H76M76 12L69 5M76 12L69 19" />
-                            </svg>
-                        </button>
-                    </div>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 12H76M76 12L69 5M76 12L69 19" />
+                        </svg>
+                    </motion.button>
                 </div>
+            </div>
+
+            <div className="absolute bottom-0 left-0 w-full z-20 pb-[env(safe-area-inset-bottom)]">
+                <Footer />
             </div>
         </motion.div>
     );

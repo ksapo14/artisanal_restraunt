@@ -1,11 +1,53 @@
 import { StrictMode, cloneElement } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { createBrowserRouter, RouterProvider, useLocation, useOutlet } from 'react-router';
-import { AnimatePresence } from 'framer-motion';
+import { createBrowserRouter, RouterProvider, useLocation, useOutlet, isRouteErrorResponse, useRouteError, Link } from 'react-router';
+import { AnimatePresence, motion } from 'framer-motion';
 import Home from './pages/Home.tsx'
 import Menu from './pages/Menu.tsx';
 import Admin from './pages/Admin.tsx';
+import About from './pages/About.tsx';
+import Contact from './pages/Contact.tsx';
+import FAQ from './pages/FAQ.tsx';
+import PrivateEvents from './pages/PrivateEvents.tsx';
+import { UIProvider } from './context/UIContext.tsx';
+
+function ErrorPage() {
+  const error = useRouteError();
+  const is404 = isRouteErrorResponse(error) && error.status === 404;
+
+  return (
+    <div className="h-screen w-screen bg-[#1c170a] flex flex-col items-center justify-center text-[#dac464] px-6 text-center">
+      <motion.h1 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-8xl font-display mb-4"
+      >
+        {is404 ? "404" : "Oops"}
+      </motion.h1>
+      <motion.p 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-2xl font-display italic mb-12 opacity-80"
+      >
+        {is404 ? "This page has wandered off the menu." : "Something went wrong in the kitchen."}
+      </motion.p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <Link 
+          to="/" 
+          className="border border-[#dac464] px-8 py-3 font-display text-xl hover:bg-[#dac464] hover:text-black transition-all duration-300 rounded-lg"
+        >
+          Return to Home
+        </Link>
+      </motion.div>
+    </div>
+  );
+}
 
 function AnimatedLayout() {
   const location = useLocation();
@@ -13,14 +55,18 @@ function AnimatedLayout() {
 
   return (
     <div className="relative w-full h-full">
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {element && (
-          <div 
+          <motion.div 
             key={location.pathname} 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
             className="absolute inset-0 w-full"
           >
             {cloneElement(element)}
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
@@ -30,6 +76,7 @@ function AnimatedLayout() {
 const router = createBrowserRouter([
   {
     element: <AnimatedLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
@@ -40,8 +87,24 @@ const router = createBrowserRouter([
         element: <Menu />
       },
       {
+        path: "/about",
+        element: <About />
+      },
+      {
+        path: "/private-events",
+        element: <PrivateEvents />
+      },
+      {
+        path: "/faq",
+        element: <FAQ />
+      },
+      {
         path: "/admin",
         element: <Admin />
+      },
+      {
+        path: "/contact",
+        element: <Contact />
       },
     ]
   },
@@ -49,6 +112,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <UIProvider>
+      <RouterProvider router={router} />
+    </UIProvider>
   </StrictMode>,
 )

@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { Variants } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import MenuItemModal, { type MenuItemDetail } from "../components/MenuItemModal";
 import { useMenuData } from "../hooks/useMenuData";
+import { useUI } from "../context/UIContext";
+import bgImg1 from "../assets/artisanal_full_restraunt_pic.jpg";
 
 type SelectedMenuItem = {
     item: MenuItemDetail;
@@ -13,9 +16,11 @@ type SelectedMenuItem = {
 
 export default function Menu() {
     const { menuData } = useMenuData();
+    const { isSiteMapOpen, isMobile } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedItem, setSelectedItem] = useState<SelectedMenuItem | null>(null);
     const sectionSpan = Math.max(menuData.length - 1, 1);
+    const maxSectionIndex = menuData.length;
     const isNavigating = useRef(false);
     const activeIndexRef = useRef(activeIndex);
 
@@ -29,7 +34,7 @@ export default function Menu() {
 
             const prev = activeIndexRef.current;
             const next = direction === "next" ? prev + 1 : prev - 1;
-            if (next < 0 || next > menuData.length) return;
+            if (next < 0 || next > maxSectionIndex) return;
 
             isNavigating.current = true;
             window.setTimeout(() => {
@@ -38,7 +43,7 @@ export default function Menu() {
 
             setActiveIndex(next);
         },
-        [menuData.length, selectedItem]
+        [maxSectionIndex, selectedItem]
     );
 
     const nextSection = () => navigateSection("next");
@@ -49,10 +54,10 @@ export default function Menu() {
     }, []);
 
     useEffect(() => {
-        if (activeIndex > menuData.length) {
-            setActiveIndex(menuData.length);
+        if (activeIndex > maxSectionIndex) {
+            setActiveIndex(maxSectionIndex);
         }
-    }, [menuData.length, activeIndex]);
+    }, [maxSectionIndex, activeIndex]);
 
     useEffect(() => {
         const onWheel = (e: WheelEvent) => {
@@ -86,10 +91,30 @@ export default function Menu() {
         };
     }, [navigateSection, selectedItem]);
 
-    const FOOTER_SPLIT = 40; // % of viewport: desserts (top) + footer (bottom)
-    const currentSection = activeIndex < menuData.length ? menuData[activeIndex] : menuData[menuData.length - 1];
-    const isFooter = activeIndex === menuData.length;
-    const displayIndex = isFooter ? menuData.length - 1 : activeIndex;
+    const currentSection = menuData[Math.min(Math.max(activeIndex - 1, 0), menuData.length - 1)];
+    const displayIndex = Math.min(Math.max(activeIndex - 1, 0), menuData.length - 1);
+    const nextDisplayIndex = Math.min(displayIndex + 1, menuData.length - 1);
+    const isIntroActive = activeIndex === 0;
+
+    const itemVariants: Variants = {
+        hidden: { opacity: 0, y: 36, filter: "blur(8px)" },
+        visible: (index: number) => ({
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            transition: {
+                duration: 0.75,
+                delay: index * 0.08,
+                ease: [0.19, 1, 0.22, 1] as [number, number, number, number],
+            },
+        }),
+        inactive: {
+            opacity: 0,
+            y: -24,
+            filter: "blur(6px)",
+            transition: { duration: 0.35, ease: "easeOut" },
+        },
+    };
 
     return (
         <motion.div 
@@ -97,27 +122,33 @@ export default function Menu() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="h-screen w-screen overflow-hidden flex flex-col relative" 
+            className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative" 
             style={{ '--color-theme-primary': currentSection.color } as React.CSSProperties}
         >
-            {/* Seamless Gradient Background */}
+            {/* Seamless Fixed Background Base */}
             <div 
-                className="fixed inset-0 transition-all duration-1000 ease-in-out -z-10"
+                className="fixed inset-0 transition-all duration-1000 ease-in-out -z-30"
                 style={{ 
-                    background: isFooter ? currentSection.bg : `linear-gradient(135deg, ${currentSection.bg} 0%, ${currentSection.bg} 40%, ${menuData[(activeIndex + 1) % menuData.length].bg} 100%)`,
-                    filter: 'brightness(1.2)'
+                    background: `linear-gradient(135deg, ${currentSection.bg} 0%, ${currentSection.bg} 60%, ${menuData[nextDisplayIndex].bg} 100%)`,
                 }}
             />
             
-            <div className={`transition-all duration-700 ${activeIndex > 0 ? 'opacity-0 pointer-events-none -translate-y-10' : 'opacity-100'}`}>
-                <Navbar />
+            <div
+                className={`relative transition-all duration-700 ease-out ${
+                    activeIndex > 0 && !isSiteMapOpen
+                        ? 'opacity-0 pointer-events-none -translate-y-10 z-0'
+                        : 'opacity-100 pointer-events-auto translate-y-0 z-[1000]'
+                }`}
+            >
+                <Navbar compactMobile />
             </div>
             
             <div className="flex-1 relative overflow-hidden">
-                {/* Side nav — fixed between courses; shifts up only for footer reveal */}
+                {/* Side nav — fixed between courses */}
                 <div
-                    className="absolute left-8 md:left-24 top-0 bottom-0 z-30 flex items-center pointer-events-none transition-transform duration-1000"
-                    style={{ transform: isFooter ? `translateY(-${FOOTER_SPLIT}%)` : undefined }}
+                    className={`hidden md:flex absolute left-8 md:left-24 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${
+                        isIntroActive ? "opacity-0 -translate-x-6" : "opacity-100 translate-x-0"
+                    }`}
                 >
                     <div className="relative h-[60vh] w-px bg-white/5">
                         <div 
@@ -134,7 +165,7 @@ export default function Menu() {
                                 style={{ top: `${(idx / sectionSpan) * 100}%` }}
                             >
                                 <div 
-                                    className="w-2 h-2 -ml-[4px] rounded-full shadow-[0_0_20px_rgba(255,255,255,0.4)]"
+                                    className="w-2 h-2 -ml-[4px] rounded-full"
                                     style={{ backgroundColor: section.color }}
                                 />
                                 <span 
@@ -151,54 +182,124 @@ export default function Menu() {
                 {/* Main Content Sections - Organized Vertically on the Right */}
                 <div 
                     className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19, 1, 0.22, 1)]"
-                    style={{ transform: `translateY(-${isFooter ? (activeIndex - 1) * 100 + FOOTER_SPLIT : activeIndex * 100}%)` }}
+                    style={{ transform: `translateY(-${activeIndex * 100}%)` }}
                 >
+                    <div className="h-[100svh] md:h-full w-full flex justify-center items-center px-6 md:px-16 pt-24 pb-32 md:py-0 relative overflow-hidden">
+                        {/* Hero Background Image - Now slides with the section */}
+                        <motion.img
+                            src={bgImg1}
+                            alt=""
+                            aria-hidden="true"
+                            animate={{
+                                scale: isIntroActive ? 1.05 : 1.15,
+                            }}
+                            transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
+                            className="absolute inset-0 h-full w-full object-cover brightness-50 -z-20 pointer-events-none opacity-60"
+                        />
+                        {/* Hero Gradient Overlay - Now slides with the section */}
+                        <div 
+                            className="absolute inset-0 -z-10"
+                            style={{ 
+                                background: `linear-gradient(to bottom, transparent 40%, ${menuData[0].bg} 95%)`
+                            }}
+                        />
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 24 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.9, ease: [0.19, 1, 0.22, 1] }}
+                            className="max-w-3xl text-center flex flex-col items-center justify-center gap-6"
+                        >
+                            <motion.p
+                                initial={{ opacity: 0, y: 16 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
+                                className="font-body text-[10px] sm:text-xs md:text-sm uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)]"
+                            >
+                                Artisanal Dining
+                            </motion.p>
+                            <motion.h1
+                                initial={{ opacity: 0, y: 18 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.85, delay: 0.25, ease: [0.19, 1, 0.22, 1] }}
+                                className="font-display text-5xl sm:text-6xl md:text-7xl text-white/95 italic tracking-wide leading-none"
+                            >
+                                Prix Fixe Menu
+                            </motion.h1>
+                            <motion.p
+                                initial={{ opacity: 0, y: 18 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.85, delay: 0.35, ease: [0.19, 1, 0.22, 1] }}
+                                className="font-body text-xs sm:text-sm md:text-base text-white/55 leading-relaxed font-light tracking-[0.1em] md:tracking-[0.12em] uppercase italic max-w-2xl"
+                            >
+                                Seasonal ingredients, deliberate technique, and composed courses designed for a measured evening at the table.
+                            </motion.p>
+                        </motion.div>
+                    </div>
+
                     {menuData.map((section, sIdx) => (
-                        <div key={section.id} className="h-full w-full flex items-center justify-end px-6 md:px-32 pt-40 pb-32">
-                            <div className="w-full md:w-1/2 flex flex-col gap-y-10 md:gap-y-14">
-                                {section.items.map((item, iIdx) => (
-                                    <div 
-                                        key={item.id} 
-                                        role="button"
-                                        tabIndex={sIdx === displayIndex ? 0 : -1}
-                                        onClick={() => setSelectedItem({ item, sectionTitle: section.title, accentColor: section.color })}
-                                        onKeyDown={(e) => e.key === "Enter" && setSelectedItem({ item, sectionTitle: section.title, accentColor: section.color })}
-                                        className={`flex gap-6 md:gap-14 group cursor-pointer hover:scale-[1.04] transition-all duration-500 ease-out ${sIdx === displayIndex ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'}`}
-                                        style={{ transitionDelay: sIdx === displayIndex ? `${iIdx * 100}ms` : '0ms' }}
-                                    >
-                                        <div className="w-24 h-24 md:w-28 md:h-28 shrink-0 overflow-hidden relative rounded-xs self-center bg-white/5">
-                                            <div className="absolute inset-0 border border-white/5 z-10 transition-colors duration-500 group-hover:border-white/20" />
-                                            {sIdx === displayIndex && item.image ? (
-                                                <img
-                                                    src={item.image}
-                                                    alt={item.name}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                    className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
+                        <div key={section.id} className="h-[100svh] md:h-full w-full relative">
+                            <div className="h-full w-full overflow-y-auto md:overflow-visible flex flex-col justify-center items-center md:items-end px-5 sm:px-8 md:px-32 pt-28 md:pt-40 pb-36 md:pb-32">
+                                <div className="w-full max-w-xl md:max-w-none md:w-1/2 flex flex-col gap-y-6 sm:gap-y-8 md:gap-y-14">
+                                    {section.items.map((item, iIdx) => (
+                                        <motion.div 
+                                            key={item.id} 
+                                            role="button"
+                                            tabIndex={activeIndex === sIdx + 1 ? 0 : -1}
+                                            onClick={() => setSelectedItem({ item, sectionTitle: section.title, accentColor: section.color })}
+                                            onKeyDown={(e) => e.key === "Enter" && setSelectedItem({ item, sectionTitle: section.title, accentColor: section.color })}
+                                            custom={iIdx}
+                                            variants={itemVariants}
+                                            initial={false}
+                                            animate={activeIndex === sIdx + 1 ? "visible" : "inactive"}
+                                            whileHover={activeIndex === sIdx + 1 && !isMobile ? { scale: 1.04, x: -10 } : undefined}
+                                            whileTap={activeIndex === sIdx + 1 ? (isMobile ? { scale: 0.95 } : { scale: 0.99 }) : undefined}
+                                            className={`flex gap-4 sm:gap-6 md:gap-14 group cursor-pointer transition-colors duration-500 ease-out ${
+                                                activeIndex === sIdx + 1 ? 'pointer-events-auto' : 'pointer-events-none'
+                                            }`}
+                                        >
+                                            <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 shrink-0 overflow-hidden relative rounded-xs self-center bg-white/5">
+                                                <motion.div
+                                                    className="absolute inset-0 border border-white/5 z-10 transition-colors duration-500 group-hover:border-white/20"
+                                                    animate={{ borderColor: activeIndex === sIdx + 1 ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.02)" }}
+                                                    transition={{ duration: 0.5 }}
                                                 />
-                                            ) : null}
-                                        </div>
-                                        <div className="flex flex-col justify-center border-b border-white/5 pb-6 w-full group-hover:border-white/10 transition-colors">
-                                            <div className="flex justify-between items-baseline mb-3">
-                                                <h3 className="font-display text-lg md:text-2xl text-white/90 group-hover:text-white transition-colors duration-300 tracking-wider">{item.name}</h3>
-                                                <span className="font-body text-[10px] md:text-xs tracking-widest text-white/40 ml-4 font-light italic" style={{ color: sIdx === displayIndex ? section.color : '' }}>{item.price}</span>
+                                                {activeIndex === sIdx + 1 && item.image ? (
+                                                    <motion.img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        initial={{ scale: 1.12, opacity: 0 }}
+                                                        animate={{ scale: 1, opacity: 1 }}
+                                                        transition={{ duration: 0.8, delay: iIdx * 0.06, ease: [0.19, 1, 0.22, 1] }}
+                                                        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                                                    />
+                                                ) : null}
                                             </div>
-                                            <p className="font-body text-[10px] md:text-xs text-white/40 leading-relaxed font-light tracking-[0.1em] uppercase italic group-hover:text-white/60 transition-colors">{item.description}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                            <div className="flex flex-col justify-center border-b border-white/5 pb-6 w-full group-hover:border-white/10 transition-colors">
+                                                <div className="flex justify-between items-baseline mb-3">
+                                                    <h3 className="font-display text-base sm:text-lg md:text-2xl text-white/90 group-hover:text-white transition-colors duration-300 tracking-wider leading-tight">{item.name}</h3>
+                                                    <span className="font-body text-[10px] md:text-xs tracking-widest text-white/40 ml-4 font-light italic" style={{ color: sIdx === displayIndex ? section.color : '' }}>{item.price}</span>
+                                                </div>
+                                                <p className="font-body text-[9px] sm:text-[10px] md:text-xs text-white/40 leading-relaxed font-light tracking-[0.08em] md:tracking-[0.1em] uppercase italic group-hover:text-white/60 transition-colors">{item.description}</p>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
                             </div>
+                            
+                            {sIdx === menuData.length - 1 && (
+                                <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
+                                    <Footer embedded />
+                                </div>
+                            )}
                         </div>
                     ))}
-                    
-                    {/* Footer — bottom half; desserts remain in top half */}
-                    <div className="h-[50vh] w-full shrink-0 overflow-hidden">
-                        <Footer embedded />
-                    </div>
                 </div>
 
                 {/* Navigation Controls - Spanning Full Page on the Right */}
-                <div className="absolute right-4 md:right-8 top-0 bottom-0 z-50 flex flex-col justify-between py-32 pointer-events-none">
+                <div className="hidden md:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
                     <button 
                         onClick={prevSection}
                         disabled={activeIndex === 0}
@@ -217,7 +318,7 @@ export default function Menu() {
                     </button>
                     <button 
                         onClick={nextSection}
-                        disabled={isFooter}
+                        disabled={activeIndex === maxSectionIndex}
                         className="group flex items-end justify-center text-white/10 hover:text-white transition-all duration-700 disabled:opacity-0 cursor-pointer pointer-events-auto h-[30vh]"
                     >
                         <svg 
@@ -230,6 +331,32 @@ export default function Menu() {
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 0V196M12 196L5 189M12 196L19 189" />
                         </svg>
+                    </button>
+                </div>
+
+                <div className="md:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
+                    <button
+                        type="button"
+                        onClick={prevSection}
+                        disabled={activeIndex === 0}
+                        className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
+                        aria-label="Previous menu section"
+                    >
+                        <span className="text-2xl leading-none">↑</span>
+                    </button>
+                    <div className="pointer-events-auto min-w-0 flex-1 rounded-full border border-white/10 bg-black/45 px-4 py-3 text-center backdrop-blur-md">
+                        <p className="truncate font-body text-[10px] uppercase tracking-[0.28em] text-white/55">
+                            {isIntroActive ? "Menu" : currentSection.title}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={nextSection}
+                        disabled={activeIndex === maxSectionIndex}
+                        className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
+                        aria-label="Next menu section"
+                    >
+                        <span className="text-2xl leading-none">↓</span>
                     </button>
                 </div>
             </div>

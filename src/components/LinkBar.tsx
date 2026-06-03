@@ -1,33 +1,37 @@
 import { Link } from 'react-router';
+import { motion } from 'framer-motion';
+import { useUI } from '../context/UIContext';
 
 export default function LinkBar() {
-    const links = {
-        "Home": "/",
-        "Menu": "/menu",
-        "About": "/",
-    }
+    const { isMobile } = useUI();
+    const links = [
+        { name: "Home", url: "/" },
+        { name: "Menu", url: "/menu" },
+        { name: "About", url: "/about" },
+        { name: "Contact", url: "/contact" },
+    ];
 
     return (
-        <div className="flex justify-center items-center gap-6 py-10">
-            {Object.entries(links).map(([name, url]) => (
-                <div key={name} className="flex items-center gap-6">
-                    <Link 
-                        to={url} 
-                        className="inline-block text-7xl font-display text-[var(--color-theme-secondary)] transition-all duration-500 ease-out hover:text-[var(--color-theme-primary)] hover:scale-110"
+        <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-4 sm:gap-5 md:gap-8 py-6 md:py-10 px-4">
+            {links.map((link, index) => (
+                <div key={link.name} className="flex items-center gap-4 sm:gap-5 md:gap-8">
+                    <motion.div
+                        whileHover={!isMobile ? { scale: 1.08 } : undefined}
+                        whileTap={{ scale: 0.94 }}
+                        transition={{ type: "spring", stiffness: 150, damping: 30 }}
                     >
-                        {name}
-                    </Link>
-                    <span className="w-2 h-2 bg-[var(--color-theme-primary)] rounded-full transition-colors duration-500"></span>
+                        <Link 
+                            to={link.url} 
+                            className="inline-block text-4xl sm:text-5xl md:text-7xl font-display text-[var(--color-theme-secondary)] transition-colors duration-500 ease-out hover:text-[var(--color-theme-primary)] whitespace-nowrap leading-none"
+                        >
+                            {link.name}
+                        </Link>
+                    </motion.div>
+                    {index < links.length - 1 && (
+                        <span className="hidden sm:block w-1.5 h-1.5 md:w-2 md:h-2 bg-[var(--color-theme-primary)] rounded-full transition-colors duration-500 shrink-0"></span>
+                    )}
                 </div>
             ))}
-            <div className="flex items-center gap-6">
-                <Link
-                    to="/"
-                    className="inline-block text-7xl font-display text-[var(--color-theme-secondary)] transition-all duration-500 ease-out hover:text-[var(--color-theme-primary)] hover:scale-110"
-                >
-                    Contact
-                </Link>
-            </div>
         </div>
     );
 }
