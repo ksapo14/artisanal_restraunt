@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useUI } from "../context/UIContext";
+import { sendContactEmail, isResendConfigured } from "../api/emailService";
 import "../index.css";
 import bgImg from '../assets/artisanal_full_restraunt_pic.jpg';
 
@@ -16,7 +17,13 @@ const sectionConfig = [
 export default function Contact() {
     const { isSiteMapOpen, isMobile } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
-    const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success">("idle");
+    const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        message: ""
+    });
 
     const isNavigating = useRef(false);
     const activeIndexRef = useRef(activeIndex);
@@ -72,10 +79,31 @@ export default function Contact() {
         };
     }, [navigateSection]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!isResendConfigured) {
+            setErrorMessage("Email service is not configured. Please contact the administrator.");
+            setFormStatus("error");
+            return;
+        }
+
         setFormStatus("submitting");
-        setTimeout(() => setFormStatus("success"), 1500);
+        setErrorMessage("");
+
+        try {
+            await sendContactEmail(formData);
+            setFormStatus("success");
+            setFormData({ name: "", email: "", message: "" });
+        } catch (err: any) {
+            setErrorMessage(err.message || "Failed to send message. Please try again later.");
+            setFormStatus("error");
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const currentTheme = sectionConfig[activeIndex];
@@ -93,20 +121,19 @@ export default function Contact() {
             } as React.CSSProperties}
         >
             {/* Seamless Static Gradient Background */}
-            <div 
+            <div
                 className="fixed inset-0 -z-10"
-                style={{ 
+                style={{
                     background: `linear-gradient(135deg, #1c170a 0%, #1c170a 40%, #1a0f0f 100%)`,
                     filter: 'brightness(1.2)'
                 }}
             />
 
             <div
-                className={`relative transition-all duration-700 ease-out ${
-                    activeIndex > 0 && !isSiteMapOpen
+                className={`relative transition-all duration-700 ease-out ${activeIndex > 0 && !isSiteMapOpen
                         ? "opacity-0 pointer-events-none -translate-y-10 z-0"
                         : "opacity-100 pointer-events-auto translate-y-0 z-[1000]"
-                }`}
+                    }`}
             >
                 <Navbar compactMobile />
             </div>
@@ -127,52 +154,77 @@ export default function Contact() {
                             >
                                 <h1 className="text-4xl sm:text-5xl font-display text-[var(--color-theme-primary)] mb-3 md:mb-4">Contact Us</h1>
                                 <p className="text-sm sm:text-base md:text-lg text-white/60 mb-6 md:mb-8 font-body italic">We'd love to hear from you. Please reach out with any inquiries.</p>
-                                
+
                                 {formStatus === "success" ? (
-                                    <motion.div 
+                                    <motion.div
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         className="bg-white/5 border border-[var(--color-theme-primary)] p-6 md:p-8 rounded-lg text-center"
                                     >
                                         <h3 className="text-2xl font-display text-[var(--color-theme-primary)] mb-2">Message Received</h3>
-                                        <p className="text-white/60 font-body">Thank you for reaching out. Our team will get back to you shortly.</p>
+                                        <p className="text-white/60 font-body mb-6">Thank you for reaching out. Our team will get back to you shortly.</p>
+                                        <button
+                                            onClick={() => setFormStatus("idle")}
+                                            className="text-xs uppercase tracking-widest text-[var(--color-theme-primary)] hover:underline"
+                                        >
+                                            Send another message
+                                        </button>
                                     </motion.div>
                                 ) : (
                                     <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                                         <div className="space-y-2">
                                             <label className="block text-xs md:text-sm font-body uppercase tracking-widest text-[var(--color-theme-primary)] opacity-80">Full Name</label>
-                                            <input 
+                                            <input
                                                 required
-                                                type="text" 
+                                                type="text"
+                                                name="name"
+                                                value={formData.name}
+                                                onChange={handleChange}
                                                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[var(--color-theme-primary)] transition-colors font-body text-sm md:text-base"
                                                 placeholder="John Doe"
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="block text-xs md:text-sm font-body uppercase tracking-widest text-[var(--color-theme-primary)] opacity-80">Email Address</label>
-                                            <input 
+                                            <input
                                                 required
-                                                type="email" 
+                                                type="email"
+                                                name="email"
+                                                value={formData.email}
+                                                onChange={handleChange}
                                                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[var(--color-theme-primary)] transition-colors font-body text-sm md:text-base"
                                                 placeholder="john@example.com"
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="block text-xs md:text-sm font-body uppercase tracking-widest text-[var(--color-theme-primary)] opacity-80">Message</label>
-                                            <textarea 
+                                            <textarea
                                                 required
                                                 rows={4}
+                                                name="message"
+                                                value={formData.message}
+                                                onChange={handleChange}
                                                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[var(--color-theme-primary)] transition-colors font-body resize-none text-sm md:text-base"
                                                 placeholder="How can we help you?"
                                             />
                                         </div>
+
+                                        {formStatus === "error" && (
+                                            <p className="text-red-400 text-sm font-body">{errorMessage}</p>
+                                        )}
+
                                         <motion.button
                                             whileHover={!isMobile ? { scale: 1.02 } : undefined}
                                             whileTap={{ scale: 0.96 }}
                                             disabled={formStatus === "submitting"}
-                                            className="w-full py-3 md:py-4 bg-[var(--color-theme-primary)] text-black font-display text-lg md:text-xl rounded-lg hover:brightness-110 transition-all duration-300 tracking-wider uppercase disabled:opacity-50"
+                                            className="w-full py-3 md:py-4 bg-[var(--color-theme-primary)] text-black font-display text-lg md:text-xl rounded-lg hover:brightness-110 transition-all duration-300 tracking-wider uppercase disabled:opacity-50 flex items-center justify-center gap-3"
                                         >
-                                            {formStatus === "submitting" ? "Sending..." : "Send Message"}
+                                            {formStatus === "submitting" ? (
+                                                <>
+                                                    <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                                                    Sending...
+                                                </>
+                                            ) : "Send Message"}
                                         </motion.button>
                                     </form>
                                 )}
@@ -185,9 +237,9 @@ export default function Contact() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="relative rounded-lg overflow-hidden border border-white/5 aspect-[4/5] hidden md:block"
                             >
-                                <img 
-                                    src={bgImg} 
-                                    alt="Artisanal Atmosphere" 
+                                <img
+                                    src={bgImg}
+                                    alt="Artisanal Atmosphere"
                                     className="w-full h-full object-cover grayscale brightness-75 hover:grayscale-0 hover:brightness-100 transition-all duration-1000"
                                 />
                             </motion.div>
@@ -198,7 +250,7 @@ export default function Contact() {
                     <div className="h-[100svh] md:h-screen w-screen relative overflow-y-auto md:overflow-visible bg-transparent">
                         <div className="min-h-full md:h-full w-full flex flex-col justify-center items-center px-5 sm:px-8 md:px-16 pt-24 md:pt-0 pb-40 md:pb-20">
                             <div className="max-w-6xl w-full flex flex-col gap-6">
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.8 }}
@@ -225,7 +277,7 @@ export default function Contact() {
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Absolutely positioned footer */}
                         <div className="absolute bottom-16 md:bottom-8 left-0 w-full z-20 pointer-events-auto">
                             <Footer embedded />
@@ -240,9 +292,8 @@ export default function Contact() {
                     <button
                         key={i}
                         onClick={() => setActiveIndex(i)}
-                        className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                            activeIndex === i ? "bg-[var(--color-theme-primary)] scale-150" : "bg-white/20 hover:bg-white/40"
-                        }`}
+                        className={`w-2 h-2 rounded-full transition-all duration-500 ${activeIndex === i ? "bg-[var(--color-theme-primary)] scale-150" : "bg-white/20 hover:bg-white/40"
+                            }`}
                         title={`Go to section ${i}`}
                     />
                 ))}
@@ -255,11 +306,10 @@ export default function Contact() {
                         type="button"
                         onClick={() => setActiveIndex(i)}
                         whileTap={{ scale: 0.95 }}
-                        className={`rounded-full border px-4 py-3 font-body text-[10px] uppercase tracking-[0.24em] backdrop-blur-md transition-all duration-300 ${
-                            activeIndex === i
+                        className={`rounded-full border px-4 py-3 font-body text-[10px] uppercase tracking-[0.24em] backdrop-blur-md transition-all duration-300 ${activeIndex === i
                                 ? "border-[var(--color-theme-primary)] bg-[var(--color-theme-primary)] text-black"
                                 : "border-white/15 bg-black/45 text-white/65"
-                        }`}
+                            }`}
                     >
                         {label}
                     </motion.button>

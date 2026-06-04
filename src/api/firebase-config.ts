@@ -8,7 +8,7 @@ import { getStorage } from "firebase/storage";
 import type { FirebaseStorage } from "firebase/storage";
 
 function readApiKey(): string | undefined {
-    const raw = import.meta.env.VITE_FIREBASE_API_KEY ?? import.meta.env.FIREBASE_API_KEY;
+    const raw = import.meta.env.VITE_FIREBASE_API_KEY ?? import.meta.env.VITE_FIREBASE_API_KEY;
     if (typeof raw !== "string") return undefined;
     return raw.replace(/^["']|["']$/g, "").trim() || undefined;
 }
