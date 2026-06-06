@@ -29,7 +29,7 @@ const sectionConfig = [
 
 export default function About() {
     const location = useLocation();
-    const { isSiteMapOpen, isMobile } = useUI();
+    const { isSiteMapOpen } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
     const [ownerOpen, setOwnerOpen] = useState<number | null>(0); // Default first one open
 
@@ -76,16 +76,18 @@ export default function About() {
     useEffect(() => {
         const onWheel = (e: WheelEvent) => {
             e.preventDefault();
-            if (Math.abs(e.deltaY) < 30) return;
-            if (e.deltaY > 0) navigateSection("next");
+            // Use deltaY primarily but also deltaX for trackpad horizontal scrolls
+            const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            if (Math.abs(delta) < 30) return;
+            if (delta > 0) navigateSection("next");
             else navigateSection("prev");
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "ArrowDown" || e.key === "PageDown") {
+            if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === "ArrowRight") {
                 e.preventDefault();
                 navigateSection("next");
-            } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+            } else if (e.key === "ArrowUp" || e.key === "PageUp" || e.key === "ArrowLeft") {
                 e.preventDefault();
                 navigateSection("prev");
             }
@@ -115,20 +117,18 @@ export default function About() {
 
     const currentTheme = sectionConfig[activeIndex];
 
-    const themeStyles = {
-        '--color-theme-primary': currentTheme.primary,
-        '--color-theme-secondary': currentTheme.secondary,
-        '--color-theme-bg': currentTheme.bg,
-    } as React.CSSProperties;
-
     return (
         <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ 
+                opacity: 1,
+                '--color-theme-primary': currentTheme.primary,
+                '--color-theme-secondary': currentTheme.secondary,
+                '--color-theme-bg': currentTheme.bg,
+            } as any}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
+            transition={{ duration: 1, ease: "easeInOut" }}
             className="h-screen w-screen overflow-hidden flex flex-col relative"
-            style={themeStyles}
         >
             {/* Ambient Background Elements — Minimalistic approach, no glows */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden -z-5">
@@ -157,9 +157,9 @@ export default function About() {
             </div>
 
             <div
-                className="fixed inset-0 -z-10 transition-all duration-1000 ease-in-out"
+                className="fixed inset-0 -z-10"
                 style={{
-                    background: currentTheme.bg,
+                    background: 'var(--color-theme-bg)',
                     filter: 'brightness(1.2)'
                 }}
             />
@@ -176,11 +176,11 @@ export default function About() {
 
             <div className="flex-1 relative overflow-hidden">
                 <div
-                    className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19, 1, 0.22, 1)]"
-                    style={{ transform: `translateY(-${activeIndex * 100}%)` }}
+                    className="h-full w-full flex transition-all duration-1000 ease-[cubic-bezier(0.19, 1, 0.22, 1)]"
+                    style={{ transform: `translateX(-${activeIndex * 100}%)` }}
                 >
                     {/* Section 0: Hero */}
-                    <div className="h-screen w-screen flex justify-center items-center relative">
+                    <div className="h-screen w-screen shrink-0 flex justify-center items-center relative">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -188,70 +188,75 @@ export default function About() {
                             className="relative"
                         >
                             <motion.div
-                                animate={{ y: [0, -15, 0] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                animate={{ 
+                                    y: [0, -15, 0],
+                                    rotate: [0, 5, -5, 0]
+                                }}
+                                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                                 className="relative z-10"
                             >
-                                <img src={logoNoBg} alt="Artisanal" className="h-64 w-64 object-contain" />
+                                <img src={logoNoBg} alt="Artisanal" className="h-64 w-64 object-contain drop-shadow-[0_0_30px_rgba(var(--color-theme-primary),0.2)]" />
                             </motion.div>
-
-                            <motion.p
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 1, delay: 0.8 }}
-                                className="text-center text-[var(--color-theme-primary)] font-display text-lg mt-8 tracking-widest"
-                            >
-                                scroll to explore
-                            </motion.p>
                         </motion.div>
                     </div>
 
                     {/* Section 1: About */}
-                    <div className="h-screen w-screen flex justify-center items-center px-8 md:px-16">
+                    <div className="h-screen w-screen shrink-0 flex justify-center items-center px-8 md:px-16">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl items-center">
                             <motion.div
-                                initial={{ opacity: 0, x: -40 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.8 }}
+                                initial={{ opacity: 0, x: -60, rotate: -2 }}
+                                whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+                                transition={{ duration: 1, ease: "easeOut" }}
                                 viewport={{ once: true }}
                                 className="rounded-lg overflow-hidden relative group"
                             >
                                 <motion.img
                                     src={bgImg}
                                     alt="Restaurant"
-                                    className="w-full h-auto rounded-lg relative z-10 border border-white/5"
-                                    whileHover={!isMobile ? { scale: 1.05 } : undefined}
-                                    whileTap={isMobile ? { scale: 0.98 } : undefined}
-                                    transition={{ duration: 0.6 }}
+                                    className="w-full h-auto rounded-lg relative z-10 border border-white/10"
+                                    whileHover={{ scale: 1.02 }}
+                                    transition={{ duration: 0.8 }}
                                 />
+                                <div className="absolute inset-0 bg-[var(--color-theme-primary)]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-20 pointer-events-none" />
                             </motion.div>
 
                             <motion.div
-                                initial={{ opacity: 0, x: 40 }}
+                                initial={{ opacity: 0, x: 60 }}
                                 whileInView={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.8 }}
+                                transition={{ duration: 1, delay: 0.2 }}
                                 viewport={{ once: true }}
                             >
                                 <motion.h2
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8, delay: 0.4 }}
                                     className="text-5xl font-display text-[var(--color-theme-primary)] mb-6"
                                 >
                                     About Artisanal
                                 </motion.h2>
-                                <p className="text-lg text-[var(--color-theme-secondary)] leading-relaxed">
+                                <motion.p 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8, delay: 0.6 }}
+                                    className="text-lg text-[var(--color-theme-secondary)] leading-relaxed"
+                                >
                                     Artisanal represents a commitment to culinary excellence and authentic hospitality.
                                     Since our founding, we've dedicated ourselves to sourcing the finest ingredients and
                                     employing time-honored techniques that elevate every dish. Our chefs work with passion
                                     and precision, creating not just meals, but memorable experiences that celebrate the
                                     art of fine dining. We believe exceptional food brings people together.
-                                </p>
+                                </motion.p>
                             </motion.div>
                         </div>
                     </div>
 
                     {/* Section 2: Owners */}
-                    <div className="h-screen w-screen flex justify-center items-center px-8 md:px-16">
+                    <div className="h-screen w-screen shrink-0 flex justify-center items-center px-8 md:px-16">
                         <div className="max-w-4xl w-full">
                             <motion.h2
+                                initial={{ opacity: 0, y: -20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8 }}
                                 className="text-5xl font-display text-[var(--color-theme-primary)] mb-12 text-center"
                             >
                                 Our Founders
@@ -260,26 +265,39 @@ export default function About() {
                                 {owners.map((owner, idx) => (
                                     <motion.div
                                         key={idx}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.8, delay: idx * 0.2 }}
+                                        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                                        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                                        transition={{ duration: 0.7, delay: idx * 0.2 }}
                                         viewport={{ once: true }}
                                         className="border border-[var(--color-theme-primary)]/20 rounded-lg overflow-hidden relative group"
                                     >
                                         <motion.button
                                             onClick={() => toggleOwner(idx)}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="w-full p-6 bg-transparent hover:bg-white/5 transition-colors duration-300 text-left relative z-10"
+                                            whileHover={{ backgroundColor: "rgba(255,255,255,0.03)" }}
+                                            className="w-full p-6 bg-transparent transition-colors duration-500 text-left relative z-10"
                                         >
                                             <div className="flex items-center gap-6">
-                                                <motion.img
-                                                    src={owner.image}
-                                                    alt={owner.name}
-                                                    className="h-20 w-20 rounded-full object-cover border border-[var(--color-theme-primary)]/30"
-                                                    animate={{
-                                                        scale: ownerOpen === idx ? 1.05 : 1
-                                                    }}
-                                                />
+                                                <div className="relative">
+                                                    <motion.img
+                                                        src={owner.image}
+                                                        alt={owner.name}
+                                                        className="h-20 w-20 rounded-full object-cover border border-[var(--color-theme-primary)]/30 relative z-10"
+                                                        animate={{
+                                                            y: [0, -5, 0],
+                                                            rotate: idx % 2 === 0 ? [0, 5, 0] : [0, -5, 0]
+                                                        }}
+                                                        transition={{
+                                                            duration: 4 + idx,
+                                                            repeat: Infinity,
+                                                            ease: "easeInOut"
+                                                        }}
+                                                    />
+                                                    <motion.div 
+                                                        className="absolute inset-0 bg-[var(--color-theme-primary)]/20 blur-xl rounded-full -z-1"
+                                                        animate={{ scale: [1, 1.2, 1] }}
+                                                        transition={{ duration: 3, repeat: Infinity }}
+                                                    />
+                                                </div>
                                                 <div className="flex-1">
                                                     <h3 className="text-2xl font-display text-[var(--color-theme-secondary)]">{owner.name}</h3>
                                                     <p className="text-sm text-[var(--color-theme-primary)] font-body tracking-wider uppercase opacity-60">
@@ -287,7 +305,10 @@ export default function About() {
                                                     </p>
                                                 </div>
                                                 <motion.span
-                                                    animate={{ rotate: ownerOpen === idx ? 45 : 0 }}
+                                                    animate={{ 
+                                                        rotate: ownerOpen === idx ? 45 : 0,
+                                                        scale: ownerOpen === idx ? 1.2 : 1
+                                                    }}
                                                     className="text-[var(--color-theme-primary)] text-2xl"
                                                 >
                                                     +
@@ -301,14 +322,14 @@ export default function About() {
                                                 height: ownerOpen === idx ? "auto" : 0,
                                                 opacity: ownerOpen === idx ? 1 : 0
                                             }}
-                                            transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+                                            transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
                                             className="overflow-hidden relative z-10"
                                         >
-                                            <div className="px-8 pb-8 bg-white/5 text-[var(--color-theme-secondary)] border-t border-[var(--color-theme-primary)]/10">
+                                            <div className="px-8 pb-8 bg-white/2 text-[var(--color-theme-secondary)] border-t border-[var(--color-theme-primary)]/10">
                                                 <motion.p
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: 0.2 }}
+                                                    initial={{ opacity: 0, x: -10 }}
+                                                    animate={ownerOpen === idx ? { opacity: 1, x: 0 } : {}}
+                                                    transition={{ delay: 0.3 }}
                                                     className="text-lg leading-relaxed font-body pt-6"
                                                 >
                                                     {owner.bio}
@@ -322,41 +343,50 @@ export default function About() {
                     </div>
 
                     {/* Section 3: Community */}
-                    <div className="h-screen w-screen relative flex justify-center items-center px-8 md:px-16 pb-40 md:pb-20">
+                    <div className="h-screen w-screen shrink-0 relative flex justify-center items-center px-8 md:px-16 pb-40 md:pb-20">
                         <div className="max-w-5xl w-full">
                             <motion.h2
+                                initial={{ opacity: 0, y: -20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8 }}
                                 className="text-5xl font-display text-[var(--color-theme-primary)] mb-6 text-center"
                             >
                                 Local Giving
                             </motion.h2>
-                            <p className="text-center text-[var(--color-theme-secondary)] mb-16 text-lg max-w-2xl mx-auto">
+                            <motion.p 
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                transition={{ duration: 1, delay: 0.3 }}
+                                className="text-center text-[var(--color-theme-secondary)] mb-16 text-lg max-w-2xl mx-auto"
+                            >
                                 We believe in giving back to the community that supports us. A portion of our proceeds
                                 goes to local nonprofits dedicated to food security and education.
-                            </p>
+                            </motion.p>
 
                             <div className="relative h-96 max-w-3xl mx-auto flex items-center justify-center">
                                 {/* Left image */}
                                 <motion.div
-                                    initial={{ opacity: 0, x: -60, y: 40 }}
-                                    whileInView={{ opacity: 1, x: 0, y: 0 }}
-                                    transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
+                                    initial={{ opacity: 0, x: -100, rotate: -10 }}
+                                    whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+                                    transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
                                     viewport={{ once: true }}
                                     className="absolute left-0 bottom-12 w-64 h-64 flex items-center justify-center z-10"
                                 >
                                     <motion.img
                                         src={giving1}
                                         alt="Local Partner 1"
-                                        className="max-w-full max-h-full object-contain brightness-90 hover:brightness-100 transition-all duration-700"
-                                        whileHover={!isMobile ? { scale: 1.1 } : undefined}
-                                        whileTap={isMobile ? { scale: 0.95 } : undefined}
+                                        className="max-w-full max-h-full object-contain brightness-90"
+                                        animate={{ y: [0, -10, 0] }}
+                                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                                        whileHover={{ scale: 1.1, filter: "brightness(1)" }}
                                     />
                                 </motion.div>
 
-                                {/* Center image (Offset vertically and overlaps others) */}
+                                {/* Center image */}
                                 <motion.div
-                                    initial={{ opacity: 0, y: 80 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 1, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
+                                    initial={{ opacity: 0, y: 100, scale: 0.8 }}
+                                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                    transition={{ duration: 1.2, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
                                     viewport={{ once: true }}
                                     className="absolute left-1/2 top-0 -translate-x-1/2 w-72 h-72 flex items-center justify-center z-20"
                                 >
@@ -364,25 +394,27 @@ export default function About() {
                                         src={giving2}
                                         alt="Local Partner 2"
                                         className="max-w-full max-h-full object-contain"
-                                        whileHover={!isMobile ? { scale: 1.1 } : undefined}
-                                        whileTap={isMobile ? { scale: 0.95 } : undefined}
+                                        animate={{ y: [0, 15, 0] }}
+                                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                                        whileHover={{ scale: 1.1 }}
                                     />
                                 </motion.div>
 
                                 {/* Right image */}
                                 <motion.div
-                                    initial={{ opacity: 0, x: 60, y: 40 }}
-                                    whileInView={{ opacity: 1, x: 0, y: 0 }}
-                                    transition={{ duration: 1, delay: 0.4, ease: [0.19, 1, 0.22, 1] }}
+                                    initial={{ opacity: 0, x: 100, rotate: 10 }}
+                                    whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+                                    transition={{ duration: 1.2, delay: 0.4, ease: [0.19, 1, 0.22, 1] }}
                                     viewport={{ once: true }}
                                     className="absolute right-0 bottom-12 w-64 h-64 flex items-center justify-center z-10"
                                 >
                                     <motion.img
                                         src={giving3}
                                         alt="Local Partner 3"
-                                        className="max-w-full max-h-full object-contain brightness-90 hover:brightness-100 transition-all duration-700"
-                                        whileHover={!isMobile ? { scale: 1.1 } : undefined}
-                                        whileTap={isMobile ? { scale: 0.95 } : undefined}
+                                        className="max-w-full max-h-full object-contain brightness-90"
+                                        animate={{ y: [0, -12, 0] }}
+                                        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+                                        whileHover={{ scale: 1.1, filter: "brightness(1)" }}
                                     />
                                 </motion.div>
                             </div>
@@ -396,7 +428,7 @@ export default function About() {
             </div>
 
             {/* Navigation Dots */}
-            <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex-col gap-4">
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-4">
                 {[...Array(MAX_SECTION_INDEX + 1)].map((_, i) => (
                     <motion.button
                         key={i}
@@ -411,19 +443,19 @@ export default function About() {
             </div>
 
             {/* Scroll indicator */}
-            <div className="absolute bottom-24 md:bottom-8 left-1/2 transform -translate-x-1/2 z-40">
+            <div className="fixed right-8 top-1/2 -translate-y-1/2 z-40 hidden md:block">
                 <motion.div
-                    animate={{ y: [0, 8, 0] }}
+                    animate={{ x: [0, 8, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
                     className={`${activeIndex === MAX_SECTION_INDEX ? 'opacity-0 pointer-events-none' : 'opacity-100'} transition-opacity duration-500`}
                 >
                     <svg
-                        className="w-6 h-6 text-[var(--color-theme-primary)]"
+                        className="w-8 h-8 text-[var(--color-theme-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                 </motion.div>
             </div>

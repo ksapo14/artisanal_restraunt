@@ -21,4 +21,16 @@ body {
   scroll-behavior: smooth;
   background-color: #1a0f0f;
   margin: 0;
+  /* Disable text selection by default for a more "app-like" feel */
+  user-select: none;
+}
+
+/* Allow selection for headings, paragraphs, and descriptions */
+h1, h2, h3, h4, h5, h6, p, span, blockquote, li {
+  user-select: text;
+}
+
+/* Explicitly disable selection for links, buttons, and nav elements */
+a, button, nav, .navbar, .footer {
+  user-select: none;
 }
