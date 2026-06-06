@@ -31,6 +31,7 @@ export default function Admin() {
     const [saving, setSaving] = useState(false);
     const [status, setStatus] = useState<string | null>(null);
     const [uploadingId, setUploadingId] = useState<string | null>(null);
+    const [uploadProgress, setUploadProgress] = useState<number>(0);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [menuPublished, setMenuPublished] = useState(true);
 
@@ -133,15 +134,19 @@ export default function Admin() {
 
     const handleImageUpload = async (sectionId: string, itemId: string, file: File) => {
         setUploadingId(itemId);
+        setUploadProgress(0);
         setStatus(null);
         try {
-            const url = await uploadMenuImage(file, itemId);
+            const url = await uploadMenuImage(file, itemId, (progress) => {
+                setUploadProgress(Math.round(progress));
+            });
             updateItem(sectionId, itemId, { image: url });
-            setStatus("Image uploaded.");
+            setStatus("Image uploaded successfully.");
         } catch (err) {
             setStatus(err instanceof Error ? err.message : "Image upload failed");
         } finally {
             setUploadingId(null);
+            setUploadProgress(0);
         }
     };
 
@@ -417,7 +422,7 @@ export default function Admin() {
                                                             : "cursor-pointer"
                                                     }`}
                                                 >
-                                                    {uploadingId === item.id ? "Uploading…" : "Choose a file"}
+                                                    {uploadingId === item.id ? `Uploading ${uploadProgress}%…` : "Choose a file"}
                                                 </label>
                                             </div>
                                         </div>
