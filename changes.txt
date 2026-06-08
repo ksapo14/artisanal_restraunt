@@ -1,0 +1,25 @@
+About Page Redesign - Changes Description
+
+1. Navigation Overhaul:
+   - Replaced the horizontal slider with a vertical section-based navigation system.
+   - Synchronized the UX with the Menu page by implementing wheel-based and keyboard-based scrolling.
+   - Added a side navigation indicator (line with dots) on the left for quick jumps between sections.
+   - Added large vertical navigation arrows on the right for a consistent desktop experience.
+   - Implemented a mobile-friendly bottom navigation bar with section indicators.
+
+2. Visual & Theme Updates:
+   - Implemented section-specific themes (primary, secondary, and background colors) that transition smoothly.
+   - Aligned the color palette with the Homepage and Menu page for a cohesive brand identity.
+   - Added "lively but controlled" animations using Framer Motion (blur, opacity, and translate transitions).
+   - Replaced static layouts with a minimalist, high-end grid and flex system.
+
+3. Content Refinement:
+   - Structured the page into four distinct chapters: Artisanal (Hero), Philosophy, Founders, and Community.
+   - Removed the logo from the Hero section for a more minimalist, typographic introduction.
+   - Restored high-quality imagery to the Philosophy and Community sections to balance minimalist text with visual storytelling.
+   - Improved readability with clear font-display (Cormorant) and font-body (Poppins) hierarchy.
+
+4. Functionality & Accessibility:
+   - Maintained full responsiveness across mobile, tablet, and desktop.
+   - Added ARIA labels to navigation elements.
+   - Ensured smooth section snapping and navigation debouncing to prevent accidental skips.

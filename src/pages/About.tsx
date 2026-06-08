@@ -1,38 +1,63 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
-import { useLocation } from "react-router";
+import { motion, AnimatePresence } from "framer-motion";
+import type { Variants } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useUI } from "../context/UIContext";
 import "../index.css";
+
+// Assets
 import logoNoBg from '../assets/artisanal_logo_high_res_nobg.jpeg';
-import bgImg from '../assets/artisanal_full_restraunt_pic.jpg';
+import bgImg1 from '../assets/artisanal_full_restraunt_pic.jpg';
+import bgImg2 from '../assets/restraunt_2.png';
+import bgImg3 from '../assets/restraunt_3.png';
 import giving1 from '../assets/giving_1_nobg.png';
 import giving2 from '../assets/giving_2_nobg.png';
 import giving3 from '../assets/giving_3_nobg.png';
 
-const MAX_SECTION_INDEX = 3;
-
-const SECTION_MAP: Record<string, number> = {
-    "#hero": 0,
-    "#about": 1,
-    "#founders": 2,
-    "#community": 3,
-};
-
-const sectionConfig = [
-    { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" }, // Hero
-    { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" }, // About
-    { bg: "#1b1412", primary: "#a68a7b", secondary: "#f5f0ed" }, // Owners
-    { bg: "#1a0f0f", primary: "#d48888", secondary: "#f5f0ed" }, // Community
+const sections = [
+    {
+        id: "hero",
+        title: "Artisanal",
+        subtitle: "Since 2014",
+        theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" }
+    },
+    {
+        id: "philosophy",
+        title: "Philosophy",
+        content: "We believe in the integrity of ingredients and the precision of craft. Our kitchen is a laboratory of tradition, where age-old techniques meet modern sensibilities to create something truly timeless.",
+        image: bgImg2,
+        theme: { bg: "#1b1412", primary: "#a68a7b", secondary: "#f5f0ed" }
+    },
+    {
+        id: "founders",
+        title: "Founders",
+        owners: [
+            { 
+                name: "Chef Marcus Chen", 
+                role: "Executive Chef",
+                bio: "With over 20 years of culinary expertise, Marcus has trained under Michelin-starred chefs across Europe and Asia. His passion for artisanal techniques drives our vision." 
+            },
+            { 
+                name: "Sophie Durand", 
+                role: "Maître d'Hôtel",
+                bio: "Sophie ensures every guest experience is thoughtfully curated. A true believer in service excellence and building lasting community partnerships." 
+            }
+        ],
+        theme: { bg: "#1a0f0f", primary: "#d48888", secondary: "#f5f0ed" }
+    },
+    {
+        id: "community",
+        title: "Community",
+        content: "Artisanal is more than a restaurant; it's a member of the community. We partner with local farmers, support urban gardens, and contribute to food security initiatives across the region.",
+        images: [giving1, giving2, giving3],
+        theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" }
+    }
 ];
 
 export default function About() {
-    const location = useLocation();
-    const { isSiteMapOpen } = useUI();
+    const { isMobile, isSiteMapOpen } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
-    const [ownerOpen, setOwnerOpen] = useState<number | null>(0); // Default first one open
-
     const isNavigating = useRef(false);
     const activeIndexRef = useRef(activeIndex);
 
@@ -40,424 +65,237 @@ export default function About() {
         activeIndexRef.current = activeIndex;
     }, [activeIndex]);
 
-    // Handle hash routing
-    useEffect(() => {
-        if (location.hash && SECTION_MAP[location.hash] !== undefined) {
-            setActiveIndex(SECTION_MAP[location.hash]);
-        }
-    }, [location.hash]);
+    const navigateSection = useCallback((direction: "next" | "prev" | number) => {
+        if (isNavigating.current) return;
 
-    const navigateSection = useCallback(
-        (direction: "next" | "prev") => {
-            if (isNavigating.current) return;
-
+        let next: number;
+        if (typeof direction === "number") {
+            next = direction;
+        } else {
             const prev = activeIndexRef.current;
-            const next = direction === "next" ? prev + 1 : prev - 1;
-            if (next < 0 || next > MAX_SECTION_INDEX) return;
+            next = direction === "next" ? prev + 1 : prev - 1;
+        }
 
-            isNavigating.current = true;
-            window.setTimeout(() => {
-                isNavigating.current = false;
-            }, 1000);
+        if (next < 0 || next >= sections.length) return;
 
-            setActiveIndex(next);
-        },
-        []
-    );
-
-    const toggleOwner = (index: number) => {
-        setOwnerOpen(ownerOpen === index ? null : index);
-    };
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
+        isNavigating.current = true;
+        setActiveIndex(next);
+        setTimeout(() => { isNavigating.current = false; }, 1000);
     }, []);
 
     useEffect(() => {
-        const onWheel = (e: WheelEvent) => {
+        const handleWheel = (e: WheelEvent) => {
+            if (isSiteMapOpen) return;
             e.preventDefault();
-            // Use deltaY primarily but also deltaX for trackpad horizontal scrolls
-            const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-            if (Math.abs(delta) < 30) return;
-            if (delta > 0) navigateSection("next");
+            if (Math.abs(e.deltaY) < 30) return;
+            if (e.deltaY > 0) navigateSection("next");
             else navigateSection("prev");
         };
 
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === "ArrowRight") {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (isSiteMapOpen) return;
+            if (e.key === "ArrowDown" || e.key === "PageDown") {
                 e.preventDefault();
                 navigateSection("next");
-            } else if (e.key === "ArrowUp" || e.key === "PageUp" || e.key === "ArrowLeft") {
+            } else if (e.key === "ArrowUp" || e.key === "PageUp") {
                 e.preventDefault();
                 navigateSection("prev");
             }
         };
 
-        window.addEventListener("wheel", onWheel, { passive: false });
-        window.addEventListener("keydown", onKeyDown);
-
+        window.addEventListener("wheel", handleWheel, { passive: false });
+        window.addEventListener("keydown", handleKeyDown);
         return () => {
-            window.removeEventListener("wheel", onWheel);
-            window.removeEventListener("keydown", onKeyDown);
+            window.removeEventListener("wheel", handleWheel);
+            window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [navigateSection]);
+    }, [navigateSection, isSiteMapOpen]);
 
-    const owners = [
-        {
-            name: "Chef Marcus Chen",
-            image: logoNoBg,
-            bio: "With over 20 years of culinary expertise, Marcus has trained under Michelin-starred chefs across Europe and Asia. His passion for artisanal techniques and sustainable sourcing drives Artisanal's philosophy and vision."
+    const currentSection = sections[activeIndex];
+    const themeStyles = {
+        '--color-theme-primary': currentSection.theme.primary,
+        '--color-theme-secondary': currentSection.theme.secondary,
+        '--color-theme-bg': currentSection.theme.bg,
+    } as React.CSSProperties;
+
+    const contentVariants: Variants = {
+        hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
+        visible: { 
+            opacity: 1, 
+            y: 0, 
+            filter: "blur(0px)",
+            transition: { duration: 0.8, ease: [0.19, 1, 0.22, 1] }
         },
-        {
-            name: "Sophie Durand",
-            image: logoNoBg,
-            bio: "Bringing keen eye for hospitality and deep wine expertise, Sophie ensures every guest experience is thoughtfully curated. A true believer in service excellence and building lasting community partnerships."
+        exit: { 
+            opacity: 0, 
+            y: -30, 
+            filter: "blur(10px)",
+            transition: { duration: 0.4, ease: "easeIn" }
         }
-    ];
-
-    const currentTheme = sectionConfig[activeIndex];
+    };
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
-            animate={{ 
-                opacity: 1,
-                '--color-theme-primary': currentTheme.primary,
-                '--color-theme-secondary': currentTheme.secondary,
-                '--color-theme-bg': currentTheme.bg,
-            } as any}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1, ease: "easeInOut" }}
-            className="h-screen w-screen overflow-hidden flex flex-col relative"
+            animate={{ opacity: 1 }}
+            className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
+            style={themeStyles}
         >
-            {/* Ambient Background Elements — Minimalistic approach, no glows */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-5">
-                {[...Array(6)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute border border-[var(--color-theme-primary)]/10 rounded-full"
-                        style={{
-                            width: `${200 + i * 100}px`,
-                            height: `${200 + i * 100}px`,
-                            left: `${(i * 30) % 100}%`,
-                            top: `${(i * 25) % 100}%`,
-                        }}
-                        animate={{
-                            x: [0, 50, -50, 0],
-                            y: [0, -50, 50, 0],
-                            scale: [1, 1.2, 0.8, 1],
-                        }}
-                        transition={{
-                            duration: 15 + i * 5,
-                            repeat: Infinity,
-                            ease: "linear",
-                        }}
-                    />
-                ))}
-            </div>
-
-            <div
-                className="fixed inset-0 -z-10"
-                style={{
-                    background: 'var(--color-theme-bg)',
-                    filter: 'brightness(1.2)'
-                }}
-            />
-
-            <div
-                className={`relative transition-all duration-700 ease-out ${
-                    activeIndex > 0 && !isSiteMapOpen
-                        ? "opacity-0 pointer-events-none -translate-y-10 z-0"
-                        : "opacity-100 pointer-events-auto translate-y-0 z-[1000]"
-                }`}
-            >
+            <div className="fixed inset-0 -z-10 bg-[var(--color-theme-bg)] transition-colors duration-1000" />
+            
+            <div className={`relative transition-all duration-700 ease-out ${activeIndex > 0 && !isSiteMapOpen ? 'opacity-0 pointer-events-none -translate-y-10' : 'opacity-100'}`}>
                 <Navbar />
             </div>
 
             <div className="flex-1 relative overflow-hidden">
-                <div
-                    className="h-full w-full flex transition-all duration-1000 ease-[cubic-bezier(0.19, 1, 0.22, 1)]"
-                    style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-                >
-                    {/* Section 0: Hero */}
-                    <div className="h-screen w-screen shrink-0 flex justify-center items-center relative">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 1, delay: 0.3 }}
-                            className="relative"
-                        >
-                            <motion.div
-                                animate={{ 
-                                    y: [0, -15, 0],
-                                    rotate: [0, 5, -5, 0]
-                                }}
-                                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                                className="relative z-10"
+                {/* Side Navigation Indicator */}
+                <div className={`hidden md:flex absolute left-12 md:left-24 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${activeIndex === 0 ? "opacity-0 -translate-x-6" : "opacity-100 translate-x-0"}`}>
+                    <div className="relative h-[40vh] w-px bg-white/10">
+                        <div 
+                            className="absolute top-0 left-0 w-full transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)]"
+                            style={{ 
+                                height: `${(activeIndex / (sections.length - 1)) * 100}%`,
+                                backgroundColor: "var(--color-theme-primary)" 
+                            }}
+                        />
+                        {sections.map((section, idx) => (
+                            <button
+                                key={section.id}
+                                onClick={() => navigateSection(idx)}
+                                className={`absolute left-0 group pointer-events-auto cursor-pointer flex items-center transition-all duration-500 ${idx === activeIndex ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
+                                style={{ top: `${(idx / (sections.length - 1)) * 100}%` }}
                             >
-                                <img src={logoNoBg} alt="Artisanal" className="h-64 w-64 object-contain drop-shadow-[0_0_30px_rgba(var(--color-theme-primary),0.2)]" />
-                            </motion.div>
-                        </motion.div>
-                    </div>
-
-                    {/* Section 1: About */}
-                    <div className="h-screen w-screen shrink-0 flex justify-center items-center px-8 md:px-16">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl items-center">
-                            <motion.div
-                                initial={{ opacity: 0, x: -60, rotate: -2 }}
-                                whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-                                transition={{ duration: 1, ease: "easeOut" }}
-                                viewport={{ once: true }}
-                                className="rounded-lg overflow-hidden relative group"
-                            >
-                                <motion.img
-                                    src={bgImg}
-                                    alt="Restaurant"
-                                    className="w-full h-auto rounded-lg relative z-10 border border-white/10"
-                                    whileHover={{ scale: 1.02 }}
-                                    transition={{ duration: 0.8 }}
-                                />
-                                <div className="absolute inset-0 bg-[var(--color-theme-primary)]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-20 pointer-events-none" />
-                            </motion.div>
-
-                            <motion.div
-                                initial={{ opacity: 0, x: 60 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 1, delay: 0.2 }}
-                                viewport={{ once: true }}
-                            >
-                                <motion.h2
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.8, delay: 0.4 }}
-                                    className="text-5xl font-display text-[var(--color-theme-primary)] mb-6"
-                                >
-                                    About Artisanal
-                                </motion.h2>
-                                <motion.p 
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.8, delay: 0.6 }}
-                                    className="text-lg text-[var(--color-theme-secondary)] leading-relaxed"
-                                >
-                                    Artisanal represents a commitment to culinary excellence and authentic hospitality.
-                                    Since our founding, we've dedicated ourselves to sourcing the finest ingredients and
-                                    employing time-honored techniques that elevate every dish. Our chefs work with passion
-                                    and precision, creating not just meals, but memorable experiences that celebrate the
-                                    art of fine dining. We believe exceptional food brings people together.
-                                </motion.p>
-                            </motion.div>
-                        </div>
-                    </div>
-
-                    {/* Section 2: Owners */}
-                    <div className="h-screen w-screen shrink-0 flex justify-center items-center px-8 md:px-16">
-                        <div className="max-w-4xl w-full">
-                            <motion.h2
-                                initial={{ opacity: 0, y: -20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8 }}
-                                className="text-5xl font-display text-[var(--color-theme-primary)] mb-12 text-center"
-                            >
-                                Our Founders
-                            </motion.h2>
-                            <div className="flex flex-col gap-6 max-w-2xl mx-auto">
-                                {owners.map((owner, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                                        whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                                        transition={{ duration: 0.7, delay: idx * 0.2 }}
-                                        viewport={{ once: true }}
-                                        className="border border-[var(--color-theme-primary)]/20 rounded-lg overflow-hidden relative group"
-                                    >
-                                        <motion.button
-                                            onClick={() => toggleOwner(idx)}
-                                            whileHover={{ backgroundColor: "rgba(255,255,255,0.03)" }}
-                                            className="w-full p-6 bg-transparent transition-colors duration-500 text-left relative z-10"
-                                        >
-                                            <div className="flex items-center gap-6">
-                                                <div className="relative">
-                                                    <motion.img
-                                                        src={owner.image}
-                                                        alt={owner.name}
-                                                        className="h-20 w-20 rounded-full object-cover border border-[var(--color-theme-primary)]/30 relative z-10"
-                                                        animate={{
-                                                            y: [0, -5, 0],
-                                                            rotate: idx % 2 === 0 ? [0, 5, 0] : [0, -5, 0]
-                                                        }}
-                                                        transition={{
-                                                            duration: 4 + idx,
-                                                            repeat: Infinity,
-                                                            ease: "easeInOut"
-                                                        }}
-                                                    />
-                                                    <motion.div 
-                                                        className="absolute inset-0 bg-[var(--color-theme-primary)]/20 blur-xl rounded-full -z-1"
-                                                        animate={{ scale: [1, 1.2, 1] }}
-                                                        transition={{ duration: 3, repeat: Infinity }}
-                                                    />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <h3 className="text-2xl font-display text-[var(--color-theme-secondary)]">{owner.name}</h3>
-                                                    <p className="text-sm text-[var(--color-theme-primary)] font-body tracking-wider uppercase opacity-60">
-                                                        {ownerOpen === idx ? "Founding Partner" : "Click to learn more"}
-                                                    </p>
-                                                </div>
-                                                <motion.span
-                                                    animate={{ 
-                                                        rotate: ownerOpen === idx ? 45 : 0,
-                                                        scale: ownerOpen === idx ? 1.2 : 1
-                                                    }}
-                                                    className="text-[var(--color-theme-primary)] text-2xl"
-                                                >
-                                                    +
-                                                </motion.span>
-                                            </div>
-                                        </motion.button>
-
-                                        <motion.div
-                                            initial={false}
-                                            animate={{
-                                                height: ownerOpen === idx ? "auto" : 0,
-                                                opacity: ownerOpen === idx ? 1 : 0
-                                            }}
-                                            transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                                            className="overflow-hidden relative z-10"
-                                        >
-                                            <div className="px-8 pb-8 bg-white/2 text-[var(--color-theme-secondary)] border-t border-[var(--color-theme-primary)]/10">
-                                                <motion.p
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={ownerOpen === idx ? { opacity: 1, x: 0 } : {}}
-                                                    transition={{ delay: 0.3 }}
-                                                    className="text-lg leading-relaxed font-body pt-6"
-                                                >
-                                                    {owner.bio}
-                                                </motion.p>
-                                            </div>
-                                        </motion.div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section 3: Community */}
-                    <div className="h-screen w-screen shrink-0 relative flex justify-center items-center px-8 md:px-16 pb-40 md:pb-20">
-                        <div className="max-w-5xl w-full">
-                            <motion.h2
-                                initial={{ opacity: 0, y: -20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8 }}
-                                className="text-5xl font-display text-[var(--color-theme-primary)] mb-6 text-center"
-                            >
-                                Local Giving
-                            </motion.h2>
-                            <motion.p 
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                transition={{ duration: 1, delay: 0.3 }}
-                                className="text-center text-[var(--color-theme-secondary)] mb-16 text-lg max-w-2xl mx-auto"
-                            >
-                                We believe in giving back to the community that supports us. A portion of our proceeds
-                                goes to local nonprofits dedicated to food security and education.
-                            </motion.p>
-
-                            <div className="relative h-96 max-w-3xl mx-auto flex items-center justify-center">
-                                {/* Left image */}
-                                <motion.div
-                                    initial={{ opacity: 0, x: -100, rotate: -10 }}
-                                    whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-                                    transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
-                                    viewport={{ once: true }}
-                                    className="absolute left-0 bottom-12 w-64 h-64 flex items-center justify-center z-10"
-                                >
-                                    <motion.img
-                                        src={giving1}
-                                        alt="Local Partner 1"
-                                        className="max-w-full max-h-full object-contain brightness-90"
-                                        animate={{ y: [0, -10, 0] }}
-                                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                                        whileHover={{ scale: 1.1, filter: "brightness(1)" }}
-                                    />
-                                </motion.div>
-
-                                {/* Center image */}
-                                <motion.div
-                                    initial={{ opacity: 0, y: 100, scale: 0.8 }}
-                                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                                    transition={{ duration: 1.2, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
-                                    viewport={{ once: true }}
-                                    className="absolute left-1/2 top-0 -translate-x-1/2 w-72 h-72 flex items-center justify-center z-20"
-                                >
-                                    <motion.img
-                                        src={giving2}
-                                        alt="Local Partner 2"
-                                        className="max-w-full max-h-full object-contain"
-                                        animate={{ y: [0, 15, 0] }}
-                                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                                        whileHover={{ scale: 1.1 }}
-                                    />
-                                </motion.div>
-
-                                {/* Right image */}
-                                <motion.div
-                                    initial={{ opacity: 0, x: 100, rotate: 10 }}
-                                    whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-                                    transition={{ duration: 1.2, delay: 0.4, ease: [0.19, 1, 0.22, 1] }}
-                                    viewport={{ once: true }}
-                                    className="absolute right-0 bottom-12 w-64 h-64 flex items-center justify-center z-10"
-                                >
-                                    <motion.img
-                                        src={giving3}
-                                        alt="Local Partner 3"
-                                        className="max-w-full max-h-full object-contain brightness-90"
-                                        animate={{ y: [0, -12, 0] }}
-                                        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-                                        whileHover={{ scale: 1.1, filter: "brightness(1)" }}
-                                    />
-                                </motion.div>
-                            </div>
-                        </div>
-
-                        <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
-                            <Footer embedded />
-                        </div>
+                                <div className="w-2 h-2 -ml-[4px] rounded-full bg-[var(--color-theme-primary)]" />
+                                <span className="ml-8 font-display text-sm tracking-[0.3em] uppercase whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    {section.title}
+                                </span>
+                            </button>
+                        ))}
                     </div>
                 </div>
-            </div>
 
-            {/* Navigation Dots */}
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-4">
-                {[...Array(MAX_SECTION_INDEX + 1)].map((_, i) => (
-                    <motion.button
-                        key={i}
-                        onClick={() => setActiveIndex(i)}
-                        whileTap={{ scale: 0.8 }}
-                        className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                            activeIndex === i ? "bg-[var(--color-theme-primary)] scale-150" : "bg-white/20 hover:bg-white/40"
-                        }`}
-                        title={`Go to section ${i}`}
-                    />
-                ))}
-            </div>
-
-            {/* Scroll indicator */}
-            <div className="fixed right-8 top-1/2 -translate-y-1/2 z-40 hidden md:block">
-                <motion.div
-                    animate={{ x: [0, 8, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className={`${activeIndex === MAX_SECTION_INDEX ? 'opacity-0 pointer-events-none' : 'opacity-100'} transition-opacity duration-500`}
+                {/* Main Content Sections */}
+                <div 
+                    className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19, 1, 0.22, 1)]"
+                    style={{ transform: `translateY(-${activeIndex * 100}%)` }}
                 >
-                    <svg
-                        className="w-8 h-8 text-[var(--color-theme-primary)]"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    {sections.map((section, idx) => (
+                        <div key={section.id} className="h-full w-full flex justify-center items-center px-6 md:px-16 pt-24 pb-32 md:py-0 relative overflow-hidden">
+                            <AnimatePresence mode="wait">
+                                {activeIndex === idx && (
+                                    <motion.div
+                                        variants={contentVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="exit"
+                                        className="max-w-5xl w-full flex flex-col items-center"
+                                    >
+                                        {idx === 0 ? (
+                                            <div className="flex flex-col items-center gap-8">
+                                                <div className="text-center">
+                                                    <h1 className="font-display text-5xl md:text-7xl text-white italic tracking-wide mb-2">{section.title}</h1>
+                                                    <p className="font-body text-xs md:text-sm uppercase tracking-[0.4em] text-[var(--color-theme-primary)]">{section.subtitle}</p>
+                                                </div>
+                                            </div>
+                                        ) : idx === 1 ? (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                                                <div className="order-2 md:order-1">
+                                                    <h2 className="font-display text-4xl md:text-6xl text-[var(--color-theme-primary)] mb-6 italic">{section.title}</h2>
+                                                    <p className="font-body text-sm md:text-lg text-[var(--color-theme-secondary)] leading-relaxed font-light">{section.content}</p>
+                                                </div>
+                                                <div className="order-1 md:order-2 rounded-lg overflow-hidden border border-white/5">
+                                                    <img src={section.image} alt="Philosophy" className="w-full h-auto object-cover brightness-75 scale-105" />
+                                                </div>
+                                            </div>
+                                        ) : idx === 2 ? (
+                                            <div className="w-full">
+                                                <h2 className="font-display text-4xl md:text-6xl text-[var(--color-theme-primary)] mb-12 italic text-center">{section.title}</h2>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                                                    {section.owners?.map((owner, i) => (
+                                                        <div key={i} className="p-8 border border-[var(--color-theme-primary)]/20 rounded-lg bg-black/20 backdrop-blur-sm group hover:border-[var(--color-theme-primary)]/40 transition-colors">
+                                                            <p className="font-body text-[10px] uppercase tracking-[0.3em] text-[var(--color-theme-primary)] mb-2">{owner.role}</p>
+                                                            <h3 className="font-display text-2xl md:text-3xl text-white mb-4 italic">{owner.name}</h3>
+                                                            <p className="font-body text-xs md:text-sm text-[var(--color-theme-secondary)]/80 leading-relaxed font-light">{owner.bio}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center max-w-3xl">
+                                                <h2 className="font-display text-4xl md:text-6xl text-[var(--color-theme-primary)] mb-6 italic">{section.title}</h2>
+                                                <p className="font-body text-sm md:text-lg text-[var(--color-theme-secondary)] leading-relaxed font-light mb-12">{section.content}</p>
+                                                <div className="flex justify-center gap-4 md:gap-12 items-center">
+                                                    {section.images?.map((img, i) => (
+                                                        <motion.img 
+                                                            key={i} 
+                                                            src={img} 
+                                                            alt="Giving" 
+                                                            className="h-24 md:h-40 object-contain grayscale hover:grayscale-0 transition-all duration-500"
+                                                            whileHover={{ scale: 1.1 }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {idx === sections.length - 1 && (
+                                <div className="absolute bottom-8 left-0 w-full z-20">
+                                    <Footer embedded />
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Navigation Controls */}
+                <div className="hidden md:flex absolute right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
+                    <button 
+                        onClick={() => navigateSection("prev")}
+                        disabled={activeIndex === 0}
+                        className="group flex items-start justify-center text-white/10 hover:text-white transition-all duration-700 disabled:opacity-0 cursor-pointer pointer-events-auto h-[30vh]"
+                        aria-label="Previous section"
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                </motion.div>
+                        <svg viewBox="0 0 24 200" className="h-full w-8 md:w-10" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 200V4M12 4L5 11M12 4L19 11" />
+                        </svg>
+                    </button>
+                    <button 
+                        onClick={() => navigateSection("next")}
+                        disabled={activeIndex === sections.length - 1}
+                        className="group flex items-end justify-center text-white/10 hover:text-white transition-all duration-700 disabled:opacity-0 cursor-pointer pointer-events-auto h-[30vh]"
+                        aria-label="Next section"
+                    >
+                        <svg viewBox="0 0 24 200" className="h-full w-8 md:w-10" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 0V196M12 196L5 189M12 196L19 189" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Mobile Navigation */}
+                <div className="md:hidden fixed left-4 right-4 bottom-8 z-50 flex items-center justify-between gap-3 pointer-events-none pb-[env(safe-area-inset-bottom)]">
+                    <button
+                        onClick={() => navigateSection("prev")}
+                        disabled={activeIndex === 0}
+                        className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
+                    >
+                        ↑
+                    </button>
+                    <div className="pointer-events-auto min-w-0 flex-1 rounded-full border border-white/10 bg-black/45 px-4 py-3 text-center backdrop-blur-md">
+                        <p className="truncate font-body text-[10px] uppercase tracking-[0.28em] text-white/55">
+                            {currentSection.title}
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => navigateSection("next")}
+                        disabled={activeIndex === sections.length - 1}
+                        className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
+                    >
+                        ↓
+                    </button>
+                </div>
             </div>
         </motion.div>
     );

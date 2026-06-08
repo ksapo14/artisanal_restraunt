@@ -255,10 +255,15 @@ export default function Menu() {
                                             animate={activeIndex === sIdx + 1 ? "visible" : "inactive"}
                                             whileHover={activeIndex === sIdx + 1 && !isMobile ? { scale: 1.04, x: -10 } : undefined}
                                             whileTap={activeIndex === sIdx + 1 ? (isMobile ? { scale: 0.95 } : { scale: 0.99 }) : undefined}
-                                            className={`flex gap-4 sm:gap-6 md:gap-14 group cursor-pointer transition-colors duration-500 ease-out ${
+                                            className={`flex gap-4 sm:gap-6 md:gap-14 group cursor-pointer transition-colors duration-500 ease-out relative ${
                                                 activeIndex === sIdx + 1 ? 'pointer-events-auto' : 'pointer-events-none'
                                             }`}
                                         >
+                                            {/* View Hint */}
+                                            <div className="absolute -left-32 top-1/2 -translate-y-1/2 font-display text-[var(--color-theme-primary)] italic text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                                                Click to expand
+                                            </div>
+
                                             <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 shrink-0 overflow-hidden relative rounded-xs self-center bg-white/5">
                                                 <motion.div
                                                     className="absolute inset-0 border border-white/5 z-10 transition-colors duration-500 group-hover:border-white/20"
