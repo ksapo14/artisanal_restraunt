@@ -1,30 +1,37 @@
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
+import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import "../index.css";
+import bgImg from "../assets/restraunt_3.png";
 
 const faqItems = [
     {
         q: "What are your restaurant hours?",
-        a: "We're open Tuesday through Saturday, 5:00 PM to 9:30 PM. Closed Sundays and Mondays. Reservations are recommended, walk-ins welcome based on availability."
+        a: "We're open Tuesday through Saturday, 5:00 PM to 9:30 PM. Closed Sundays and Mondays. Reservations are recommended, with walk-ins welcomed based on availability.",
     },
     {
         q: "Do you accommodate dietary restrictions?",
-        a: "Absolutely. We accommodate vegetarian, vegan, gluten-free, and other dietary needs. Please inform your server, and our chefs will create something special for you."
+        a: "Yes. We accommodate vegetarian, vegan, gluten-free, and other dietary needs with advance notice whenever possible.",
     },
     {
         q: "Can I make a reservation online?",
-        a: "You can call us directly at 828-898-5395 or visit our contact page to submit an inquiry. We recommend calling to discuss your preferences and ensure we have the perfect experience ready."
+        a: "Reservations can be made through OpenTable or by calling us directly at 828-898-5395 for specific requests.",
     },
     {
         q: "Do you offer wine pairings?",
-        a: "Yes, our sommelier curates wine pairings to complement our tasting menus. Ask your server about our wine selection and pairing options on your visit."
-    }
+        a: "Yes. Our team curates wine pairings to complement the menu and can guide selections during your visit.",
+    },
 ];
 
+const pageTheme = {
+    bg: "#1c170a",
+    primary: "#dac464",
+    secondary: "#ffe6ac",
+};
+
 export default function FAQ() {
-    const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({});
+    const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({ 0: true });
 
     const toggleFaq = (index: number) => {
         setFaqOpen((prev) => ({
@@ -34,9 +41,9 @@ export default function FAQ() {
     };
 
     const themeStyles = {
-        "--color-theme-primary": "#dac464",
-        "--color-theme-secondary": "#ffe6ac",
-        "--color-theme-bg": "#1c170a",
+        "--color-theme-primary": pageTheme.primary,
+        "--color-theme-secondary": pageTheme.secondary,
+        "--color-theme-bg": pageTheme.bg,
     } as CSSProperties;
 
     return (
@@ -45,64 +52,104 @@ export default function FAQ() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="min-h-screen w-screen overflow-x-hidden flex flex-col relative bg-[var(--color-theme-bg)]"
+            className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
             style={themeStyles}
         >
-            <Navbar />
+            <div
+                className="fixed inset-0 -z-30"
+                style={{
+                    background: `linear-gradient(135deg, ${pageTheme.bg} 0%, ${pageTheme.bg} 68%, #1a0f0f 100%)`,
+                }}
+            />
+            <motion.img
+                src={bgImg}
+                alt=""
+                aria-hidden="true"
+                initial={{ scale: 1.14, opacity: 0 }}
+                animate={{ scale: 1.08, opacity: 0.36 }}
+                transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1] }}
+                className="fixed inset-0 h-full w-full object-cover brightness-50 -z-20 pointer-events-none"
+            />
+            <div
+                className="fixed inset-0 -z-10 pointer-events-none"
+                style={{
+                    background: "linear-gradient(to bottom, rgba(0,0,0,0.24) 0%, transparent 35%, var(--color-theme-bg) 100%)",
+                }}
+            />
 
-            <main className="flex-1 flex justify-center items-center px-8 md:px-16 pt-32 pb-32">
-                <div className="max-w-3xl w-full">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="text-5xl font-display text-[var(--color-theme-primary)] mb-12 text-center"
+            <Navbar compactMobile />
+
+            <main className="flex-1 relative overflow-hidden">
+                <section
+                    aria-labelledby="faq-heading"
+                    className="h-full w-full flex items-center justify-center px-5 sm:px-8 md:px-32 pt-24 pb-36 md:py-0 relative overflow-y-auto md:overflow-hidden"
+                >
+                    <motion.div
+                        initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        transition={{ duration: 0.75, ease: [0.19, 1, 0.22, 1] }}
+                        className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-[0.78fr_1fr] gap-9 md:gap-16 items-start md:items-center"
                     >
-                        Frequently Asked
-                    </motion.h1>
-                    <div className="space-y-4">
-                        {faqItems.map((item, idx) => (
-                            <motion.div
-                                key={idx}
-                                initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                                className="border border-white/10 rounded-lg overflow-hidden relative group"
+                        <div className="max-w-xl">
+                            <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
+                                Before You Visit
+                            </p>
+                            <h1
+                                id="faq-heading"
+                                className="font-display text-5xl sm:text-6xl md:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
                             >
-                                <button
-                                    type="button"
-                                    onClick={() => toggleFaq(idx)}
-                                    className="w-full p-5 bg-transparent hover:bg-white/5 transition-colors duration-300 text-left flex justify-between items-center relative z-10"
-                                >
-                                    <h2 className="text-lg font-display text-[var(--color-theme-secondary)] tracking-wide">{item.q}</h2>
-                                    <motion.span
-                                        animate={{ rotate: faqOpen[idx] ? 180 : 0 }}
-                                        className="text-[var(--color-theme-primary)] text-xl"
-                                    >
-                                        {faqOpen[idx] ? "-" : "+"}
-                                    </motion.span>
-                                </button>
+                                FAQ
+                            </h1>
+                            <p className="font-body text-xs sm:text-sm md:text-base text-[var(--color-theme-secondary)]/70 leading-relaxed font-light tracking-[0.08em] md:tracking-[0.1em] uppercase italic">
+                                Common questions for planning dinner, dietary requests, reservations, and wine service.
+                            </p>
+                        </div>
 
-                                <motion.div
-                                    initial={false}
-                                    animate={{
-                                        height: faqOpen[idx] ? "auto" : 0,
-                                        opacity: faqOpen[idx] ? 1 : 0
-                                    }}
-                                    transition={{ duration: 0.4, ease: "easeInOut" }}
-                                    className="overflow-hidden relative z-10"
-                                >
-                                    <div className="px-5 pb-5 bg-white/5 text-[var(--color-theme-secondary)] border-t border-white/5">
-                                        <p className="pt-4 font-body leading-relaxed opacity-80">{item.a}</p>
-                                    </div>
-                                </motion.div>
-                            </motion.div>
-                        ))}
+                        <div className="w-full space-y-1 md:justify-self-end">
+                            {faqItems.map((item, index) => {
+                                const isOpen = Boolean(faqOpen[index]);
+
+                                return (
+                                    <article key={item.q} className="border-b border-white/10">
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleFaq(index)}
+                                            aria-expanded={isOpen}
+                                            className="group flex w-full items-center justify-between gap-5 py-5 text-left cursor-pointer"
+                                        >
+                                            <span className="font-display text-xl sm:text-2xl text-white/90 italic tracking-wide transition-colors duration-300 group-hover:text-[var(--color-theme-primary)]">
+                                                {item.q}
+                                            </span>
+                                            <motion.span
+                                                animate={{ rotate: isOpen ? 45 : 0 }}
+                                                className="shrink-0 font-body text-2xl leading-none text-[var(--color-theme-primary)]"
+                                                aria-hidden="true"
+                                            >
+                                                +
+                                            </motion.span>
+                                        </button>
+
+                                        <motion.div
+                                            initial={false}
+                                            animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+                                            transition={{ duration: 0.35, ease: "easeInOut" }}
+                                            className="overflow-hidden"
+                                        >
+                                            <p className="pb-5 pr-10 font-body text-xs sm:text-sm text-white/55 leading-relaxed font-light tracking-[0.06em]">
+                                                {item.a}
+                                            </p>
+                                        </motion.div>
+                                    </article>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+
+                    <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
+                        <Footer embedded />
                     </div>
-                </div>
+                </section>
             </main>
-
-            <Footer />
         </motion.div>
     );
 }

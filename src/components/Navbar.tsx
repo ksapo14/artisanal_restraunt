@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { useUI } from '../context/UIContext';
 import SiteMap from './SiteMap';
 
+const RESERVATION_URL = "https://www.opentable.com/booking/restref/availability?rid=44458&searchdatetime=2024-04-05T19%3A00&correlationId=555d2496-d57d-436f-9b78-c125559a78c0&restRef=44458&dateTime=2024-04-05T19%3A00&partySize=2";
+
 type NavbarProps = {
     compactMobile?: boolean;
 };
@@ -26,11 +28,17 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
                     <motion.div
                         whileTap={isMobile ? { scale: 0.95 } : { scale: 0.98 }}
                     >
-                        <Link to="/about" onClick={closeSiteMap}>
-                            <button className={`border-solid text-white border-white border px-4 sm:px-5 md:px-6 py-3 md:py-4 font-display text-xs sm:text-sm md:text-base transition-all duration-300 hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)] hover:text-black hover:rounded-4xl cursor-pointer ${
+                        <a
+                            href={RESERVATION_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={closeSiteMap}
+                            className={`inline-block border-solid text-white border-white border px-4 sm:px-5 md:px-6 py-3 md:py-4 font-display text-xs sm:text-sm md:text-base transition-all duration-300 hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)] hover:text-black hover:rounded-4xl cursor-pointer ${
                                 compactMobile ? "hidden sm:block" : ""
-                            }`}>RESERVE A TABLE</button>
-                        </Link>
+                            }`}
+                        >
+                            RESERVE A TABLE
+                        </a>
                     </motion.div>
 
                     <motion.div 

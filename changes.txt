@@ -1,25 +1,33 @@
 About Page Redesign - Changes Description
 
-1. Navigation Overhaul:
-   - Replaced the horizontal slider with a vertical section-based navigation system.
-   - Synchronized the UX with the Menu page by implementing wheel-based and keyboard-based scrolling.
-   - Added a side navigation indicator (line with dots) on the left for quick jumps between sections.
-   - Added large vertical navigation arrows on the right for a consistent desktop experience.
-   - Implemented a mobile-friendly bottom navigation bar with section indicators.
+1. Rebuilt the About page as a full-screen chapter flow that matches the Home and Menu pages.
+   - Added the same fixed themed background treatment, vertical transitions, left progress rail, right desktop arrows, and mobile bottom controls.
+   - Kept the existing story beats: Artisanal since 2014, Philosophy, Founders, and Community.
 
-2. Visual & Theme Updates:
-   - Implemented section-specific themes (primary, secondary, and background colors) that transition smoothly.
-   - Aligned the color palette with the Homepage and Menu page for a cohesive brand identity.
-   - Added "lively but controlled" animations using Framer Motion (blur, opacity, and translate transitions).
-   - Replaced static layouts with a minimalist, high-end grid and flex system.
+2. Simplified the visual system.
+   - Used the site's existing dark restaurant palette with restrained accent changes per section.
+   - Added controlled background photography and subtle motion so the page feels active without becoming busy.
+   - Removed heavy card-like presentation in favor of cleaner text blocks, dividers, and focused imagery.
 
-3. Content Refinement:
-   - Structured the page into four distinct chapters: Artisanal (Hero), Philosophy, Founders, and Community.
-   - Removed the logo from the Hero section for a more minimalist, typographic introduction.
-   - Restored high-quality imagery to the Philosophy and Community sections to balance minimalist text with visual storytelling.
-   - Improved readability with clear font-display (Cormorant) and font-body (Poppins) hierarchy.
+3. Improved responsive UX and accessibility.
+   - Preserved wheel, arrow key, Page Up, and Page Down navigation.
+   - Added aria labels, aria-current state for the section rail, aria-live mobile section status, and accessible heading relationships.
+   - Kept mobile controls aligned with the Menu page's compact bottom navigation pattern.
 
-4. Functionality & Accessibility:
-   - Maintained full responsiveness across mobile, tablet, and desktop.
-   - Added ARIA labels to navigation elements.
-   - Ensured smooth section snapping and navigation debouncing to prevent accidental skips.
+4. Verified implementation.
+   - Ran npm run build successfully.
+
+5. Follow-up fixes.
+   - Removed the section-to-section color change animation and kept the About page on one restrained theme.
+   - Constrained the final Community images so they stay inside the viewport on mobile and desktop.
+   - Moved section rail hover labels to the left side so they no longer overlap the main page content.
+
+6. Contact page redesign.
+   - Rebuilt Contact as a two-section full-screen flow matching the Home, Menu, and About page treatment.
+   - Added restrained background imagery, section rail navigation, desktop arrows, and mobile section controls.
+   - Simplified Visit and Contact content into cleaner restaurant-style typography with a lighter form layout.
+   - Preserved email submission behavior while keeping arrow-key navigation from interfering with form fields.
+
+7. Contact page spacing refinement.
+   - Removed the Contact page section rail.
+   - Reformatted the Contact form section to use the same centered width, padding, and grid spacing as the Visit section.

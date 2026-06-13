@@ -2,6 +2,9 @@ import { Link } from 'react-router';
 import { createPortal } from 'react-dom';
 import { useUI } from '../context/UIContext';
 
+const RESERVATION_URL = "https://www.opentable.com/booking/restref/availability?rid=44458&searchdatetime=2024-04-05T19%3A00&correlationId=555d2496-d57d-436f-9b78-c125559a78c0&restRef=44458&dateTime=2024-04-05T19%3A00&partySize=2";
+const GIFT_CARD_URL = "https://order.toasttab.com/egiftcards/artisanal-restaurant-1200-dobbins-rd";
+
 export default function SiteMap({ open }: { open: boolean }) {
     const { closeSiteMap } = useUI();
 
@@ -25,8 +28,8 @@ export default function SiteMap({ open }: { open: boolean }) {
                     <Link to="/about" onClick={closeSiteMap} className="text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300">About</Link>
                     <Link to="/private-events" onClick={closeSiteMap} className="text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300">Private Events</Link>
                     <Link to="/faq" onClick={closeSiteMap} className="text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300">FAQ</Link>
-                    <Link to="/contact" onClick={closeSiteMap} className="text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300">Gift Cards</Link>
-                    <Link to="/contact" onClick={closeSiteMap} className="text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300">Reservations</Link>
+                    <a href={GIFT_CARD_URL} target="_blank" rel="noopener noreferrer" onClick={closeSiteMap} className="text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300">Gift Cards</a>
+                    <a href={RESERVATION_URL} target="_blank" rel="noopener noreferrer" onClick={closeSiteMap} className="text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300">Reservations</a>
                     <Link to="/contact" onClick={closeSiteMap} className="text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300">Contact</Link>
                 </div>
             </div>

@@ -1,172 +1,256 @@
-import { useEffect, useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useUI } from "../context/UIContext";
-import "../index.css";
+import bgImg1 from "../assets/artisanal_full_restraunt_pic.jpg";
+import bgImg2 from "../assets/restraunt_2.png";
+import bgImg3 from "../assets/restraunt_3.png";
+import giving1 from "../assets/giving_1_nobg.png";
+import giving2 from "../assets/giving_2_nobg.png";
+import giving3 from "../assets/giving_3_nobg.png";
 
-// Assets
-import logoNoBg from '../assets/artisanal_logo_high_res_nobg.jpeg';
-import bgImg1 from '../assets/artisanal_full_restraunt_pic.jpg';
-import bgImg2 from '../assets/restraunt_2.png';
-import bgImg3 from '../assets/restraunt_3.png';
-import giving1 from '../assets/giving_1_nobg.png';
-import giving2 from '../assets/giving_2_nobg.png';
-import giving3 from '../assets/giving_3_nobg.png';
+type AboutTheme = {
+    bg: string;
+    primary: string;
+    secondary: string;
+};
 
-const sections = [
+type Founder = {
+    name: string;
+    role: string;
+    bio: string;
+};
+
+type AboutSection = {
+    id: string;
+    title: string;
+    eyebrow: string;
+    body: string;
+    image: string;
+    theme: AboutTheme;
+    founders?: Founder[];
+    communityImages?: string[];
+};
+
+const sections: AboutSection[] = [
     {
-        id: "hero",
+        id: "story",
         title: "Artisanal",
-        subtitle: "Since 2014",
-        theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" }
+        eyebrow: "Since 2014",
+        body: "A quiet dining room built around seasonal ingredients, deliberate technique, and a measured evening at the table.",
+        image: bgImg1,
+        theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" },
     },
     {
         id: "philosophy",
         title: "Philosophy",
-        content: "We believe in the integrity of ingredients and the precision of craft. Our kitchen is a laboratory of tradition, where age-old techniques meet modern sensibilities to create something truly timeless.",
+        eyebrow: "Ingredient led",
+        body: "We believe in the integrity of ingredients and the precision of craft. Age-old techniques meet modern sensibilities to create something timeless.",
         image: bgImg2,
-        theme: { bg: "#1b1412", primary: "#a68a7b", secondary: "#f5f0ed" }
+        theme: { bg: "#1b1412", primary: "#a68a7b", secondary: "#f5f0ed" },
     },
     {
         id: "founders",
         title: "Founders",
-        owners: [
-            { 
-                name: "Chef Marcus Chen", 
+        eyebrow: "The hosts",
+        body: "Chef Marcus Chen and Sophie Durand shape the food, pacing, and service with a shared focus on care and restraint.",
+        image: bgImg3,
+        theme: { bg: "#1a0f0f", primary: "#d48888", secondary: "#f5f0ed" },
+        founders: [
+            {
+                name: "Chef Marcus Chen",
                 role: "Executive Chef",
-                bio: "With over 20 years of culinary expertise, Marcus has trained under Michelin-starred chefs across Europe and Asia. His passion for artisanal techniques drives our vision." 
+                bio: "Leads the kitchen with more than 20 years of culinary experience and a precise approach to artisanal technique.",
             },
-            { 
-                name: "Sophie Durand", 
-                role: "Maître d'Hôtel",
-                bio: "Sophie ensures every guest experience is thoughtfully curated. A true believer in service excellence and building lasting community partnerships." 
-            }
+            {
+                name: "Sophie Durand",
+                role: "Maitre d'Hotel",
+                bio: "Curates the guest experience through warm service, careful pacing, and lasting community partnerships.",
+            },
         ],
-        theme: { bg: "#1a0f0f", primary: "#d48888", secondary: "#f5f0ed" }
     },
     {
         id: "community",
         title: "Community",
-        content: "Artisanal is more than a restaurant; it's a member of the community. We partner with local farmers, support urban gardens, and contribute to food security initiatives across the region.",
-        images: [giving1, giving2, giving3],
-        theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" }
-    }
+        eyebrow: "Local roots",
+        body: "Artisanal partners with local farmers, supports urban gardens, and contributes to food security initiatives across the region.",
+        image: bgImg1,
+        theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" },
+        communityImages: [giving1, giving2, giving3],
+    },
 ];
 
+const sectionCount = sections.length - 1;
+const pageTheme = sections[0].theme;
+
 export default function About() {
-    const { isMobile, isSiteMapOpen } = useUI();
+    const { isSiteMapOpen } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
-    const isNavigating = useRef(false);
     const activeIndexRef = useRef(activeIndex);
+    const isNavigating = useRef(false);
 
     useEffect(() => {
         activeIndexRef.current = activeIndex;
     }, [activeIndex]);
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const navigateSection = useCallback((direction: "next" | "prev" | number) => {
         if (isNavigating.current) return;
 
-        let next: number;
-        if (typeof direction === "number") {
-            next = direction;
-        } else {
-            const prev = activeIndexRef.current;
-            next = direction === "next" ? prev + 1 : prev - 1;
-        }
+        const next =
+            typeof direction === "number"
+                ? direction
+                : direction === "next"
+                  ? activeIndexRef.current + 1
+                  : activeIndexRef.current - 1;
 
         if (next < 0 || next >= sections.length) return;
 
         isNavigating.current = true;
         setActiveIndex(next);
-        setTimeout(() => { isNavigating.current = false; }, 1000);
+
+        window.setTimeout(() => {
+            isNavigating.current = false;
+        }, 900);
     }, []);
 
     useEffect(() => {
-        const handleWheel = (e: WheelEvent) => {
+        const handleWheel = (event: WheelEvent) => {
             if (isSiteMapOpen) return;
-            e.preventDefault();
-            if (Math.abs(e.deltaY) < 30) return;
-            if (e.deltaY > 0) navigateSection("next");
-            else navigateSection("prev");
+
+            event.preventDefault();
+            if (Math.abs(event.deltaY) < 30) return;
+
+            navigateSection(event.deltaY > 0 ? "next" : "prev");
         };
 
-        const handleKeyDown = (e: KeyboardEvent) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if (isSiteMapOpen) return;
-            if (e.key === "ArrowDown" || e.key === "PageDown") {
-                e.preventDefault();
+
+            if (event.key === "ArrowDown" || event.key === "PageDown") {
+                event.preventDefault();
                 navigateSection("next");
-            } else if (e.key === "ArrowUp" || e.key === "PageUp") {
-                e.preventDefault();
+            }
+
+            if (event.key === "ArrowUp" || event.key === "PageUp") {
+                event.preventDefault();
                 navigateSection("prev");
             }
         };
 
         window.addEventListener("wheel", handleWheel, { passive: false });
         window.addEventListener("keydown", handleKeyDown);
+
         return () => {
             window.removeEventListener("wheel", handleWheel);
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [navigateSection, isSiteMapOpen]);
+    }, [isSiteMapOpen, navigateSection]);
 
     const currentSection = sections[activeIndex];
     const themeStyles = {
-        '--color-theme-primary': currentSection.theme.primary,
-        '--color-theme-secondary': currentSection.theme.secondary,
-        '--color-theme-bg': currentSection.theme.bg,
-    } as React.CSSProperties;
+        "--color-theme-primary": pageTheme.primary,
+        "--color-theme-secondary": pageTheme.secondary,
+        "--color-theme-bg": pageTheme.bg,
+    } as CSSProperties;
 
     const contentVariants: Variants = {
-        hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
-        visible: { 
-            opacity: 1, 
-            y: 0, 
-            filter: "blur(0px)",
-            transition: { duration: 0.8, ease: [0.19, 1, 0.22, 1] }
+        inactive: {
+            opacity: 0,
+            y: 28,
+            filter: "blur(8px)",
+            transition: { duration: 0.35, ease: "easeOut" },
         },
-        exit: { 
-            opacity: 0, 
-            y: -30, 
-            filter: "blur(10px)",
-            transition: { duration: 0.4, ease: "easeIn" }
-        }
+        active: {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            transition: { duration: 0.75, ease: [0.19, 1, 0.22, 1] },
+        },
     };
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
             className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
             style={themeStyles}
         >
-            <div className="fixed inset-0 -z-10 bg-[var(--color-theme-bg)] transition-colors duration-1000" />
-            
-            <div className={`relative transition-all duration-700 ease-out ${activeIndex > 0 && !isSiteMapOpen ? 'opacity-0 pointer-events-none -translate-y-10' : 'opacity-100'}`}>
-                <Navbar />
+            <div
+                className="fixed inset-0 -z-30"
+                style={{
+                    background: `linear-gradient(135deg, ${pageTheme.bg} 0%, ${pageTheme.bg} 68%, #1a0f0f 100%)`,
+                }}
+            />
+
+            {sections.map((section, index) => (
+                <motion.img
+                    key={section.id}
+                    src={section.image}
+                    alt=""
+                    aria-hidden="true"
+                    animate={{
+                        opacity: activeIndex === index ? 0.42 : 0,
+                        scale: activeIndex === index ? 1.08 : 1.14,
+                    }}
+                    transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1] }}
+                    className="fixed inset-0 h-full w-full object-cover brightness-50 -z-20 pointer-events-none"
+                />
+            ))}
+
+            <div
+                className="fixed inset-0 -z-10 pointer-events-none"
+                style={{
+                    background: "linear-gradient(to bottom, rgba(0,0,0,0.22) 0%, transparent 38%, var(--color-theme-bg) 100%)",
+                }}
+            />
+
+            <div
+                className={`relative transition-all duration-700 ease-out ${
+                    activeIndex > 0 && !isSiteMapOpen
+                        ? "opacity-0 pointer-events-none -translate-y-10 z-0"
+                        : "opacity-100 pointer-events-auto translate-y-0 z-[1000]"
+                }`}
+            >
+                <Navbar compactMobile />
             </div>
 
             <div className="flex-1 relative overflow-hidden">
-                {/* Side Navigation Indicator */}
-                <div className={`hidden md:flex absolute left-12 md:left-24 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${activeIndex === 0 ? "opacity-0 -translate-x-6" : "opacity-100 translate-x-0"}`}>
-                    <div className="relative h-[40vh] w-px bg-white/10">
-                        <div 
+                <div
+                    className={`hidden md:flex absolute left-8 md:left-36 lg:left-44 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${
+                        activeIndex === 0 ? "opacity-0 -translate-x-6" : "opacity-100 translate-x-0"
+                    }`}
+                >
+                    <div className="relative h-[52vh] w-px bg-white/8">
+                        <div
                             className="absolute top-0 left-0 w-full transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)]"
-                            style={{ 
-                                height: `${(activeIndex / (sections.length - 1)) * 100}%`,
-                                backgroundColor: "var(--color-theme-primary)" 
+                            style={{
+                                height: `${(activeIndex / sectionCount) * 100}%`,
+                                backgroundColor: "var(--color-theme-primary)",
                             }}
                         />
-                        {sections.map((section, idx) => (
+                        {sections.map((section, index) => (
                             <button
                                 key={section.id}
-                                onClick={() => navigateSection(idx)}
-                                className={`absolute left-0 group pointer-events-auto cursor-pointer flex items-center transition-all duration-500 ${idx === activeIndex ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
-                                style={{ top: `${(idx / (sections.length - 1)) * 100}%` }}
+                                type="button"
+                                onClick={() => navigateSection(index)}
+                                aria-label={`View ${section.title} section`}
+                                aria-current={activeIndex === index ? "step" : undefined}
+                                className={`absolute left-0 flex items-center group pointer-events-auto cursor-pointer transition-all duration-500 ${
+                                    activeIndex === index ? "opacity-100" : "opacity-35 hover:opacity-100"
+                                }`}
+                                style={{ top: `${(index / sectionCount) * 100}%` }}
                             >
-                                <div className="w-2 h-2 -ml-[4px] rounded-full bg-[var(--color-theme-primary)]" />
-                                <span className="ml-8 font-display text-sm tracking-[0.3em] uppercase whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <span className="w-2 h-2 -ml-[4px] rounded-full bg-[var(--color-theme-primary)]" />
+                                <span className="absolute right-6 font-display text-sm md:text-base lg:text-lg italic uppercase tracking-[0.14em] lg:tracking-[0.2em] whitespace-nowrap text-[var(--color-theme-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                     {section.title}
                                 </span>
                             </button>
@@ -174,99 +258,127 @@ export default function About() {
                     </div>
                 </div>
 
-                {/* Main Content Sections */}
-                <div 
-                    className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19, 1, 0.22, 1)]"
+                <div
+                    className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)]"
                     style={{ transform: `translateY(-${activeIndex * 100}%)` }}
                 >
-                    {sections.map((section, idx) => (
-                        <div key={section.id} className="h-full w-full flex justify-center items-center px-6 md:px-16 pt-24 pb-32 md:py-0 relative overflow-hidden">
-                            <AnimatePresence mode="wait">
-                                {activeIndex === idx && (
-                                    <motion.div
-                                        variants={contentVariants}
-                                        initial="hidden"
-                                        animate="visible"
-                                        exit="exit"
-                                        className="max-w-5xl w-full flex flex-col items-center"
-                                    >
-                                        {idx === 0 ? (
-                                            <div className="flex flex-col items-center gap-8">
-                                                <div className="text-center">
-                                                    <h1 className="font-display text-5xl md:text-7xl text-white italic tracking-wide mb-2">{section.title}</h1>
-                                                    <p className="font-body text-xs md:text-sm uppercase tracking-[0.4em] text-[var(--color-theme-primary)]">{section.subtitle}</p>
-                                                </div>
-                                            </div>
-                                        ) : idx === 1 ? (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                                                <div className="order-2 md:order-1">
-                                                    <h2 className="font-display text-4xl md:text-6xl text-[var(--color-theme-primary)] mb-6 italic">{section.title}</h2>
-                                                    <p className="font-body text-sm md:text-lg text-[var(--color-theme-secondary)] leading-relaxed font-light">{section.content}</p>
-                                                </div>
-                                                <div className="order-1 md:order-2 rounded-lg overflow-hidden border border-white/5">
-                                                    <img src={section.image} alt="Philosophy" className="w-full h-auto object-cover brightness-75 scale-105" />
-                                                </div>
-                                            </div>
-                                        ) : idx === 2 ? (
-                                            <div className="w-full">
-                                                <h2 className="font-display text-4xl md:text-6xl text-[var(--color-theme-primary)] mb-12 italic text-center">{section.title}</h2>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                                                    {section.owners?.map((owner, i) => (
-                                                        <div key={i} className="p-8 border border-[var(--color-theme-primary)]/20 rounded-lg bg-black/20 backdrop-blur-sm group hover:border-[var(--color-theme-primary)]/40 transition-colors">
-                                                            <p className="font-body text-[10px] uppercase tracking-[0.3em] text-[var(--color-theme-primary)] mb-2">{owner.role}</p>
-                                                            <h3 className="font-display text-2xl md:text-3xl text-white mb-4 italic">{owner.name}</h3>
-                                                            <p className="font-body text-xs md:text-sm text-[var(--color-theme-secondary)]/80 leading-relaxed font-light">{owner.bio}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="text-center max-w-3xl">
-                                                <h2 className="font-display text-4xl md:text-6xl text-[var(--color-theme-primary)] mb-6 italic">{section.title}</h2>
-                                                <p className="font-body text-sm md:text-lg text-[var(--color-theme-secondary)] leading-relaxed font-light mb-12">{section.content}</p>
-                                                <div className="flex justify-center gap-4 md:gap-12 items-center">
-                                                    {section.images?.map((img, i) => (
-                                                        <motion.img 
-                                                            key={i} 
-                                                            src={img} 
-                                                            alt="Giving" 
-                                                            className="h-24 md:h-40 object-contain grayscale hover:grayscale-0 transition-all duration-500"
-                                                            whileHover={{ scale: 1.1 }}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                    {sections.map((section, index) => (
+                        <section
+                            key={section.id}
+                            aria-labelledby={`${section.id}-heading`}
+                            className={`h-[100svh] md:h-full w-full flex items-center justify-center px-5 sm:px-8 pt-24 pb-36 md:py-0 relative overflow-hidden ${
+                                index === 0
+                                    ? "md:px-32"
+                                    : "md:px-48 lg:px-56 xl:px-64"
+                            }`}
+                        >
+                            <motion.div
+                                custom={index}
+                                variants={contentVariants}
+                                initial={false}
+                                animate={activeIndex === index ? "active" : "inactive"}
+                                className={`w-full max-w-5xl ${
+                                    index === 0
+                                        ? "text-center flex flex-col items-center"
+                                        : "grid grid-cols-1 md:grid-cols-[0.78fr_1fr] gap-9 md:gap-16 items-center"
+                                }`}
+                            >
+                                <div className={index === 0 ? "max-w-3xl" : "max-w-xl"}>
+                                    <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
+                                        {section.eyebrow}
+                                    </p>
+                                    {index === 0 ? (
+                                        <h1
+                                            id={`${section.id}-heading`}
+                                            className="font-display text-5xl sm:text-6xl md:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
+                                        >
+                                            {section.title}
+                                        </h1>
+                                    ) : (
+                                        <h2
+                                            id={`${section.id}-heading`}
+                                            className="font-display text-4xl sm:text-5xl md:text-6xl text-white/95 italic tracking-wide leading-none mb-6"
+                                        >
+                                            {section.title}
+                                        </h2>
+                                    )}
+                                    <p className="font-body text-xs sm:text-sm md:text-base text-[var(--color-theme-secondary)]/70 leading-relaxed font-light tracking-[0.08em] md:tracking-[0.1em] uppercase italic">
+                                        {section.body}
+                                    </p>
+                                </div>
 
-                            {idx === sections.length - 1 && (
-                                <div className="absolute bottom-8 left-0 w-full z-20">
+                                {section.founders ? (
+                                    <div className="grid grid-cols-1 gap-6">
+                                        {section.founders.map((founder) => (
+                                            <article
+                                                key={founder.name}
+                                                className="border-b border-white/10 pb-6 transition-colors duration-500 hover:border-[var(--color-theme-primary)]/45"
+                                            >
+                                                <p className="font-body text-[10px] uppercase tracking-[0.28em] text-[var(--color-theme-primary)] mb-2">
+                                                    {founder.role}
+                                                </p>
+                                                <h3 className="font-display text-2xl md:text-3xl text-white/90 italic tracking-wide mb-3">
+                                                    {founder.name}
+                                                </h3>
+                                                <p className="font-body text-xs md:text-sm text-white/50 leading-relaxed font-light">
+                                                    {founder.bio}
+                                                </p>
+                                            </article>
+                                        ))}
+                                    </div>
+                                ) : section.communityImages ? (
+                                    <div className="grid w-full max-w-md grid-cols-3 items-center justify-items-center gap-4 sm:gap-6 md:max-w-lg md:gap-8 overflow-hidden md:justify-self-end">
+                                        {section.communityImages.map((image, imageIndex) => (
+                                            <img
+                                                key={image}
+                                                src={image}
+                                                alt=""
+                                                aria-hidden="true"
+                                                className={`h-20 w-full max-w-[6.5rem] object-contain opacity-80 transition-[filter,opacity] duration-500 hover:opacity-100 sm:h-24 sm:max-w-[8rem] md:h-32 md:max-w-[9rem] lg:h-36 lg:max-w-[10rem] ${
+                                                    imageIndex === 1 ? "" : "grayscale hover:grayscale-0"
+                                                }`}
+                                            />
+                                        ))}
+                                    </div>
+                                ) : index > 0 ? (
+                                    <div className="hidden md:block justify-self-end w-full max-w-sm overflow-hidden border border-white/8 bg-black/10">
+                                        <img
+                                            src={section.image}
+                                            alt=""
+                                            aria-hidden="true"
+                                            className="aspect-[4/5] w-full object-cover brightness-75 transition-transform duration-700 hover:scale-105"
+                                        />
+                                    </div>
+                                ) : null}
+                            </motion.div>
+
+                            {index === sections.length - 1 && (
+                                <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
                                     <Footer embedded />
                                 </div>
                             )}
-                        </div>
+                        </section>
                     ))}
                 </div>
 
-                {/* Navigation Controls */}
-                <div className="hidden md:flex absolute right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
-                    <button 
+                <div className="hidden md:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
+                    <button
+                        type="button"
                         onClick={() => navigateSection("prev")}
                         disabled={activeIndex === 0}
                         className="group flex items-start justify-center text-white/10 hover:text-white transition-all duration-700 disabled:opacity-0 cursor-pointer pointer-events-auto h-[30vh]"
-                        aria-label="Previous section"
+                        aria-label="Previous about section"
                     >
                         <svg viewBox="0 0 24 200" className="h-full w-8 md:w-10" fill="none" stroke="currentColor" strokeWidth="1.5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 200V4M12 4L5 11M12 4L19 11" />
                         </svg>
                     </button>
-                    <button 
+                    <button
+                        type="button"
                         onClick={() => navigateSection("next")}
                         disabled={activeIndex === sections.length - 1}
                         className="group flex items-end justify-center text-white/10 hover:text-white transition-all duration-700 disabled:opacity-0 cursor-pointer pointer-events-auto h-[30vh]"
-                        aria-label="Next section"
+                        aria-label="Next about section"
                     >
                         <svg viewBox="0 0 24 200" className="h-full w-8 md:w-10" fill="none" stroke="currentColor" strokeWidth="1.5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 0V196M12 196L5 189M12 196L19 189" />
@@ -274,26 +386,33 @@ export default function About() {
                     </button>
                 </div>
 
-                {/* Mobile Navigation */}
-                <div className="md:hidden fixed left-4 right-4 bottom-8 z-50 flex items-center justify-between gap-3 pointer-events-none pb-[env(safe-area-inset-bottom)]">
+                <div className="md:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
                     <button
+                        type="button"
                         onClick={() => navigateSection("prev")}
                         disabled={activeIndex === 0}
                         className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
+                        aria-label="Previous about section"
                     >
-                        ↑
+                        <span className="text-2xl leading-none" aria-hidden="true">
+                            ↑
+                        </span>
                     </button>
                     <div className="pointer-events-auto min-w-0 flex-1 rounded-full border border-white/10 bg-black/45 px-4 py-3 text-center backdrop-blur-md">
-                        <p className="truncate font-body text-[10px] uppercase tracking-[0.28em] text-white/55">
+                        <p className="truncate font-body text-[10px] uppercase tracking-[0.28em] text-white/55" aria-live="polite">
                             {currentSection.title}
                         </p>
                     </div>
                     <button
+                        type="button"
                         onClick={() => navigateSection("next")}
                         disabled={activeIndex === sections.length - 1}
                         className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
+                        aria-label="Next about section"
                     >
-                        ↓
+                        <span className="text-2xl leading-none" aria-hidden="true">
+                            ↓
+                        </span>
                     </button>
                 </div>
             </div>
