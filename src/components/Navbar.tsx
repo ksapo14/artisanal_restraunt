@@ -19,7 +19,7 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
     return (
         <>
             <nav
-                className="flex justify-between items-center w-screen fixed h-10 px-4 sm:px-5 md:px-10 py-8 sm:py-10 md:py-15 transition-all duration-500 z-[1000] top-0"
+                className="flex justify-between items-center w-screen fixed h-10 px-4 sm:px-5 md:px-10 py-8 sm:py-10 lg:py-15 transition-all duration-500 z-[1000] top-0"
             >
                 <Link to="/" onClick={closeSiteMap}>
                     <img src={txtWhite} className="transition-all duration-500 object-contain h-8 sm:h-9 md:h-10" />
@@ -33,7 +33,7 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={closeSiteMap}
-                            className={`inline-block border-solid text-white border-white border px-4 sm:px-5 md:px-6 py-3 md:py-4 font-display text-xs sm:text-sm md:text-base transition-all duration-300 hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)] hover:text-black hover:rounded-4xl cursor-pointer ${
+                            className={`inline-block border-solid text-white border-white border px-4 sm:px-5 lg:px-6 py-3 lg:py-4 font-display text-xs sm:text-sm lg:text-base transition-all duration-300 hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)] hover:text-black hover:rounded-4xl cursor-pointer ${
                                 compactMobile ? "hidden sm:block" : ""
                             }`}
                         >
@@ -54,7 +54,7 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
                                 color: hovering ? "var(--color-theme-primary)" : "#ffffff"
                             }}
                             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                            className="text-white font-display text-2xl tracking-[0.15em] uppercase opacity-100 hidden md:block"
+                            className="text-white font-display text-2xl tracking-[0.15em] uppercase opacity-100 hidden lg:block"
                         >
                             {isSiteMapOpen ? "Close" : "Information"}
                         </motion.span>

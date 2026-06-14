@@ -11,12 +11,12 @@ export default function Footer({ embedded = false }: FooterProps) {
         <footer
             className={`relative text-white/65 transition-all duration-500 ${
                 embedded
-                    ? 'h-full flex items-center bg-transparent px-4 md:px-16'
+                    ? 'min-h-20 flex items-center bg-transparent px-4 md:px-16'
                     : 'h-24 flex items-center bg-transparent px-4 md:px-16'
             }`}
         >
-            <div className="w-full max-w-7xl mx-auto flex flex-row justify-between items-center gap-3 min-w-0">
-                <div className="flex flex-row items-center gap-3 md:gap-6 min-w-0 whitespace-nowrap">
+            <div className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-3 min-w-0">
+                <div className="flex flex-row items-center justify-center gap-3 md:gap-6 min-w-0 whitespace-nowrap">
                     <p className="font-body text-[9px] md:text-xs tracking-[0.16em] text-white/55 uppercase truncate">
                         © 2026 ARTISANAL | ALL RIGHTS RESERVED
                     </p>

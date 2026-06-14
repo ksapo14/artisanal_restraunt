@@ -175,13 +175,13 @@ export default function PrivateEvents() {
                 >
                     <section
                         aria-labelledby="events-heading"
-                        className="h-[100svh] md:h-full w-full flex items-center justify-center px-5 sm:px-8 md:px-32 pt-24 pb-36 md:py-0 relative overflow-hidden"
+                        className="h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden"
                     >
                         <motion.div
                             variants={contentVariants}
                             initial={false}
                             animate={activeIndex === 0 ? "active" : "inactive"}
-                            className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-[0.78fr_1fr] gap-9 md:gap-16 items-center"
+                            className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.78fr_1fr] gap-9 lg:gap-16 items-center"
                         >
                             <div className="max-w-xl">
                                 <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
@@ -189,7 +189,7 @@ export default function PrivateEvents() {
                                 </p>
                                 <h1
                                     id="events-heading"
-                                    className="font-display text-5xl sm:text-6xl md:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
+                                    className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
                                 >
                                     {sections[0].title}
                                 </h1>
@@ -198,7 +198,7 @@ export default function PrivateEvents() {
                                 </p>
                             </div>
 
-                            <div className="hidden md:block justify-self-end w-full max-w-sm overflow-hidden border border-white/8 bg-black/10">
+                            <div className="hidden lg:block justify-self-end w-full max-w-sm overflow-hidden border border-white/8 bg-black/10">
                                 <img
                                     src={roomImg}
                                     alt=""
@@ -211,13 +211,13 @@ export default function PrivateEvents() {
 
                     <section
                         aria-labelledby="details-heading"
-                        className="h-[100svh] md:h-full w-full flex items-center justify-center px-5 sm:px-8 md:px-32 pt-24 pb-36 md:py-0 relative overflow-hidden"
+                        className="h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden"
                     >
                         <motion.div
                             variants={contentVariants}
                             initial={false}
                             animate={activeIndex === 1 ? "active" : "inactive"}
-                            className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-[0.78fr_1fr] gap-9 md:gap-16 items-center"
+                            className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.78fr_1fr] gap-9 lg:gap-16 items-center"
                         >
                             <div className="max-w-xl">
                                 <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
@@ -225,7 +225,7 @@ export default function PrivateEvents() {
                                 </p>
                                 <h2
                                     id="details-heading"
-                                    className="font-display text-4xl sm:text-5xl md:text-6xl text-white/95 italic tracking-wide leading-none mb-6"
+                                    className="font-display text-4xl sm:text-5xl lg:text-6xl text-white/95 italic tracking-wide leading-none mb-6"
                                 >
                                     {sections[1].title}
                                 </h2>
@@ -258,13 +258,13 @@ export default function PrivateEvents() {
                             </div>
                         </motion.div>
 
-                        <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
+                        <div className="absolute bottom-32 left-0 w-full z-20 pointer-events-auto lg:bottom-8">
                             <Footer embedded />
                         </div>
                     </section>
                 </div>
 
-                <div className="hidden md:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
+                <div className="hidden lg:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
                     <button
                         type="button"
                         onClick={() => navigateSection("prev")}
@@ -289,7 +289,7 @@ export default function PrivateEvents() {
                     </button>
                 </div>
 
-                <div className="md:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
+                <div className="lg:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
                     <button
                         type="button"
                         onClick={() => navigateSection("prev")}

@@ -147,7 +147,7 @@ export default function Menu() {
             <div className="flex-1 relative overflow-hidden">
                 {/* Side nav — fixed between courses */}
                 <div
-                    className={`hidden md:flex absolute left-8 md:left-24 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${
+                    className={`hidden lg:flex absolute left-8 md:left-24 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${
                         isIntroActive ? "opacity-0 -translate-x-6" : "opacity-100 translate-x-0"
                     }`}
                 >
@@ -185,7 +185,7 @@ export default function Menu() {
                     className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19, 1, 0.22, 1)]"
                     style={{ transform: `translateY(-${activeIndex * 100}%)` }}
                 >
-                    <div className="h-[100svh] md:h-full w-full flex justify-center items-center px-6 md:px-16 pt-24 pb-32 md:py-0 relative overflow-hidden">
+                    <div className="h-[100svh] lg:h-full w-full flex justify-center items-center px-5 sm:px-6 lg:px-16 pt-24 pb-32 lg:py-0 relative overflow-y-auto lg:overflow-hidden">
                         {/* Hero Background Image - Now slides with the section */}
                         <motion.img
                             src={bgImg1}
@@ -215,7 +215,7 @@ export default function Menu() {
                                 initial={{ opacity: 0, y: 16 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
-                                className="font-body text-[10px] sm:text-xs md:text-sm uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)]"
+                                className="font-body text-[10px] sm:text-xs lg:text-sm uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)]"
                             >
                                 Artisanal Dining
                             </motion.p>
@@ -223,7 +223,7 @@ export default function Menu() {
                                 initial={{ opacity: 0, y: 18 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.85, delay: 0.25, ease: [0.19, 1, 0.22, 1] }}
-                                className="font-display text-5xl sm:text-6xl md:text-7xl text-white/95 italic tracking-wide leading-none"
+                                className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none"
                             >
                                 Prix Fixe Menu
                             </motion.h1>
@@ -231,7 +231,7 @@ export default function Menu() {
                                 initial={{ opacity: 0, y: 18 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.85, delay: 0.35, ease: [0.19, 1, 0.22, 1] }}
-                                className="font-body text-xs sm:text-sm md:text-base text-white/55 leading-relaxed font-light tracking-[0.1em] md:tracking-[0.12em] uppercase italic max-w-2xl"
+                                className="font-body text-xs sm:text-sm lg:text-base text-white/55 leading-relaxed font-light tracking-[0.1em] lg:tracking-[0.12em] uppercase italic max-w-2xl"
                             >
                                 Seasonal ingredients, deliberate technique, and composed courses designed for a measured evening at the table.
                             </motion.p>
@@ -239,9 +239,9 @@ export default function Menu() {
                     </div>
 
                     {menuData.map((section, sIdx) => (
-                        <div key={section.id} className="h-[100svh] md:h-full w-full relative">
-                            <div className="h-full w-full overflow-y-auto md:overflow-visible flex flex-col justify-center items-center md:items-end px-5 sm:px-8 md:px-32 pt-28 md:pt-40 pb-36 md:pb-32">
-                                <div className="w-full max-w-xl md:max-w-none md:w-1/2 flex flex-col gap-y-6 sm:gap-y-8 md:gap-y-14">
+                        <div key={section.id} className="h-[100svh] lg:h-full w-full relative">
+                            <div className="h-full w-full overflow-y-auto lg:overflow-visible flex flex-col justify-center items-center lg:items-end px-5 sm:px-8 lg:px-32 pt-28 lg:pt-40 pb-36 lg:pb-32">
+                                <div className="w-full max-w-xl lg:max-w-none lg:w-1/2 flex flex-col gap-y-6 sm:gap-y-8 lg:gap-y-14">
                                     {section.items.map((item, iIdx) => (
                                         <motion.div 
                                             key={item.id} 
@@ -264,7 +264,7 @@ export default function Menu() {
                                                 Click to expand
                                             </div>
 
-                                            <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 shrink-0 overflow-hidden relative rounded-xs self-center bg-white/5">
+                                            <div className="w-18 h-18 sm:w-24 sm:h-24 lg:w-28 lg:h-28 shrink-0 overflow-hidden relative rounded-xs self-center bg-white/5">
                                                 <motion.div
                                                     className="absolute inset-0 border border-white/5 z-10 transition-colors duration-500 group-hover:border-white/20"
                                                     animate={{ borderColor: activeIndex === sIdx + 1 ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.02)" }}
@@ -285,10 +285,10 @@ export default function Menu() {
                                             </div>
                                             <div className="flex flex-col justify-center border-b border-white/5 pb-6 w-full group-hover:border-white/10 transition-colors">
                                                 <div className="flex justify-between items-baseline mb-3">
-                                                    <h3 className="font-display text-base sm:text-lg md:text-2xl text-white/90 group-hover:text-white transition-colors duration-300 tracking-wider leading-tight">{item.name}</h3>
-                                                    <span className="font-body text-[10px] md:text-xs tracking-widest text-white/40 ml-4 font-light italic" style={{ color: sIdx === displayIndex ? section.color : '' }}>{item.price}</span>
+                                                    <h3 className="font-display text-base sm:text-lg lg:text-2xl text-white/90 group-hover:text-white transition-colors duration-300 tracking-wider leading-tight">{item.name}</h3>
+                                                    <span className="font-body text-[10px] lg:text-xs tracking-widest text-white/40 ml-4 font-light italic" style={{ color: sIdx === displayIndex ? section.color : '' }}>{item.price}</span>
                                                 </div>
-                                                <p className="font-body text-[9px] sm:text-[10px] md:text-xs text-white/40 leading-relaxed font-light tracking-[0.08em] md:tracking-[0.1em] uppercase italic group-hover:text-white/60 transition-colors">{item.description}</p>
+                                                <p className="font-body text-[9px] sm:text-[10px] lg:text-xs text-white/40 leading-relaxed font-light tracking-[0.08em] lg:tracking-[0.1em] uppercase italic group-hover:text-white/60 transition-colors">{item.description}</p>
                                             </div>
                                         </motion.div>
                                     ))}
@@ -296,7 +296,7 @@ export default function Menu() {
                             </div>
                             
                             {sIdx === menuData.length - 1 && (
-                                <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
+                                <div className="absolute bottom-32 left-0 w-full z-20 pointer-events-auto lg:bottom-8">
                                     <Footer embedded />
                                 </div>
                             )}
@@ -305,7 +305,7 @@ export default function Menu() {
                 </div>
 
                 {/* Navigation Controls - Spanning Full Page on the Right */}
-                <div className="hidden md:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
+                <div className="hidden lg:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
                     <button 
                         onClick={prevSection}
                         disabled={activeIndex === 0}
@@ -340,7 +340,7 @@ export default function Menu() {
                     </button>
                 </div>
 
-                <div className="md:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
+                <div className="lg:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
                     <button
                         type="button"
                         onClick={prevSection}

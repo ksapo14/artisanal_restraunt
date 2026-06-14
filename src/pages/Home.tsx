@@ -99,7 +99,7 @@ export default function Home() {
                     }`}
                 >
                     <div className="relative flex items-center justify-center">
-                        <svg className="absolute w-72 h-72 md:w-[380px] md:h-[380px]" viewBox="0 0 380 380">
+                        <svg className="absolute w-64 h-64 sm:w-72 sm:h-72 lg:w-[380px] lg:h-[380px]" viewBox="0 0 380 380">
                             <rect x="2" y="2" width="376" height="376" fill="none" stroke="#e5c97a" strokeWidth="3" />
                             <rect
                                 x="2"
@@ -116,7 +116,7 @@ export default function Home() {
                                 style={{ animation: "fillCircle 1.4s ease-out forwards" }}
                             />
                         </svg>
-                        <img src={logoNoBg} className="h-60 w-60 md:h-80 md:w-80 object-contain" alt="" />
+                        <img src={logoNoBg} className="h-52 w-52 sm:h-60 sm:w-60 lg:h-80 lg:w-80 object-contain" alt="" />
                     </div>
                 </div>
             )}
@@ -142,14 +142,14 @@ export default function Home() {
             <Navbar compactMobile />
 
             <div className="flex-1 relative overflow-hidden">
-                <div className="h-full w-full flex justify-center items-center relative px-4 md:px-8 pt-20 pb-36 md:py-0">
+                <div className="h-full w-full flex justify-center items-center relative px-4 lg:px-8 pt-20 pb-36 lg:py-0 overflow-y-auto lg:overflow-hidden">
                     <motion.button
                         type="button"
                         onClick={handlePrevBg}
                         aria-label="Previous background"
                         whileHover={!isMobile ? { scale: 1.15 } : undefined}
                         whileTap={{ scale: 0.85 }}
-                        className={`group absolute left-5 bottom-32 md:bottom-auto md:left-8 z-10 flex h-12 w-16 md:h-auto md:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
+                        className={`group absolute left-5 bottom-32 lg:bottom-auto lg:left-8 z-10 flex h-12 w-16 lg:h-auto lg:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +157,7 @@ export default function Home() {
                             viewBox="0 0 80 24"
                             strokeWidth="2"
                             stroke="currentColor"
-                            className="w-14 h-6 md:w-20 md:h-8"
+                            className="w-14 h-6 lg:w-20 lg:h-8"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M76 12H4M4 12L11 5M4 12L11 19" />
                         </svg>
@@ -171,7 +171,7 @@ export default function Home() {
                         aria-label="Next background"
                         whileHover={!isMobile ? { scale: 1.15 } : undefined}
                         whileTap={{ scale: 0.85 }}
-                        className={`group absolute right-5 bottom-32 md:bottom-auto md:right-8 z-10 flex h-12 w-16 md:h-auto md:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
+                        className={`group absolute right-5 bottom-32 lg:bottom-auto lg:right-8 z-10 flex h-12 w-16 lg:h-auto lg:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -179,7 +179,7 @@ export default function Home() {
                             viewBox="0 0 80 24"
                             strokeWidth="2"
                             stroke="currentColor"
-                            className="w-14 h-6 md:w-20 md:h-8"
+                            className="w-14 h-6 lg:w-20 lg:h-8"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 12H76M76 12L69 5M76 12L69 19" />
                         </svg>

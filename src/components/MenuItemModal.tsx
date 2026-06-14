@@ -27,7 +27,7 @@ export default function MenuItemModal({ item, sectionTitle, accentColor, onClose
 
     return (
         <motion.div
-            className="fixed inset-0 z-[2000] flex items-center justify-center p-6 md:p-12"
+            className="fixed inset-0 z-[2000] flex items-center justify-center overflow-y-auto p-5 sm:p-6 md:p-12"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -44,13 +44,13 @@ export default function MenuItemModal({ item, sectionTitle, accentColor, onClose
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="menu-item-title"
-                className="relative z-10 w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 md:gap-14 pointer-events-none"
+                className="relative z-10 my-auto w-full max-w-4xl flex flex-col md:flex-row items-center gap-6 md:gap-14 pointer-events-none py-8"
                 initial={{ opacity: 0, scale: 0.92, y: 24 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 16 }}
                 transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
             >
-                <div className="pointer-events-auto w-full md:w-[48%] aspect-square max-h-[50vh] md:max-h-[65vh] overflow-hidden relative shrink-0">
+                <div className="pointer-events-auto w-full max-w-xs sm:max-w-sm md:max-w-none md:w-[48%] aspect-square max-h-[38vh] sm:max-h-[46vh] md:max-h-[65vh] overflow-hidden relative shrink-0">
                     <div className="absolute inset-0 border border-white/10 z-10" />
                     <img
                         src={resolveMenuImage(item.image)}
@@ -70,11 +70,11 @@ export default function MenuItemModal({ item, sectionTitle, accentColor, onClose
                     </p>
                     <h2
                         id="menu-item-title"
-                        className="font-display text-3xl md:text-5xl text-white/95 italic tracking-wide mb-5"
+                        className="font-display text-3xl sm:text-4xl md:text-5xl text-white/95 italic tracking-wide mb-4 md:mb-5"
                     >
                         {item.name}
                     </h2>
-                    <p className="font-body text-xs md:text-sm text-white/50 leading-relaxed font-light tracking-[0.12em] uppercase italic max-w-md mb-8">
+                    <p className="font-body text-xs md:text-sm text-white/50 leading-relaxed font-light tracking-[0.1em] md:tracking-[0.12em] uppercase italic max-w-md mb-6 md:mb-8">
                         {item.description}
                     </p>
                     <span

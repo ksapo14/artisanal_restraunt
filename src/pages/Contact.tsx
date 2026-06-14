@@ -214,13 +214,13 @@ export default function Contact() {
                 >
                     <section
                         aria-labelledby="visit-heading"
-                        className="h-[100svh] md:h-full w-full flex items-center justify-center px-5 sm:px-8 md:px-32 pt-24 pb-36 md:py-0 relative overflow-hidden"
+                        className="h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden"
                     >
                         <motion.div
                             variants={contentVariants}
                             initial={false}
                             animate={activeIndex === 0 ? "active" : "inactive"}
-                            className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-[0.82fr_1fr] gap-8 md:gap-16 items-center"
+                            className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.82fr_1fr] gap-8 lg:gap-16 items-center"
                         >
                             <div className="max-w-xl">
                                 <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
@@ -228,7 +228,7 @@ export default function Contact() {
                                 </p>
                                 <h1
                                     id="visit-heading"
-                                    className="font-display text-5xl sm:text-6xl md:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
+                                    className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
                                 >
                                     {sections[0].title}
                                 </h1>
@@ -256,7 +256,7 @@ export default function Contact() {
                                 </div>
                             </div>
 
-                            <div className="w-full h-[34svh] min-h-64 md:h-[58vh] overflow-hidden border border-white/10 bg-black/20">
+                            <div className="w-full h-[32svh] min-h-52 sm:min-h-64 lg:h-[58vh] overflow-hidden border border-white/10 bg-black/20">
                                 <iframe
                                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.2762039233075!2d-81.87413692348507!3d36.08670417242882!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x885090f777e55555%3A0x6a0c5c4e9c7e0f8!2s1200%20Dobbins%20Rd%2C%20Banner%20Elk%2C%20NC%2028604!5e0!3m2!1sen!2sus!4v1717163829000!5m2!1sen!2sus"
                                     width="100%"
@@ -273,13 +273,13 @@ export default function Contact() {
 
                     <section
                         aria-labelledby="message-heading"
-                        className="h-[100svh] md:h-full w-full flex items-center justify-center px-5 sm:px-8 md:px-32 pt-24 pb-36 md:py-0 relative overflow-hidden"
+                        className="h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden"
                     >
                         <motion.div
                             variants={contentVariants}
                             initial={false}
                             animate={activeIndex === 1 ? "active" : "inactive"}
-                            className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-[0.82fr_1fr] gap-8 md:gap-16 items-center"
+                            className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.82fr_1fr] gap-8 lg:gap-16 items-center"
                         >
                             <div className="w-full max-w-xl">
                                 <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
@@ -287,7 +287,7 @@ export default function Contact() {
                                 </p>
                                 <h2
                                     id="message-heading"
-                                    className="font-display text-4xl sm:text-5xl md:text-6xl text-white/95 italic tracking-wide leading-none mb-5"
+                                    className="font-display text-4xl sm:text-5xl lg:text-6xl text-white/95 italic tracking-wide leading-none mb-5"
                                 >
                                     {sections[1].title}
                                 </h2>
@@ -383,7 +383,7 @@ export default function Contact() {
                                 )}
                             </div>
 
-                            <div className="hidden md:block w-full h-[58vh] justify-self-end overflow-hidden border border-white/8 bg-black/10">
+                            <div className="hidden lg:block w-full h-[58vh] justify-self-end overflow-hidden border border-white/8 bg-black/10">
                                 <img
                                     src={diningImg}
                                     alt=""
@@ -393,13 +393,13 @@ export default function Contact() {
                             </div>
                         </motion.div>
 
-                        <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
+                        <div className="absolute bottom-32 left-0 w-full z-20 pointer-events-auto lg:bottom-8">
                             <Footer embedded />
                         </div>
                     </section>
                 </div>
 
-                <div className="hidden md:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
+                <div className="hidden lg:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
                     <button
                         type="button"
                         onClick={() => navigateSection("prev")}
@@ -424,7 +424,7 @@ export default function Contact() {
                     </button>
                 </div>
 
-                <div className="md:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
+                <div className="lg:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
                     <button
                         type="button"
                         onClick={() => navigateSection("prev")}

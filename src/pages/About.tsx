@@ -225,7 +225,7 @@ export default function About() {
 
             <div className="flex-1 relative overflow-hidden">
                 <div
-                    className={`hidden md:flex absolute left-8 md:left-36 lg:left-44 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${
+                    className={`hidden lg:flex absolute left-8 md:left-36 lg:left-44 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${
                         activeIndex === 0 ? "opacity-0 -translate-x-6" : "opacity-100 translate-x-0"
                     }`}
                 >
@@ -266,10 +266,10 @@ export default function About() {
                         <section
                             key={section.id}
                             aria-labelledby={`${section.id}-heading`}
-                            className={`h-[100svh] md:h-full w-full flex items-center justify-center px-5 sm:px-8 pt-24 pb-36 md:py-0 relative overflow-hidden ${
+                            className={`h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden ${
                                 index === 0
-                                    ? "md:px-32"
-                                    : "md:px-48 lg:px-56 xl:px-64"
+                                    ? "lg:px-32"
+                                    : "lg:px-56 xl:px-64"
                             }`}
                         >
                             <motion.div
@@ -280,7 +280,7 @@ export default function About() {
                                 className={`w-full max-w-5xl ${
                                     index === 0
                                         ? "text-center flex flex-col items-center"
-                                        : "grid grid-cols-1 md:grid-cols-[0.78fr_1fr] gap-9 md:gap-16 items-center"
+                                        : "grid grid-cols-1 lg:grid-cols-[0.78fr_1fr] gap-9 lg:gap-16 items-center"
                                 }`}
                             >
                                 <div className={index === 0 ? "max-w-3xl" : "max-w-xl"}>
@@ -290,14 +290,14 @@ export default function About() {
                                     {index === 0 ? (
                                         <h1
                                             id={`${section.id}-heading`}
-                                            className="font-display text-5xl sm:text-6xl md:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
+                                            className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
                                         >
                                             {section.title}
                                         </h1>
                                     ) : (
                                         <h2
                                             id={`${section.id}-heading`}
-                                            className="font-display text-4xl sm:text-5xl md:text-6xl text-white/95 italic tracking-wide leading-none mb-6"
+                                            className="font-display text-4xl sm:text-5xl lg:text-6xl text-white/95 italic tracking-wide leading-none mb-6"
                                         >
                                             {section.title}
                                         </h2>
@@ -327,21 +327,21 @@ export default function About() {
                                         ))}
                                     </div>
                                 ) : section.communityImages ? (
-                                    <div className="grid w-full max-w-md grid-cols-3 items-center justify-items-center gap-4 sm:gap-6 md:max-w-lg md:gap-8 overflow-hidden md:justify-self-end">
+                                    <div className="grid w-full max-w-md grid-cols-3 items-center justify-items-center gap-4 sm:gap-6 lg:max-w-lg lg:gap-8 overflow-hidden lg:justify-self-end">
                                         {section.communityImages.map((image, imageIndex) => (
                                             <img
                                                 key={image}
                                                 src={image}
                                                 alt=""
                                                 aria-hidden="true"
-                                                className={`h-20 w-full max-w-[6.5rem] object-contain opacity-80 transition-[filter,opacity] duration-500 hover:opacity-100 sm:h-24 sm:max-w-[8rem] md:h-32 md:max-w-[9rem] lg:h-36 lg:max-w-[10rem] ${
+                                                className={`h-20 w-full max-w-[6.5rem] object-contain opacity-80 transition-[filter,opacity] duration-500 hover:opacity-100 sm:h-24 sm:max-w-[8rem] lg:h-36 lg:max-w-[10rem] ${
                                                     imageIndex === 1 ? "" : "grayscale hover:grayscale-0"
                                                 }`}
                                             />
                                         ))}
                                     </div>
                                 ) : index > 0 ? (
-                                    <div className="hidden md:block justify-self-end w-full max-w-sm overflow-hidden border border-white/8 bg-black/10">
+                                    <div className="hidden lg:block justify-self-end w-full max-w-sm overflow-hidden border border-white/8 bg-black/10">
                                         <img
                                             src={section.image}
                                             alt=""
@@ -353,7 +353,7 @@ export default function About() {
                             </motion.div>
 
                             {index === sections.length - 1 && (
-                                <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
+                                <div className="absolute bottom-32 left-0 w-full z-20 pointer-events-auto lg:bottom-8">
                                     <Footer embedded />
                                 </div>
                             )}
@@ -361,7 +361,7 @@ export default function About() {
                     ))}
                 </div>
 
-                <div className="hidden md:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
+                <div className="hidden lg:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
                     <button
                         type="button"
                         onClick={() => navigateSection("prev")}
@@ -386,7 +386,7 @@ export default function About() {
                     </button>
                 </div>
 
-                <div className="md:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
+                <div className="lg:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
                     <button
                         type="button"
                         onClick={() => navigateSection("prev")}

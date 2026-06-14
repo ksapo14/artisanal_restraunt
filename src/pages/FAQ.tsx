@@ -52,7 +52,7 @@ export default function FAQ() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
+            className="min-h-[100svh] lg:h-screen w-screen overflow-x-hidden lg:overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
             style={themeStyles}
         >
             <div
@@ -79,16 +79,16 @@ export default function FAQ() {
 
             <Navbar compactMobile />
 
-            <main className="flex-1 relative overflow-hidden">
+            <main className="flex-1 relative overflow-y-auto lg:overflow-hidden">
                 <section
                     aria-labelledby="faq-heading"
-                    className="h-full w-full flex items-center justify-center px-5 sm:px-8 md:px-32 pt-24 pb-36 md:py-0 relative overflow-y-auto md:overflow-hidden"
+                    className="min-h-full w-full flex flex-col items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-8 lg:py-0 relative"
                 >
                     <motion.div
                         initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                         transition={{ duration: 0.75, ease: [0.19, 1, 0.22, 1] }}
-                        className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-[0.78fr_1fr] gap-9 md:gap-16 items-start md:items-center"
+                        className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.78fr_1fr] gap-9 lg:gap-16 items-start lg:items-center"
                     >
                         <div className="max-w-xl">
                             <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
@@ -96,7 +96,7 @@ export default function FAQ() {
                             </p>
                             <h1
                                 id="faq-heading"
-                                className="font-display text-5xl sm:text-6xl md:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
+                                className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
                             >
                                 FAQ
                             </h1>
@@ -105,7 +105,7 @@ export default function FAQ() {
                             </p>
                         </div>
 
-                        <div className="w-full space-y-1 md:justify-self-end">
+                        <div className="w-full space-y-1 lg:justify-self-end">
                             {faqItems.map((item, index) => {
                                 const isOpen = Boolean(faqOpen[index]);
 
@@ -145,7 +145,7 @@ export default function FAQ() {
                         </div>
                     </motion.div>
 
-                    <div className="absolute bottom-8 left-0 w-full z-20 pointer-events-auto">
+                    <div className="mt-10 w-full z-20 pointer-events-auto lg:absolute lg:bottom-8 lg:left-0">
                         <Footer embedded />
                     </div>
                 </section>
