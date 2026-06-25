@@ -1,7 +1,7 @@
-import { StrictMode, cloneElement } from 'react'
+import { StrictMode, cloneElement, useCallback } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { createBrowserRouter, RouterProvider, useLocation, useOutlet, isRouteErrorResponse, useRouteError, Link } from 'react-router';
+import { createBrowserRouter, RouterProvider, useLocation, useOutlet, isRouteErrorResponse, useRouteError, Link, useNavigate } from 'react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import Home from './pages/Home.tsx'
 import Menu from './pages/Menu.tsx';
@@ -11,6 +11,10 @@ import Contact from './pages/Contact.tsx';
 import FAQ from './pages/FAQ.tsx';
 import PrivateEvents from './pages/PrivateEvents.tsx';
 import { UIProvider } from './context/UIContext.tsx';
+import { useUI } from './context/UIContext.tsx';
+import { useSwipeNavigation } from './hooks/useSwipeNavigation.ts';
+
+const swipeRoutes = ["/", "/menu", "/about", "/private-events", "/faq", "/contact"];
 
 function ErrorPage() {
   const error = useRouteError();
@@ -52,6 +56,27 @@ function ErrorPage() {
 function AnimatedLayout() {
   const location = useLocation();
   const element = useOutlet();
+  const navigate = useNavigate();
+  const { isSiteMapOpen, closeSiteMap } = useUI();
+
+  const navigateSwipeRoute = useCallback((direction: "next" | "prev") => {
+    const currentIndex = swipeRoutes.indexOf(location.pathname);
+    if (currentIndex === -1) return;
+
+    const nextIndex = direction === "next" ? currentIndex + 1 : currentIndex - 1;
+    if (nextIndex < 0 || nextIndex >= swipeRoutes.length) return;
+
+    closeSiteMap();
+    navigate(swipeRoutes[nextIndex]);
+  }, [closeSiteMap, location.pathname, navigate]);
+
+  useSwipeNavigation({
+    enabled: !isSiteMapOpen && location.pathname !== "/admin",
+    minDistance: 86,
+    ignoreSelector: "[data-local-horizontal-swipe]",
+    onSwipeLeft: () => navigateSwipeRoute("next"),
+    onSwipeRight: () => navigateSwipeRoute("prev"),
+  });
 
   return (
     <div className="relative w-full h-full">

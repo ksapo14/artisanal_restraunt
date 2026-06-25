@@ -4,7 +4,7 @@ import { useUI } from '../context/UIContext';
 
 const RESERVATION_URL = "https://www.opentable.com/booking/restref/availability?rid=44458&searchdatetime=2024-04-05T19%3A00&correlationId=555d2496-d57d-436f-9b78-c125559a78c0&restRef=44458&dateTime=2024-04-05T19%3A00&partySize=2";
 const GIFT_CARD_URL = "https://order.toasttab.com/egiftcards/artisanal-restaurant-1200-dobbins-rd";
-const linkClass = "flex min-h-12 w-full flex-1 items-center justify-center text-center text-2xl sm:text-3xl md:text-4xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300";
+const linkClass = "flex min-h-14 w-full flex-1 items-center justify-center text-center text-3xl sm:text-4xl md:text-5xl font-display hover:text-[var(--color-theme-primary,#dac464)] transition-colors duration-300";
 
 export default function SiteMap({ open }: { open: boolean }) {
     const { closeSiteMap } = useUI();
@@ -25,7 +25,7 @@ export default function SiteMap({ open }: { open: boolean }) {
             >
                 <nav
                     aria-label="Site map"
-                    className="flex min-h-[calc(100svh-12rem)] w-full max-w-xl flex-1 flex-col items-stretch justify-between"
+                    className="flex min-h-[calc(100svh-12rem)] w-full max-w-xl flex-1 flex-col items-stretch justify-between gap-1"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <Link to="/" onClick={closeSiteMap} className={linkClass}>Home</Link>

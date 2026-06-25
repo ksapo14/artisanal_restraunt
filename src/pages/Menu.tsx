@@ -7,6 +7,7 @@ import MenuItemModal, { type MenuItemDetail } from "../components/MenuItemModal"
 import { useMenuData } from "../hooks/useMenuData";
 import { useUI } from "../context/UIContext";
 import { resolveMenuImage } from "../utils/imageResolver";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import bgImg1 from "../assets/artisanal_full_restraunt_pic.jpg";
 
 type SelectedMenuItem = {
@@ -18,6 +19,7 @@ type SelectedMenuItem = {
 export default function Menu() {
     const { menuData } = useMenuData();
     const { isSiteMapOpen, isMobile } = useUI();
+    const pageRef = useRef<HTMLDivElement | null>(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedItem, setSelectedItem] = useState<SelectedMenuItem | null>(null);
     const sectionSpan = Math.max(menuData.length - 1, 1);
@@ -49,6 +51,13 @@ export default function Menu() {
 
     const nextSection = () => navigateSection("next");
     const prevSection = () => navigateSection("prev");
+
+    useSwipeNavigation({
+        enabled: !isSiteMapOpen && !selectedItem,
+        targetRef: pageRef,
+        onSwipeUp: nextSection,
+        onSwipeDown: prevSection,
+    });
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -119,6 +128,7 @@ export default function Menu() {
 
     return (
         <motion.div 
+            ref={pageRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -185,7 +195,7 @@ export default function Menu() {
                     className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19, 1, 0.22, 1)]"
                     style={{ transform: `translateY(-${activeIndex * 100}%)` }}
                 >
-                    <div className="h-[100svh] lg:h-full w-full flex justify-center items-center px-5 sm:px-6 lg:px-16 pt-24 pb-32 lg:py-0 relative overflow-y-auto lg:overflow-hidden">
+                    <div data-swipe-scroll className="h-[100svh] lg:h-full w-full flex justify-center items-center px-5 sm:px-6 lg:px-16 pt-24 pb-32 lg:py-0 relative overflow-y-auto lg:overflow-hidden">
                         {/* Hero Background Image - Now slides with the section */}
                         <motion.img
                             src={bgImg1}
@@ -240,7 +250,7 @@ export default function Menu() {
 
                     {menuData.map((section, sIdx) => (
                         <div key={section.id} className="h-[100svh] lg:h-full w-full relative">
-                            <div className="h-full w-full overflow-y-auto lg:overflow-visible flex flex-col justify-center items-center lg:items-end px-5 sm:px-8 lg:px-32 pt-28 lg:pt-40 pb-36 lg:pb-32">
+                            <div data-swipe-scroll className="h-full w-full overflow-y-auto lg:overflow-visible flex flex-col justify-center items-center lg:items-end px-5 sm:px-8 lg:px-32 pt-28 lg:pt-40 pb-36 lg:pb-32">
                                 <div className="w-full max-w-xl lg:max-w-none lg:w-1/2 flex flex-col gap-y-6 sm:gap-y-8 lg:gap-y-14">
                                     {section.items.map((item, iIdx) => (
                                         <motion.div 
@@ -285,10 +295,10 @@ export default function Menu() {
                                             </div>
                                             <div className="flex flex-col justify-center border-b border-white/5 pb-6 w-full group-hover:border-white/10 transition-colors">
                                                 <div className="flex justify-between items-baseline mb-3">
-                                                    <h3 className="font-display text-base sm:text-lg lg:text-2xl text-white/90 group-hover:text-white transition-colors duration-300 tracking-wider leading-tight">{item.name}</h3>
-                                                    <span className="font-body text-[10px] lg:text-xs tracking-widest text-white/40 ml-4 font-light italic" style={{ color: sIdx === displayIndex ? section.color : '' }}>{item.price}</span>
+                                                    <h3 className="font-display text-xl sm:text-2xl lg:text-2xl text-white/90 group-hover:text-white transition-colors duration-300 tracking-wider leading-tight">{item.name}</h3>
+                                                    <span className="font-body text-xs sm:text-sm lg:text-xs tracking-widest text-white/40 ml-4 font-light italic" style={{ color: sIdx === displayIndex ? section.color : '' }}>{item.price}</span>
                                                 </div>
-                                                <p className="font-body text-[9px] sm:text-[10px] lg:text-xs text-white/40 leading-relaxed font-light tracking-[0.08em] lg:tracking-[0.1em] uppercase italic group-hover:text-white/60 transition-colors">{item.description}</p>
+                                                <p className="font-body text-xs sm:text-sm lg:text-xs text-white/40 leading-relaxed font-light tracking-[0.08em] lg:tracking-[0.1em] uppercase italic group-hover:text-white/60 transition-colors">{item.description}</p>
                                             </div>
                                         </motion.div>
                                     ))}

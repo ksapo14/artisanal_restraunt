@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import LinkBar from "../components/LinkBar";
 import Navbar from "../components/Navbar";
@@ -9,6 +9,7 @@ import bgImg2 from '../assets/restraunt_2.png';
 import bgImg3 from '../assets/restraunt_3.png';
 import logoNoBg from '../assets/artisanal_logo_high_res_nobg.jpeg';
 import { useUI } from "../context/UIContext";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 
 const themes = [
     {
@@ -37,6 +38,7 @@ const themes = [
 export default function Home() {
     const { isMobile } = useUI();
     const bgImages = [bgImg1, bgImg2, bgImg3];
+    const pageRef = useRef<HTMLDivElement | null>(null);
     const [bgIndex, setBgIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const [sliding, setSliding] = useState(false);
@@ -65,13 +67,19 @@ export default function Home() {
         };
     }, [bgImages.length]);
 
-    const handlePrevBg = () => {
+    const handlePrevBg = useCallback(() => {
         setBgIndex((prev) => (prev === 0 ? bgImages.length - 1 : prev - 1));
-    };
+    }, [bgImages.length]);
 
-    const handleNextBg = () => {
+    const handleNextBg = useCallback(() => {
         setBgIndex((prev) => (prev === bgImages.length - 1 ? 0 : prev + 1));
-    };
+    }, [bgImages.length]);
+
+    useSwipeNavigation({
+        targetRef: pageRef,
+        onSwipeLeft: handleNextBg,
+        onSwipeRight: handlePrevBg,
+    });
 
     const themeStyles = {
         '--color-theme-primary': currentTheme.primary,
@@ -83,6 +91,8 @@ export default function Home() {
 
     return (
         <motion.div
+            ref={pageRef}
+            data-local-horizontal-swipe
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -149,7 +159,8 @@ export default function Home() {
                         aria-label="Previous background"
                         whileHover={!isMobile ? { scale: 1.15 } : undefined}
                         whileTap={{ scale: 0.85 }}
-                        className={`group absolute left-5 bottom-32 lg:bottom-auto lg:left-8 z-10 flex h-12 w-16 lg:h-auto lg:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
+                        style={{ y: "-50%" }}
+                        className={`group absolute left-3 top-1/2 sm:left-5 lg:left-8 z-10 flex h-14 w-14 lg:h-auto lg:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +168,7 @@ export default function Home() {
                             viewBox="0 0 80 24"
                             strokeWidth="2"
                             stroke="currentColor"
-                            className="w-14 h-6 lg:w-20 lg:h-8"
+                            className="w-10 h-6 lg:w-20 lg:h-8"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M76 12H4M4 12L11 5M4 12L11 19" />
                         </svg>
@@ -171,7 +182,8 @@ export default function Home() {
                         aria-label="Next background"
                         whileHover={!isMobile ? { scale: 1.15 } : undefined}
                         whileTap={{ scale: 0.85 }}
-                        className={`group absolute right-5 bottom-32 lg:bottom-auto lg:right-8 z-10 flex h-12 w-16 lg:h-auto lg:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
+                        style={{ y: "-50%" }}
+                        className={`group absolute right-3 top-1/2 sm:right-5 lg:right-8 z-10 flex h-14 w-14 lg:h-auto lg:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -179,7 +191,7 @@ export default function Home() {
                             viewBox="0 0 80 24"
                             strokeWidth="2"
                             stroke="currentColor"
-                            className="w-14 h-6 lg:w-20 lg:h-8"
+                            className="w-10 h-6 lg:w-20 lg:h-8"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 12H76M76 12L69 5M76 12L69 19" />
                         </svg>

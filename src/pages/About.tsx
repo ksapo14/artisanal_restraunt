@@ -5,6 +5,7 @@ import type { Variants } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useUI } from "../context/UIContext";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import bgImg1 from "../assets/artisanal_full_restraunt_pic.jpg";
 import bgImg2 from "../assets/restraunt_2.png";
 import bgImg3 from "../assets/restraunt_3.png";
@@ -90,6 +91,7 @@ export default function About() {
     const { isSiteMapOpen } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
     const [openFounders, setOpenFounders] = useState<Record<string, boolean>>({});
+    const pageRef = useRef<HTMLDivElement | null>(null);
     const activeIndexRef = useRef(activeIndex);
     const isNavigating = useRef(false);
 
@@ -127,6 +129,13 @@ export default function About() {
             [name]: !current[name],
         }));
     }, []);
+
+    useSwipeNavigation({
+        enabled: !isSiteMapOpen,
+        targetRef: pageRef,
+        onSwipeUp: () => navigateSection("next"),
+        onSwipeDown: () => navigateSection("prev"),
+    });
 
     useEffect(() => {
         const handleWheel = (event: WheelEvent) => {
@@ -185,6 +194,7 @@ export default function About() {
 
     return (
         <motion.div
+            ref={pageRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -274,6 +284,7 @@ export default function About() {
                         <section
                             key={section.id}
                             aria-labelledby={`${section.id}-heading`}
+                            data-swipe-scroll
                             className={`h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden ${
                                 index === 0
                                     ? "lg:px-32"

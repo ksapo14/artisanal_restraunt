@@ -6,6 +6,7 @@ import type { Variants } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useUI } from "../context/UIContext";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import bgImg from "../assets/restraunt_2.png";
 import roomImg from "../assets/artisanal_full_restraunt_pic.jpg";
 
@@ -47,6 +48,7 @@ const pageTheme = {
 export default function PrivateEvents() {
     const { isSiteMapOpen, isMobile } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
+    const pageRef = useRef<HTMLDivElement | null>(null);
     const activeIndexRef = useRef(activeIndex);
     const isNavigating = useRef(false);
 
@@ -71,6 +73,13 @@ export default function PrivateEvents() {
             isNavigating.current = false;
         }, 900);
     }, []);
+
+    useSwipeNavigation({
+        enabled: !isSiteMapOpen,
+        targetRef: pageRef,
+        onSwipeUp: () => navigateSection("next"),
+        onSwipeDown: () => navigateSection("prev"),
+    });
 
     useEffect(() => {
         const handleWheel = (event: WheelEvent) => {
@@ -130,6 +139,7 @@ export default function PrivateEvents() {
 
     return (
         <motion.div
+            ref={pageRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -175,6 +185,7 @@ export default function PrivateEvents() {
                 >
                     <section
                         aria-labelledby="events-heading"
+                        data-swipe-scroll
                         className="h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden"
                     >
                         <motion.div
@@ -211,6 +222,7 @@ export default function PrivateEvents() {
 
                     <section
                         aria-labelledby="details-heading"
+                        data-swipe-scroll
                         className="h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden"
                     >
                         <motion.div

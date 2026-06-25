@@ -19,7 +19,7 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
     return (
         <>
             <nav
-                className="flex justify-between items-center w-screen fixed h-10 px-4 sm:px-5 md:px-10 py-8 sm:py-10 lg:py-15 transition-all duration-500 z-[1000] top-0"
+                className="flex justify-between items-center w-screen fixed px-5 sm:px-6 md:px-10 py-5 sm:py-6 lg:py-15 transition-all duration-500 z-[1000] top-0"
             >
                 <Link to="/" onClick={closeSiteMap}>
                     <img src={txtWhite} className="transition-all duration-500 object-contain h-8 sm:h-9 md:h-10" />
@@ -41,7 +41,10 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
                         </a>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.button
+                        type="button"
+                        aria-label={isSiteMapOpen ? "Close site map" : "Open site map"}
+                        aria-expanded={isSiteMapOpen}
                         className="flex items-center gap-4 cursor-pointer group"
                         onClick={toggleSiteMap}
                         onMouseEnter={() => setHovering(true)}
@@ -89,7 +92,7 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
                                 }}
                             />
                         </svg>
-                    </motion.div>
+                    </motion.button>
                 </div>
             </nav>
 
