@@ -233,7 +233,7 @@ export default function Menu() {
                                 transition={{ duration: 0.85, delay: 0.35, ease: [0.19, 1, 0.22, 1] }}
                                 className="font-body text-xs sm:text-sm lg:text-base text-white/55 leading-relaxed font-light tracking-[0.1em] lg:tracking-[0.12em] uppercase italic max-w-2xl"
                             >
-                                Seasonal ingredients, deliberate technique, and composed courses designed for a measured evening at the table.
+                                Join us at Artisanal for a refined three-course prix fixe experience, offered at $110 per guest plus tax and service. Guests can enjoy a thoughtfully curated menu with multiple selections each course, with allergy accommodations available when possible. Reservations require a credit card and may be canceled up to 48 hours in advance; late cancellations are $65 per guest. We invite you to dress business casual and enjoy an elegant, relaxed evening with us.
                             </motion.p>
                         </motion.div>
                     </div>

@@ -7,20 +7,20 @@ import bgImg from "../assets/restraunt_3.png";
 
 const faqItems = [
     {
-        q: "What are your restaurant hours?",
-        a: "We're open Tuesday through Saturday, 5:00 PM to 9:30 PM. Closed Sundays and Mondays. Reservations are recommended, with walk-ins welcomed based on availability.",
+        q: "When are you open?",
+        a: "We plan to be open for the 2026 season for the dates of June 2nd - October. We provide dinner service from 5 PM - 9:15 PM.",
     },
     {
-        q: "Do you accommodate dietary restrictions?",
-        a: "Yes. We accommodate vegetarian, vegan, gluten-free, and other dietary needs with advance notice whenever possible.",
+        q: "What is the allergy policy?",
+        a: "Please let us know about any allergies or dietary needs when booking so our team can prepare accordingly. We can accommodate many gluten, dairy, seafood, nut, and vegetarian requests, and our server will guide you through the best menu options. Vegan or more specific allergy requests should contact us in advance. For severe or life-threatening allergies, please note that we cannot guarantee zero cross-contamination in our open kitchen.",
     },
     {
-        q: "Can I make a reservation online?",
-        a: "Reservations can be made through OpenTable or by calling us directly at 828-898-5395 for specific requests.",
+        q: "What is the corkage policy?",
+        a: "We unfortunately do not allow outside food or beverages.",
     },
     {
-        q: "Do you offer wine pairings?",
-        a: "Yes. Our team curates wine pairings to complement the menu and can guide selections during your visit.",
+        q: "What is the dress code?",
+        a: "We invite guests to dress business casual. For men, collared shirts are required and jackets are welcome but not required. For women, dresses and business casual attire are encouraged. Please avoid shorts, distressed jeans, hoodies, hats, sandals, flip flops, or overly revealing attire. For outdoor dining, dress comfortably for the weather.",
     },
 ];
 

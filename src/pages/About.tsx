@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -61,14 +61,14 @@ const sections: AboutSection[] = [
         theme: { bg: "#1a0f0f", primary: "#d48888", secondary: "#f5f0ed" },
         founders: [
             {
-                name: "Chef Marcus Chen",
-                role: "Executive Chef",
-                bio: "Leads the kitchen with more than 20 years of culinary experience and a precise approach to artisanal technique.",
+                name: "Chef Bill Greene",
+                role: "Head Chef & Sommelier",
+                bio: "Chef-owner and wine director Bill Greene brings a lifelong love of food and wine to Artisanal. He began cooking at just 14 in Linville, NC, before training at the Culinary Institute of America and working in renowned kitchens including Le Cirque, Peacock Alley, and Mary Elaine’s. Today, Bill combines thoughtful cuisine, carefully chosen wines, and genuine hospitality to create an experience that feels both refined and welcoming.",
             },
             {
-                name: "Sophie Durand",
-                role: "Maitre d'Hotel",
-                bio: "Curates the guest experience through warm service, careful pacing, and lasting community partnerships.",
+                name: "Anita Greene",
+                role: "Co-Owner",
+                bio: "Co-owner Anita Greene brings warmth, care, and a thoughtful eye to Artisanal. Raised in Aiken County, South Carolina, she grew up working in her family’s retail business before earning a mechanical engineering degree from the University of South Carolina and building a career in manufacturing and engineering. Today, she helps shape the welcoming spirit of Artisanal while serving on the Appalachian State University Board of Trustees and enjoying time with her family — including puppies Cosmo and KoKo.",
             },
         ],
     },
@@ -89,6 +89,7 @@ const pageTheme = sections[0].theme;
 export default function About() {
     const { isSiteMapOpen } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
+    const [openFounders, setOpenFounders] = useState<Record<string, boolean>>({});
     const activeIndexRef = useRef(activeIndex);
     const isNavigating = useRef(false);
 
@@ -118,6 +119,13 @@ export default function About() {
         window.setTimeout(() => {
             isNavigating.current = false;
         }, 900);
+    }, []);
+
+    const toggleFounder = useCallback((name: string) => {
+        setOpenFounders((current) => ({
+            ...current,
+            [name]: !current[name],
+        }));
     }, []);
 
     useEffect(() => {
@@ -308,21 +316,52 @@ export default function About() {
                                 </div>
 
                                 {section.founders ? (
-                                    <div className="grid grid-cols-1 gap-6">
+                                    <div className="grid grid-cols-1 gap-4">
                                         {section.founders.map((founder) => (
                                             <article
                                                 key={founder.name}
-                                                className="border-b border-white/10 pb-6 transition-colors duration-500 hover:border-[var(--color-theme-primary)]/45"
+                                                className="border-b border-white/10 transition-colors duration-500 hover:border-[var(--color-theme-primary)]/45"
                                             >
-                                                <p className="font-body text-[10px] uppercase tracking-[0.28em] text-[var(--color-theme-primary)] mb-2">
-                                                    {founder.role}
-                                                </p>
-                                                <h3 className="font-display text-2xl md:text-3xl text-white/90 italic tracking-wide mb-3">
-                                                    {founder.name}
-                                                </h3>
-                                                <p className="font-body text-xs md:text-sm text-white/50 leading-relaxed font-light">
-                                                    {founder.bio}
-                                                </p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleFounder(founder.name)}
+                                                    aria-expanded={openFounders[founder.name] ? "true" : "false"}
+                                                    className="group flex w-full items-center justify-between gap-5 py-5 text-left cursor-pointer"
+                                                >
+                                                    <span>
+                                                        <span className="block font-body text-[11px] md:text-xs uppercase tracking-[0.28em] text-[var(--color-theme-primary)] mb-2">
+                                                            {founder.role}
+                                                        </span>
+                                                        <span className="block font-display text-3xl md:text-4xl text-white/90 italic tracking-wide">
+                                                            {founder.name}
+                                                        </span>
+                                                    </span>
+                                                    <span
+                                                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-[var(--color-theme-primary)] transition-all duration-300 group-hover:border-[var(--color-theme-primary)]/55 ${
+                                                            openFounders[founder.name] ? "rotate-180 bg-white/5" : ""
+                                                        }`}
+                                                        aria-hidden="true"
+                                                    >
+                                                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                                                        </svg>
+                                                    </span>
+                                                </button>
+                                                <AnimatePresence initial={false}>
+                                                    {openFounders[founder.name] && (
+                                                        <motion.div
+                                                            initial={{ height: 0, opacity: 0 }}
+                                                            animate={{ height: "auto", opacity: 1 }}
+                                                            exit={{ height: 0, opacity: 0 }}
+                                                            transition={{ duration: 0.28, ease: "easeOut" }}
+                                                            className="overflow-hidden"
+                                                        >
+                                                            <p className="pb-6 font-body text-sm md:text-base text-white/60 leading-relaxed font-light">
+                                                                {founder.bio}
+                                                            </p>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </article>
                                         ))}
                                     </div>
