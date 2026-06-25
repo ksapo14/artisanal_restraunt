@@ -26,7 +26,7 @@ const sections: ContactSection[] = [
     {
         id: "message",
         title: "Contact Us",
-        eyebrow: "Reservations & inquiries",
+        eyebrow: "Inquiries",
         body: "Send a note for private dining, special requests, or general questions. Our team will respond as soon as possible.",
     },
 ];

@@ -1,31 +1,18 @@
 # Artisanal Restaurant Website
 
-A React and Vite website for Artisanal Restaurant. The site includes public pages for the restaurant experience, menus, private events, reservations, FAQs, and an about page with the owners and community information.
+## Visit artisanal-restraunt.vercel.app
 
-## Tech Stack
+A website for Artisanal restraunt in Banner Elk, NC.
 
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- Firebase
+- React Typescript Library
+- Firebase Backend
+- Vercel Frontend Hosting
 
-## Development
+## Main Features
 
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the local development server:
-
-```bash
-npm run dev
-```
-
-Build for production:
-
-```bash
-npm run build
-```
+- Eye-Catching homepage with stunning images
+- Menu page with interactive scroll-through layout
+- About page with detailed information about the restraunt
+- Private Event Booking and FAQ Pages with simple accessible layouts
+- Contact page with a visit us section contatining a navigational map and
+  contact form for inquiries
