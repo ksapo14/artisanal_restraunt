@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import LinkBar from "../components/LinkBar";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../index.css";
 import bgImg1 from '../assets/artisanal_full_restraunt_pic.jpg';
 import bgImg2 from '../assets/restraunt_2.png';
 import bgImg3 from '../assets/restraunt_3.png';
+import logoFull from '../assets/artisanal_logo_high_res(2)_txtwhite.jpeg';
 import logoNoBg from '../assets/artisanal_logo_high_res_nobg.jpeg';
-import { useUI } from "../context/UIContext";
-import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 
 const themes = [
     {
@@ -36,9 +34,7 @@ const themes = [
 ];
 
 export default function Home() {
-    const { isMobile } = useUI();
     const bgImages = [bgImg1, bgImg2, bgImg3];
-    const pageRef = useRef<HTMLDivElement | null>(null);
     const [bgIndex, setBgIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const [sliding, setSliding] = useState(false);
@@ -67,20 +63,6 @@ export default function Home() {
         };
     }, [bgImages.length]);
 
-    const handlePrevBg = useCallback(() => {
-        setBgIndex((prev) => (prev === 0 ? bgImages.length - 1 : prev - 1));
-    }, [bgImages.length]);
-
-    const handleNextBg = useCallback(() => {
-        setBgIndex((prev) => (prev === bgImages.length - 1 ? 0 : prev + 1));
-    }, [bgImages.length]);
-
-    useSwipeNavigation({
-        targetRef: pageRef,
-        onSwipeLeft: handleNextBg,
-        onSwipeRight: handlePrevBg,
-    });
-
     const themeStyles = {
         '--color-theme-primary': currentTheme.primary,
         '--color-theme-secondary': currentTheme.secondary,
@@ -91,8 +73,6 @@ export default function Home() {
 
     return (
         <motion.div
-            ref={pageRef}
-            data-local-horizontal-swipe
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -153,49 +133,21 @@ export default function Home() {
 
             <div className="flex-1 relative overflow-hidden">
                 <div className="h-full w-full flex justify-center items-center relative px-4 lg:px-8 pt-20 pb-36 lg:py-0 overflow-y-auto lg:overflow-hidden">
-                    <motion.button
-                        type="button"
-                        onClick={handlePrevBg}
-                        aria-label="Previous background"
-                        whileHover={!isMobile ? { scale: 1.15 } : undefined}
-                        whileTap={{ scale: 0.85 }}
-                        style={{ y: "-50%" }}
-                        className={`group absolute left-3 top-1/2 sm:left-5 lg:left-8 z-10 flex h-14 w-14 lg:h-auto lg:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
+                    <motion.div
+                        initial={{ opacity: 0, y: 24 }}
+                        animate={{ opacity: loading ? 0 : 1, y: loading ? 24 : 0 }}
+                        transition={{ duration: 0.9, ease: [0.19, 1, 0.22, 1] }}
+                        className="flex flex-col items-center justify-center text-center"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 80 24"
-                            strokeWidth="2"
-                            stroke="currentColor"
-                            className="w-10 h-6 lg:w-20 lg:h-8"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M76 12H4M4 12L11 5M4 12L11 19" />
-                        </svg>
-                    </motion.button>
-
-                    <LinkBar />
-
-                    <motion.button
-                        type="button"
-                        onClick={handleNextBg}
-                        aria-label="Next background"
-                        whileHover={!isMobile ? { scale: 1.15 } : undefined}
-                        whileTap={{ scale: 0.85 }}
-                        style={{ y: "-50%" }}
-                        className={`group absolute right-3 top-1/2 sm:right-5 lg:right-8 z-10 flex h-14 w-14 lg:h-auto lg:w-auto items-center justify-center text-[var(--color-theme-arrow)] hover:text-[var(--color-theme-primary)] transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-115' : ''}`}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 80 24"
-                            strokeWidth="2"
-                            stroke="currentColor"
-                            className="w-10 h-6 lg:w-20 lg:h-8"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 12H76M76 12L69 5M76 12L69 19" />
-                        </svg>
-                    </motion.button>
+                        <img
+                            src={logoFull}
+                            className="h-auto w-[82vw] max-w-3xl object-contain drop-shadow-[0_18px_45px_rgba(0,0,0,0.55)]"
+                            alt="Artisanal"
+                        />
+                        <p className="mt-8 font-body text-[10px] uppercase leading-none tracking-[0.32em] text-[var(--color-theme-secondary)] sm:text-xs lg:text-xl">
+                            Banner Elk - North Carolina
+                        </p>
+                    </motion.div>
                 </div>
             </div>
 

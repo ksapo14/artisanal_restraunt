@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import '../index.css';
-import txtWhite from '../assets/artisanal_logo_high_res(2)_txtwhite.jpeg';
+import logoImg from '../assets/artisanal_logo_high_res_nobg.jpeg';
 import { motion } from 'framer-motion';
 import { useUI } from '../context/UIContext';
 import SiteMap from './SiteMap';
@@ -10,21 +10,76 @@ const RESERVATION_URL = "https://www.opentable.com/booking/restref/availability?
 
 type NavbarProps = {
     compactMobile?: boolean;
+    showLogo?: boolean;
 };
 
-export default function Navbar({ compactMobile = false }: NavbarProps) {
+const navLinks = [
+    { name: "Home", url: "/" },
+    { name: "Menu", url: "/menu" },
+    { name: "About", url: "/about" },
+    { name: "Contact", url: "/contact" },
+];
+
+export default function Navbar({ compactMobile = false, showLogo = true }: NavbarProps) {
     const { isSiteMapOpen, isMobile, toggleSiteMap, closeSiteMap } = useUI();
     const [hovering, setHovering] = useState(false);
 
     return (
         <>
             <nav
-                className="flex justify-between items-center w-screen fixed px-5 sm:px-6 md:px-10 py-5 sm:py-6 lg:py-15 transition-all duration-500 z-[1000] top-0"
+                className="fixed inset-x-0 top-0 z-[1000] grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 px-5 py-5 transition-all duration-500 sm:gap-x-4 sm:px-6 sm:py-6 md:gap-x-3 md:px-8 lg:gap-x-5 lg:px-10 lg:py-15"
             >
-                <Link to="/" onClick={closeSiteMap}>
-                    <img src={txtWhite} className="transition-all duration-500 object-contain h-8 sm:h-9 md:h-10" />
-                </Link>
-                <div className='flex flex-row justify-between items-center gap-3 sm:gap-5 md:gap-8'>
+                <div className="flex min-w-0 items-center justify-start ml-5">
+                    {showLogo ? (
+                        <motion.div
+                            className="shrink-0"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.65, ease: [0.19, 1, 0.22, 1] }}
+                            whileHover={!isMobile ? { scale: 1.06, y: -2 } : undefined}
+                            whileTap={{ scale: 0.96 }}
+                        >
+                            <Link to="/" onClick={closeSiteMap} aria-label="Artisanal home">
+                                <img
+                                    src={logoImg}
+                                    className="h-7 w-auto object-contain transition-all duration-500 sm:h-8 lg:h-9 xl:h-10"
+                                    alt="Artisanal"
+                                />
+                            </Link>
+                        </motion.div>
+                    ) : (
+                        <div className="h-7 sm:h-8 lg:h-9 xl:h-10" aria-hidden="true" />
+                    )}
+                </div>
+
+                <div
+                    className={`hidden min-w-0 items-center justify-center gap-2 transition-opacity duration-300 md:flex lg:gap-3 xl:gap-5 ${
+                        isSiteMapOpen ? "pointer-events-none opacity-0" : "opacity-100"
+                    }`}
+                >
+                    {navLinks.map((link, index) => (
+                        <div key={link.name} className="flex min-w-0 items-center gap-2 lg:gap-3 xl:gap-5">
+                            <motion.div
+                                whileHover={!isMobile ? { scale: 1.08 } : undefined}
+                                whileTap={{ scale: 0.94 }}
+                                transition={{ type: "spring", stiffness: 150, damping: 30 }}
+                            >
+                                <Link
+                                    to={link.url}
+                                    onClick={closeSiteMap}
+                                    className="inline-block whitespace-nowrap font-display text-lg leading-none text-[var(--color-theme-secondary,#ffe6ac)] transition-colors duration-500 ease-out hover:text-[var(--color-theme-primary,#dac464)] lg:text-2xl xl:text-3xl 2xl:text-4xl"
+                                >
+                                    {link.name}
+                                </Link>
+                            </motion.div>
+                            {index < navLinks.length - 1 && (
+                                <span className="h-1 w-1 shrink-0 rounded-full bg-[var(--color-theme-primary,#dac464)] transition-colors duration-500 xl:h-1.5 xl:w-1.5" />
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex shrink-0 flex-row items-center justify-end gap-3 sm:gap-5 lg:gap-6 xl:gap-8">
                     <motion.div
                         whileTap={isMobile ? { scale: 0.95 } : { scale: 0.98 }}
                     >
@@ -33,7 +88,7 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={closeSiteMap}
-                            className={`inline-block border-solid text-white border-white border px-4 sm:px-5 lg:px-6 py-3 lg:py-4 font-display text-xs sm:text-sm lg:text-base transition-all duration-300 hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)] hover:text-black hover:rounded-4xl cursor-pointer ${
+                            className={`inline-block cursor-pointer whitespace-nowrap border border-solid border-white px-3 py-2.5 font-display text-[11px] text-white transition-all duration-300 hover:rounded-4xl hover:border-[var(--color-theme-primary)] hover:bg-[var(--color-theme-primary)] hover:text-black sm:px-4 sm:py-3 sm:text-xs lg:px-5 lg:text-sm xl:px-6 xl:py-4 xl:text-base ${
                                 compactMobile ? "hidden sm:block" : ""
                             }`}
                         >
@@ -57,7 +112,7 @@ export default function Navbar({ compactMobile = false }: NavbarProps) {
                                 color: hovering ? "var(--color-theme-primary)" : "#ffffff"
                             }}
                             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                            className="text-white font-display text-2xl tracking-[0.15em] uppercase opacity-100 hidden lg:block"
+                            className="hidden font-display text-2xl uppercase tracking-[0.15em] text-white opacity-100 2xl:block"
                         >
                             {isSiteMapOpen ? "Close" : "Information"}
                         </motion.span>

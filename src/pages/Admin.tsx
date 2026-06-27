@@ -1,23 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
+import {
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    signOut,
+    type User,
+} from "firebase/auth";
+import { motion } from "framer-motion";
 import { auth, isFirebaseConfigured } from "../api/firebase-config";
-import { createId, fetchMenuDetailed, publishDefaultMenu, saveMenu } from "../api/menuService";
-import { resolveMenuImage } from "../utils/imageResolver";
-import { formatFirebaseError } from "../lib/firebaseErrors";
-import { uploadMenuImage } from "../api/storageService";
-import { defaultMenuData } from "../data/defaultMenu";
-import { MENU_CACHE_UPDATED, writeMenuCache } from "../lib/menuCache";
-import type { MenuItem, MenuSection } from "../types/menu";
+import {
+    fetchMenuPages,
+    isCloudinaryConfigured,
+    uploadMenuPage,
+} from "../api/menuAssetService";
+import {
+    MENU_CATEGORIES,
+    type MenuCategoryId,
+    type MenuPage,
+} from "../lib/menuAssets";
+import bgImg from "../assets/artisanal_full_restraunt_pic.jpg";
 
-function notifyMenuUpdated(sections: MenuSection[]) {
-    writeMenuCache(sections);
-    window.dispatchEvent(new CustomEvent(MENU_CACHE_UPDATED));
-}
+type SelectionState = Record<MenuCategoryId, File[]>;
+type StatusState = Record<MenuCategoryId, string | null>;
+type ProgressState = Record<MenuCategoryId, number>;
+type PublishedState = Record<MenuCategoryId, MenuPage[]>;
 
-function emptyItem(): MenuItem {
-    return { id: createId("item"), name: "", description: "", price: "", image: "" };
-}
+const emptySelections: SelectionState = { dinner: [], dessert: [] };
+const emptyStatuses: StatusState = { dinner: null, dessert: null };
+const emptyProgress: ProgressState = { dinner: 0, dessert: 0 };
+const emptyPublishedPages: PublishedState = { dinner: [], dessert: [] };
 
 export default function Admin() {
     const [user, setUser] = useState<User | null>(null);
@@ -25,21 +36,18 @@ export default function Admin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [authError, setAuthError] = useState<string | null>(null);
-
-    const [menu, setMenu] = useState<MenuSection[]>([]);
-    const [menuLoading, setMenuLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [status, setStatus] = useState<string | null>(null);
-    const [uploadingId, setUploadingId] = useState<string | null>(null);
-    const [uploadProgress, setUploadProgress] = useState<number>(0);
-    const [loadError, setLoadError] = useState<string | null>(null);
-    const [menuPublished, setMenuPublished] = useState(true);
+    const [selections, setSelections] = useState<SelectionState>(emptySelections);
+    const [statuses, setStatuses] = useState<StatusState>(emptyStatuses);
+    const [progress, setProgress] = useState<ProgressState>(emptyProgress);
+    const [publishing, setPublishing] = useState<MenuCategoryId | null>(null);
+    const [publishedPages, setPublishedPages] = useState<PublishedState>(emptyPublishedPages);
 
     useEffect(() => {
-        if (!isFirebaseConfigured || !auth) {
+        if (!auth) {
             setAuthLoading(false);
             return;
         }
+
         return onAuthStateChanged(auth, (nextUser) => {
             setUser(nextUser);
             setAuthLoading(false);
@@ -48,407 +56,484 @@ export default function Admin() {
 
     useEffect(() => {
         if (!user) return;
+        let cancelled = false;
+        const categoryIds = Object.keys(MENU_CATEGORIES) as MenuCategoryId[];
 
-        const load = async () => {
-            setMenuLoading(true);
-            const result = await fetchMenuDetailed();
-            if (result.status === "ok") {
-                setMenu(result.sections);
-                setMenuPublished(true);
-                setLoadError(null);
-            } else {
-                setMenu(structuredClone(defaultMenuData));
-                setMenuPublished(result.status !== "empty");
-                setLoadError(result.status === "empty" ? null : result.message);
-            }
-            setMenuLoading(false);
+        Promise.allSettled(categoryIds.map((categoryId) => fetchMenuPages(categoryId)))
+            .then((results) => {
+                if (cancelled) return;
+
+                results.forEach((result, index) => {
+                    const categoryId = categoryIds[index];
+                    if (result.status === "fulfilled") {
+                        setPublishedPages((current) => ({
+                            ...current,
+                            [categoryId]: result.value,
+                        }));
+                    } else {
+                        setStatuses((current) => ({
+                            ...current,
+                            [categoryId]: result.reason instanceof Error
+                                ? result.reason.message
+                                : "Unable to load current menu images.",
+                        }));
+                    }
+                });
+            });
+
+        return () => {
+            cancelled = true;
         };
-
-        load();
     }, [user]);
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleLogin = async (event: React.FormEvent) => {
+        event.preventDefault();
         setAuthError(null);
-        if (!isFirebaseConfigured || !auth) {
+
+        if (!auth) {
             setAuthError("Firebase Authentication is not configured.");
             return;
         }
+
         try {
             await signInWithEmailAndPassword(auth, email, password);
-        } catch (err) {
-            setAuthError(err instanceof Error ? err.message : "Sign in failed");
+        } catch {
+            setAuthError("Unable to sign in with those credentials.");
         }
     };
 
-    const handleLogout = () => {
-        if (!isFirebaseConfigured || !auth) return;
-        signOut(auth);
+    const handleLogout = async () => {
+        if (auth) await signOut(auth);
     };
 
-    const updateSection = (sectionId: string, patch: Partial<MenuSection>) => {
-        setMenu((prev) => prev.map((s) => (s.id === sectionId ? { ...s, ...patch } : s)));
-        setStatus(null);
-    };
-
-    const updateItem = (sectionId: string, itemId: string, patch: Partial<MenuItem>) => {
-        setMenu((prev) =>
-            prev.map((s) =>
-                s.id === sectionId
-                    ? { ...s, items: s.items.map((item) => (item.id === itemId ? { ...item, ...patch } : item)) }
-                    : s
-            )
-        );
-        setStatus(null);
-    };
-
-    const addItem = (sectionId: string) => {
-        setMenu((prev) =>
-            prev.map((s) => (s.id === sectionId ? { ...s, items: [...s.items, emptyItem()] } : s))
-        );
-        setStatus(null);
-    };
-
-    const removeItem = (sectionId: string, itemId: string) => {
-        setMenu((prev) =>
-            prev.map((s) =>
-                s.id === sectionId ? { ...s, items: s.items.filter((item) => item.id !== itemId) } : s
-            )
-        );
-        setStatus(null);
-    };
-
-    const addSection = () => {
-        setMenu((prev) => [
-            ...prev,
-            { id: createId("section"), title: "New Section", color: "#dac464", bg: "#1c170a", items: [] },
-        ]);
-        setStatus(null);
-    };
-
-    const removeSection = (sectionId: string) => {
-        if (menu.length <= 1) return;
-        setMenu((prev) => prev.filter((s) => s.id !== sectionId));
-        setStatus(null);
-    };
-
-    const handleImageUpload = async (sectionId: string, itemId: string, file: File) => {
-        setUploadingId(itemId);
-        setUploadProgress(0);
-        setStatus(null);
-        try {
-            const url = await uploadMenuImage(file, itemId, (progress) => {
-                setUploadProgress(Math.round(progress));
-            });
-            updateItem(sectionId, itemId, { image: url });
-            setStatus("Image uploaded successfully.");
-        } catch (err) {
-            setStatus(err instanceof Error ? err.message : "Image upload failed");
-        } finally {
-            setUploadingId(null);
-            setUploadProgress(0);
-        }
-    };
-
-    const handleSave = async () => {
-        setSaving(true);
-        setStatus(null);
-        try {
-            await saveMenu(menu);
-            setMenuPublished(true);
-            notifyMenuUpdated(menu);
-            setLoadError(null);
-            setStatus("Menu saved. Changes are live on the menu page.");
-        } catch (err) {
-            setStatus(formatFirebaseError(err));
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const handlePublishDefaults = async (skipConfirm = false) => {
-        if (
-            !skipConfirm &&
-            menuPublished &&
-            !window.confirm("Overwrite Firebase menu with built-in defaults?")
-        ) {
+    const handleSelection = (categoryId: MenuCategoryId, files: File[]) => {
+        if (files.length < 1 || files.length > 2) {
+            setSelections((current) => ({ ...current, [categoryId]: [] }));
+            setStatuses((current) => ({
+                ...current,
+                [categoryId]: "Choose one or two images.",
+            }));
             return;
         }
-        setSaving(true);
-        setStatus(null);
+
+        if (files.some((file) => !file.type.startsWith("image/"))) {
+            setSelections((current) => ({ ...current, [categoryId]: [] }));
+            setStatuses((current) => ({
+                ...current,
+                [categoryId]: "Only image files can be uploaded.",
+            }));
+            return;
+        }
+
+        setSelections((current) => ({ ...current, [categoryId]: files }));
+        setStatuses((current) => ({ ...current, [categoryId]: null }));
+        setProgress((current) => ({ ...current, [categoryId]: 0 }));
+    };
+
+    const handleRemoveSelection = (categoryId: MenuCategoryId, index: number) => {
+        setSelections((current) => ({
+            ...current,
+            [categoryId]: current[categoryId].filter((_, fileIndex) => fileIndex !== index),
+        }));
+        setStatuses((current) => ({ ...current, [categoryId]: null }));
+        setProgress((current) => ({ ...current, [categoryId]: 0 }));
+    };
+
+    const handlePublish = async (categoryId: MenuCategoryId) => {
+        if (!user) return;
+
+        const files = selections[categoryId];
+        if (files.length < 1 || files.length > 2) {
+            setStatuses((current) => ({
+                ...current,
+                [categoryId]: "Choose one or two images before publishing.",
+            }));
+            return;
+        }
+
+        const category = MENU_CATEGORIES[categoryId];
+        const batchId = Date.now().toString();
+        const uploadedPages: MenuPage[] = [];
+        setPublishing(categoryId);
+        setStatuses((current) => ({ ...current, [categoryId]: null }));
+        setProgress((current) => ({ ...current, [categoryId]: 0 }));
+
         try {
-            const sections = await publishDefaultMenu();
-            setMenu(sections);
-            setMenuPublished(true);
-            notifyMenuUpdated(sections);
-            setLoadError(null);
-            setStatus("Default menu published to Firebase.");
-        } catch (err) {
-            setStatus(formatFirebaseError(err));
+            for (let index = 0; index < files.length; index += 1) {
+                const file = files[index];
+                const page = await uploadMenuPage(categoryId, batchId, index + 1, file, (fileProgress) => {
+                    const totalProgress = ((index + fileProgress / 100) / files.length) * 100;
+                    setProgress((current) => ({
+                        ...current,
+                        [categoryId]: Math.round(totalProgress),
+                    }));
+                });
+                uploadedPages.push(page);
+            }
+
+            setSelections((current) => ({ ...current, [categoryId]: [] }));
+            setPublishedPages((current) => ({ ...current, [categoryId]: uploadedPages }));
+            setProgress((current) => ({ ...current, [categoryId]: 100 }));
+            setStatuses((current) => ({
+                ...current,
+                [categoryId]: `${category.title} published successfully.`,
+            }));
+        } catch (error) {
+            setStatuses((current) => ({
+                ...current,
+                [categoryId]: error instanceof Error ? error.message : "Menu upload failed.",
+            }));
         } finally {
-            setSaving(false);
+            setPublishing(null);
         }
     };
 
     if (authLoading) {
-        return (
-            <div className="min-h-screen bg-neutral-100 flex items-center justify-center font-body text-neutral-600">
-                Loading…
-            </div>
-        );
+        return <AdminMessage message="Loading admin..." />;
     }
 
     if (!user) {
         return (
-            <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-6 font-body">
-                <form onSubmit={handleLogin} className="w-full max-w-sm bg-white border border-neutral-200 rounded-lg p-6 space-y-4">
-                    <h1 className="text-lg font-semibold text-neutral-900">Menu Admin</h1>
-                    {!isFirebaseConfigured && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm space-y-1">
-                            <p className="font-semibold">Firebase Not Configured</p>
-                            <p>Please add <strong>FIREBASE_API_KEY</strong> to your Vercel project environment variables and redeploy.</p>
+            <AdminShell>
+                <main className="flex min-h-[100svh] items-center justify-center px-5 py-16">
+                    <form
+                        onSubmit={handleLogin}
+                        className="w-full max-w-sm border border-white/15 bg-black/45 p-6 backdrop-blur-md sm:p-8"
+                    >
+                        <p className="font-body text-[10px] uppercase tracking-[0.3em] text-[#dac464]">
+                            Artisanal
+                        </p>
+                        <h1 className="mt-2 font-display text-4xl text-white">Menu Admin</h1>
+                        <p className="mt-3 font-body text-xs leading-relaxed text-white/50">
+                            Sign in with your Firebase administrator account.
+                        </p>
+
+                        {!isFirebaseConfigured && (
+                            <p className="mt-5 border border-red-300/30 bg-red-950/40 px-3 py-3 font-body text-xs text-red-100">
+                                Add VITE_FIREBASE_API_KEY to the deployment environment.
+                            </p>
+                        )}
+                        {authError && (
+                            <p className="mt-5 font-body text-xs text-red-200" role="alert">
+                                {authError}
+                            </p>
+                        )}
+
+                        <div className="mt-7 space-y-5">
+                            <TextField
+                                label="Email"
+                                type="email"
+                                value={email}
+                                onChange={setEmail}
+                                autoComplete="email"
+                            />
+                            <TextField
+                                label="Password"
+                                type="password"
+                                value={password}
+                                onChange={setPassword}
+                                autoComplete="current-password"
+                            />
                         </div>
-                    )}
-                    <p className="text-sm text-neutral-600">Sign in with your Firebase admin account.</p>
-                    {authError && <p className="text-sm text-red-600">{authError}</p>}
-                    <label className="block text-sm">
-                        <span className="text-neutral-600">Email</span>
-                        <input
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="mt-1 w-full border border-neutral-300 rounded px-3 py-2 text-sm"
-                        />
-                    </label>
-                    <label className="block text-sm">
-                        <span className="text-neutral-600">Password</span>
-                        <input
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 w-full border border-neutral-300 rounded px-3 py-2 text-sm"
-                        />
-                    </label>
-                    <button type="submit" className="w-full py-2 bg-neutral-900 text-white rounded text-sm hover:bg-neutral-800">
-                        Sign in
-                    </button>
-                    <Link to="/menu" className="block text-center text-sm text-neutral-500 hover:text-neutral-800">
-                        Back to menu
-                    </Link>
-                </form>
-            </div>
+
+                        <button
+                            type="submit"
+                            disabled={!isFirebaseConfigured}
+                            className="mt-7 w-full cursor-pointer border border-[#dac464] px-5 py-3 font-body text-xs uppercase tracking-[0.18em] text-[#ffe6ac] transition-colors hover:bg-[#dac464] hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Sign in
+                        </button>
+                        <Link
+                            to="/menu"
+                            className="mt-5 block text-center font-body text-[10px] uppercase tracking-[0.18em] text-white/45 transition-colors hover:text-white"
+                        >
+                            Return to menu
+                        </Link>
+                    </form>
+                </main>
+            </AdminShell>
         );
     }
 
     return (
-        <div className="min-h-screen bg-neutral-100 text-neutral-900 font-body overflow-y-auto">
-            <header className="sticky top-0 z-10 bg-white border-b border-neutral-200 px-4 py-4 md:px-8">
-                <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <AdminShell>
+            <header className="sticky top-0 z-20 border-b border-white/10 bg-[#151108]/95 px-5 py-4 backdrop-blur-md sm:px-8">
+                <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-lg font-semibold">Menu Admin</h1>
-                        <p className="text-xs text-neutral-500">{user.email}</p>
+                        <p className="font-body text-[9px] uppercase tracking-[0.28em] text-[#dac464]">
+                            Artisanal
+                        </p>
+                        <h1 className="font-display text-3xl text-white">Menu Admin</h1>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 text-sm">
-                        <Link to="/menu" className="px-3 py-1.5 border border-neutral-300 rounded hover:bg-neutral-50">
+                    <div className="flex items-center gap-5">
+                        <Link
+                            to="/menu"
+                            className="font-body text-[10px] uppercase tracking-[0.16em] text-white/60 transition-colors hover:text-[#dac464]"
+                        >
                             View menu
                         </Link>
-                        <button type="button" onClick={handleLogout} className="px-3 py-1.5 border border-neutral-300 rounded hover:bg-neutral-50">
+                        <button
+                            type="button"
+                            onClick={handleLogout}
+                            className="cursor-pointer font-body text-[10px] uppercase tracking-[0.16em] text-white/60 transition-colors hover:text-[#dac464]"
+                        >
                             Sign out
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => handlePublishDefaults()}
-                            disabled={saving}
-                            className="px-3 py-1.5 border border-neutral-300 rounded hover:bg-neutral-50 disabled:opacity-50"
-                        >
-                            Reset to defaults
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleSave}
-                            disabled={saving}
-                            className="px-3 py-1.5 bg-neutral-900 text-white rounded hover:bg-neutral-800 disabled:opacity-50"
-                        >
-                            {saving ? "Saving…" : "Save to Firebase"}
                         </button>
                     </div>
                 </div>
-                {status && <p className="max-w-3xl mx-auto mt-2 text-sm text-neutral-700">{status}</p>}
             </header>
 
-            <main className="max-w-3xl mx-auto px-4 py-8 md:px-8 space-y-8">
-                {loadError && (
-                    <p className="text-sm text-red-600 rounded border border-red-200 bg-red-50 px-4 py-3">{loadError}</p>
-                )}
+            <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-10 sm:px-8 sm:py-14">
+                <div className="mb-10">
+                    <p className="font-body text-[10px] uppercase tracking-[0.25em] text-white/40">
+                        Signed in as {user.email}
+                    </p>
+                    <h2 className="mt-2 max-w-2xl font-display text-4xl leading-tight text-white sm:text-5xl">
+                        Publish current menu pages
+                    </h2>
+                </div>
 
-                {!menuLoading && !menuPublished && (
-                    <div className="rounded-lg border border-amber-300 bg-amber-50 p-5 space-y-3">
-                        <p className="text-sm text-amber-950 font-medium">First-time setup</p>
-                        <p className="text-sm text-amber-900">
-                            Firestore is connected, but there is no menu saved yet. Publish the starter menu to create{" "}
-                            <code className="text-xs bg-amber-100 px-1 rounded">menu/current</code> in Firebase.
-                        </p>
-                        <button
-                            type="button"
-                            onClick={() => handlePublishDefaults(true)}
-                            disabled={saving}
-                            className="px-4 py-2 bg-neutral-900 text-white text-sm rounded hover:bg-neutral-800 disabled:opacity-50"
-                        >
-                            {saving ? "Publishing…" : "Publish starter menu to Firebase"}
-                        </button>
-                    </div>
-                )}
-
-                {menuLoading ? (
-                    <p className="text-sm text-neutral-600">Loading menu…</p>
-                ) : (
-                    <>
-                        {menu.map((section) => (
-                            <section key={section.id} className="bg-white border border-neutral-200 rounded-lg p-5 space-y-5">
-                                <div className="flex flex-wrap items-start justify-between gap-3">
-                                    <h2 className="text-base font-semibold">Section</h2>
-                                    {menu.length > 1 && (
-                                        <button
-                                            type="button"
-                                            onClick={() => removeSection(section.id)}
-                                            className="text-sm text-red-600 hover:underline"
-                                        >
-                                            Remove section
-                                        </button>
-                                    )}
-                                </div>
-
-                                <label className="block text-sm">
-                                    <span className="text-neutral-600">Title</span>
-                                    <input
-                                        type="text"
-                                        value={section.title}
-                                        onChange={(e) => updateSection(section.id, { title: e.target.value })}
-                                        className="mt-1 w-full border border-neutral-300 rounded px-3 py-2 text-sm"
-                                    />
-                                </label>
-
-                                <div className="grid grid-cols-2 gap-3">
-                                    <label className="block text-sm">
-                                        <span className="text-neutral-600">Accent color</span>
-                                        <input
-                                            type="color"
-                                            value={section.color}
-                                            onChange={(e) => updateSection(section.id, { color: e.target.value })}
-                                            className="mt-1 w-full h-10 border border-neutral-300 rounded cursor-pointer"
-                                        />
-                                    </label>
-                                    <label className="block text-sm">
-                                        <span className="text-neutral-600">Background</span>
-                                        <input
-                                            type="color"
-                                            value={section.bg}
-                                            onChange={(e) => updateSection(section.id, { bg: e.target.value })}
-                                            className="mt-1 w-full h-10 border border-neutral-300 rounded cursor-pointer"
-                                        />
-                                    </label>
-                                </div>
-
-                                <div className="space-y-6 pt-2 border-t border-neutral-100">
-                                    {section.items.map((item, index) => (
-                                        <div key={item.id} className="space-y-3 pb-6 border-b border-neutral-100 last:border-0 last:pb-0">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm font-medium text-neutral-700">Item {index + 1}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeItem(section.id, item.id)}
-                                                    className="text-sm text-red-600 hover:underline"
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
-
-                                            {item.image && (
-                                                <img src={resolveMenuImage(item.image)} alt="" className="w-20 h-20 object-cover rounded border border-neutral-200" />
-                                            )}
-
-                                            <label className="block text-sm">
-                                                <span className="text-neutral-600">Name</span>
-                                                <input
-                                                    type="text"
-                                                    value={item.name}
-                                                    onChange={(e) => updateItem(section.id, item.id, { name: e.target.value })}
-                                                    className="mt-1 w-full border border-neutral-300 rounded px-3 py-2 text-sm"
-                                                />
-                                            </label>
-
-                                            <label className="block text-sm">
-                                                <span className="text-neutral-600">Description</span>
-                                                <textarea
-                                                    value={item.description}
-                                                    onChange={(e) => updateItem(section.id, item.id, { description: e.target.value })}
-                                                    rows={2}
-                                                    className="mt-1 w-full border border-neutral-300 rounded px-3 py-2 text-sm resize-y"
-                                                />
-                                            </label>
-
-                                            <label className="block text-sm">
-                                                <span className="text-neutral-600">Price</span>
-                                                <input
-                                                    type="text"
-                                                    value={item.price}
-                                                    onChange={(e) => updateItem(section.id, item.id, { price: e.target.value })}
-                                                    placeholder="$18"
-                                                    className="mt-1 w-full border border-neutral-300 rounded px-3 py-2 text-sm"
-                                                />
-                                            </label>
-
-                                            <div className="block text-sm">
-                                                <span className="text-neutral-600">Upload image</span>
-                                                <input
-                                                    id={`upload-${item.id}`}
-                                                    type="file"
-                                                    accept="image/*"
-                                                    disabled={uploadingId === item.id}
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) handleImageUpload(section.id, item.id, file);
-                                                        e.target.value = "";
-                                                    }}
-                                                    className="sr-only"
-                                                />
-                                                <label
-                                                    htmlFor={`upload-${item.id}`}
-                                                    className={`mt-2 inline-flex items-center justify-center px-4 py-2 text-sm font-medium border border-neutral-300 rounded bg-white hover:bg-neutral-50 transition-colors select-none ${
-                                                        uploadingId === item.id
-                                                            ? "opacity-50 cursor-not-allowed pointer-events-none"
-                                                            : "cursor-pointer"
-                                                    }`}
-                                                >
-                                                    {uploadingId === item.id ? `Uploading ${uploadProgress}%…` : "Choose a file"}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <button
-                                    type="button"
-                                    onClick={() => addItem(section.id)}
-                                    className="text-sm text-neutral-700 border border-dashed border-neutral-400 rounded w-full py-2 hover:bg-neutral-50"
-                                >
-                                    + Add item
-                                </button>
-                            </section>
-                        ))}
-
-                        <button
-                            type="button"
-                            onClick={addSection}
-                            className="text-sm border border-neutral-300 rounded w-full py-3 hover:bg-white bg-neutral-50"
-                        >
-                            + Add section
-                        </button>
-                    </>
-                )}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    {(Object.keys(MENU_CATEGORIES) as MenuCategoryId[]).map((categoryId) => (
+                        <MenuUploadField
+                            key={categoryId}
+                            categoryId={categoryId}
+                            files={selections[categoryId]}
+                            status={statuses[categoryId]}
+                            progress={progress[categoryId]}
+                            publishing={publishing === categoryId}
+                            disabled={publishing !== null}
+                            publishedPages={publishedPages[categoryId]}
+                            onSelect={(files) => handleSelection(categoryId, files)}
+                            onRemove={(index) => handleRemoveSelection(categoryId, index)}
+                            onPublish={() => handlePublish(categoryId)}
+                        />
+                    ))}
+                </div>
             </main>
+        </AdminShell>
+    );
+}
+
+function AdminShell({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="relative isolate min-h-[100svh] overflow-x-hidden bg-[#1c170a] text-white">
+            <img
+                src={bgImg}
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover brightness-[0.22]"
+            />
+            <div className="pointer-events-none fixed inset-0 z-0 bg-[#1c170a]/75" />
+            <div className="relative z-10 min-h-[100svh]">{children}</div>
         </div>
+    );
+}
+
+function AdminMessage({ message }: { message: string }) {
+    return (
+        <AdminShell>
+            <div className="flex min-h-[100svh] items-center justify-center">
+                <p className="font-body text-xs uppercase tracking-[0.22em] text-white/55">{message}</p>
+            </div>
+        </AdminShell>
+    );
+}
+
+function TextField({
+    label,
+    type,
+    value,
+    autoComplete,
+    onChange,
+}: {
+    label: string;
+    type: "email" | "password";
+    value: string;
+    autoComplete: string;
+    onChange: (value: string) => void;
+}) {
+    return (
+        <label className="block">
+            <span className="font-body text-[10px] uppercase tracking-[0.18em] text-white/55">
+                {label}
+            </span>
+            <input
+                type={type}
+                required
+                value={value}
+                autoComplete={autoComplete}
+                onChange={(event) => onChange(event.target.value)}
+                className="mt-2 w-full border-b border-white/25 bg-transparent px-0 py-2 font-body text-sm text-white outline-none transition-colors focus:border-[#dac464]"
+            />
+        </label>
+    );
+}
+
+function MenuUploadField({
+    categoryId,
+    files,
+    status,
+    progress,
+    publishing,
+    disabled,
+    publishedPages,
+    onSelect,
+    onRemove,
+    onPublish,
+}: {
+    categoryId: MenuCategoryId;
+    files: File[];
+    status: string | null;
+    progress: number;
+    publishing: boolean;
+    disabled: boolean;
+    publishedPages: MenuPage[];
+    onSelect: (files: File[]) => void;
+    onRemove: (index: number) => void;
+    onPublish: () => void;
+}) {
+    const category = MENU_CATEGORIES[categoryId];
+
+    return (
+        <section className="border border-white/12 bg-black/25 p-5 sm:p-7">
+            <p className="font-body text-[9px] uppercase tracking-[0.28em] text-[#dac464]">
+                One or two images
+            </p>
+            <h3 className="mt-2 font-display text-3xl text-white">{category.title}</h3>
+
+            <div className="mt-5 grid grid-cols-2 gap-3">
+                {[0, 1].map((index) => (
+                    <CurrentAsset
+                        key={publishedPages[index]?.url ?? `${categoryId}-${index}`}
+                        page={publishedPages[index]}
+                        pageNumber={index + 1}
+                    />
+                ))}
+            </div>
+
+            <label className="mt-6 block">
+                <span className="font-body text-[10px] uppercase tracking-[0.18em] text-white/55">
+                    Menu images
+                </span>
+                <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={disabled || !isCloudinaryConfigured}
+                    onChange={(event) => {
+                        onSelect(Array.from(event.target.files ?? []));
+                        event.target.value = "";
+                    }}
+                    className="mt-2 block w-full cursor-pointer border border-dashed border-white/25 bg-white/5 px-3 py-5 font-body text-xs text-white/60 file:mr-4 file:cursor-pointer file:border-0 file:bg-[#dac464] file:px-3 file:py-2 file:font-body file:text-[10px] file:uppercase file:tracking-[0.12em] file:text-black disabled:cursor-not-allowed disabled:opacity-50"
+                />
+            </label>
+
+            {files.length > 0 && (
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                    {files.map((file, index) => (
+                        <SelectedAsset
+                            key={`${file.name}-${file.lastModified}-${index}`}
+                            file={file}
+                            pageNumber={index + 1}
+                            onRemove={() => onRemove(index)}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {status && (
+                <p className="mt-5 font-body text-xs leading-relaxed text-[#ffe6ac]" role="status">
+                    {status}
+                </p>
+            )}
+
+            {publishing && (
+                <div className="mt-5" aria-label={`Upload progress ${progress}%`}>
+                    <div className="h-px w-full bg-white/15">
+                        <motion.div
+                            className="h-px bg-[#dac464]"
+                            animate={{ width: `${progress}%` }}
+                        />
+                    </div>
+                    <p className="mt-2 font-body text-[9px] uppercase tracking-[0.18em] text-white/45">
+                        Publishing {progress}%
+                    </p>
+                </div>
+            )}
+
+            <button
+                type="button"
+                onClick={onPublish}
+                disabled={disabled || files.length === 0}
+                className="mt-6 w-full cursor-pointer border border-[#dac464] px-4 py-3 font-body text-[10px] uppercase tracking-[0.18em] text-[#ffe6ac] transition-colors hover:bg-[#dac464] hover:text-black disabled:cursor-not-allowed disabled:opacity-35"
+            >
+                {publishing ? "Publishing..." : `Publish ${category.title}`}
+            </button>
+        </section>
+    );
+}
+
+function CurrentAsset({
+    page,
+    pageNumber,
+}: {
+    page?: MenuPage;
+    pageNumber: number;
+}) {
+    const [unavailable, setUnavailable] = useState(false);
+
+    return (
+        <div className="relative aspect-[4/5] overflow-hidden border border-white/10 bg-white/5">
+            {!page || unavailable ? (
+                <div className="flex h-full items-center justify-center px-3 text-center font-body text-[9px] uppercase tracking-[0.15em] text-white/30">
+                    Page {pageNumber} not published
+                </div>
+            ) : (
+                <img
+                    src={page.url}
+                    alt={`Current page ${pageNumber}`}
+                    onError={() => setUnavailable(true)}
+                    className="h-full w-full bg-white object-contain"
+                />
+            )}
+            <span className="absolute bottom-2 left-2 bg-black/70 px-2 py-1 font-body text-[8px] uppercase tracking-[0.14em] text-white/70">
+                Page {pageNumber}
+            </span>
+        </div>
+    );
+}
+
+function SelectedAsset({
+    file,
+    pageNumber,
+    onRemove,
+}: {
+    file: File;
+    pageNumber: number;
+    onRemove: () => void;
+}) {
+    const previewUrl = useMemo(() => URL.createObjectURL(file), [file]);
+
+    useEffect(() => {
+        return () => URL.revokeObjectURL(previewUrl);
+    }, [previewUrl]);
+
+    return (
+        <figure className="relative aspect-[4/5] overflow-hidden border border-[#dac464]/35 bg-white/5">
+            <img src={previewUrl} alt={`Selected page ${pageNumber}`} className="h-full w-full bg-white object-contain" />
+            <button
+                type="button"
+                title={`Remove selected page ${pageNumber}`}
+                aria-label={`Remove selected page ${pageNumber}`}
+                onClick={onRemove}
+                className="absolute right-2 top-2 flex h-8 w-8 cursor-pointer items-center justify-center border border-white/25 bg-black/80 font-body text-xs text-white transition-colors hover:border-[#dac464] hover:text-[#dac464]"
+            >
+                X
+            </button>
+            <figcaption className="absolute inset-x-0 bottom-0 bg-black/75 px-2 py-2 font-body text-[8px] uppercase tracking-[0.12em] text-white/75">
+                New page {pageNumber}
+            </figcaption>
+        </figure>
     );
 }
