@@ -15,7 +15,9 @@ html,
 body,
 #root {
   height: 100%;
+  overflow: hidden;
   overscroll-behavior-y: none;
+  background-color: #1a0f0f;
 }
 
 body {

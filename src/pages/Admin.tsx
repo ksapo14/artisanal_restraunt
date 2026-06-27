@@ -317,7 +317,7 @@ export default function Admin() {
 
 function AdminShell({ children }: { children: React.ReactNode }) {
     return (
-        <div className="relative isolate min-h-[100svh] overflow-x-hidden bg-[#1c170a] text-white">
+        <div className="relative isolate h-[100svh] overflow-x-hidden overflow-y-auto overscroll-contain bg-[#1c170a] text-white">
             <img
                 src={bgImg}
                 alt=""
