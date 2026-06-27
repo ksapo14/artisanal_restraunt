@@ -230,7 +230,7 @@ export default function Contact() {
                             variants={contentVariants}
                             initial={false}
                             animate={activeIndex === 0 ? "active" : "inactive"}
-                            className="my-auto w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.82fr_1fr] gap-8 lg:gap-16 items-center"
+                            className="my-auto grid h-full w-full max-w-6xl grid-cols-1 grid-rows-[auto_minmax(0,1fr)] items-center gap-8 lg:h-auto lg:grid-cols-[0.82fr_1fr] lg:grid-rows-none lg:gap-16"
                         >
                             <div className="max-w-xl">
                                 <p className="mb-3 hidden font-body text-[10px] uppercase tracking-[0.32em] text-[var(--color-theme-primary)] sm:mb-5 sm:block sm:text-xs sm:tracking-[0.45em]">
@@ -266,7 +266,7 @@ export default function Contact() {
                                 </div>
                             </div>
 
-                            <div className="h-[26svh] min-h-36 w-full overflow-hidden border border-white/10 bg-black/20 sm:min-h-64 lg:h-[58vh]">
+                            <div className="h-full min-h-40 w-full overflow-hidden border border-white/10 bg-black/20 sm:min-h-64 lg:h-[58vh]">
                                 <iframe
                                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.2762039233075!2d-81.87413692348507!3d36.08670417242882!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x885090f777e55555%3A0x6a0c5c4e9c7e0f8!2s1200%20Dobbins%20Rd%2C%20Banner%20Elk%2C%20NC%2028604!5e0!3m2!1sen!2sus!4v1717163829000!5m2!1sen!2sus"
                                     width="100%"
