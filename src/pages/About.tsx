@@ -120,7 +120,7 @@ export default function About() {
 
         window.setTimeout(() => {
             isNavigating.current = false;
-        }, 900);
+        }, 1000);
     }, []);
 
     const toggleFounder = useCallback((name: string) => {
@@ -182,13 +182,13 @@ export default function About() {
             opacity: 0,
             y: 28,
             filter: "blur(8px)",
-            transition: { duration: 0.35, ease: "easeOut" },
+            transition: { duration: 0.5, ease: [0.65, 0, 0.35, 1] },
         },
         active: {
             opacity: 1,
             y: 0,
             filter: "blur(0px)",
-            transition: { duration: 0.75, ease: [0.19, 1, 0.22, 1] },
+            transition: { duration: 0.75, ease: [0.65, 0, 0.35, 1] },
         },
     };
 
@@ -198,7 +198,7 @@ export default function About() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
+            transition={{ duration: 1, ease: "easeInOut" }}
             className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
             style={themeStyles}
         >
@@ -219,7 +219,7 @@ export default function About() {
                         opacity: activeIndex === index ? 0.42 : 0,
                         scale: activeIndex === index ? 1.08 : 1.14,
                     }}
-                    transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1] }}
+                    transition={{ duration: 1.05, ease: [0.65, 0, 0.35, 1] }}
                     className="fixed inset-0 h-full w-full object-cover brightness-50 -z-20 pointer-events-none"
                 />
             ))}
@@ -232,7 +232,7 @@ export default function About() {
             />
 
             <div
-                className={`relative transition-all duration-700 ease-out ${
+                className={`relative transition-all duration-[800ms] ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     activeIndex > 0 && !isSiteMapOpen
                         ? "opacity-0 pointer-events-none -translate-y-10 z-0"
                         : "opacity-100 pointer-events-auto translate-y-0 z-[1000]"
@@ -243,13 +243,13 @@ export default function About() {
 
             <div className="flex-1 relative overflow-hidden">
                 <div
-                    className={`hidden lg:flex absolute left-8 md:left-36 lg:left-44 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-1000 ${
+                    className={`hidden lg:flex absolute left-8 md:left-36 lg:left-44 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)] ${
                         activeIndex === 0 ? "opacity-0 -translate-x-6" : "opacity-100 translate-x-0"
                     }`}
                 >
                     <div className="relative h-[52vh] w-px bg-white/8">
                         <div
-                            className="absolute top-0 left-0 w-full transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)]"
+                            className="absolute top-0 left-0 w-full transition-all duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
                             style={{
                                 height: `${(activeIndex / sectionCount) * 100}%`,
                                 backgroundColor: "var(--color-theme-primary)",
@@ -277,7 +277,7 @@ export default function About() {
                 </div>
 
                 <div
-                    className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)]"
+                    className="h-full w-full transition-all duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
                     style={{ transform: `translateY(-${activeIndex * 100}%)` }}
                 >
                     {sections.map((section, index) => (
@@ -348,7 +348,7 @@ export default function About() {
                                                         </span>
                                                     </span>
                                                     <span
-                                                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-[var(--color-theme-primary)] transition-all duration-300 group-hover:border-[var(--color-theme-primary)]/55 ${
+                                                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-[var(--color-theme-primary)] transition-all duration-500 ease-in-out group-hover:border-[var(--color-theme-primary)]/55 ${
                                                             openFounders[founder.name] ? "rotate-180 bg-white/5" : ""
                                                         }`}
                                                         aria-hidden="true"
@@ -364,7 +364,7 @@ export default function About() {
                                                             initial={{ height: 0, opacity: 0 }}
                                                             animate={{ height: "auto", opacity: 1 }}
                                                             exit={{ height: 0, opacity: 0 }}
-                                                            transition={{ duration: 0.28, ease: "easeOut" }}
+                                                            transition={{ duration: 0.5, ease: [0.65, 0, 0.35, 1] }}
                                                             className="overflow-hidden"
                                                         >
                                                             <p className="pb-6 font-body text-sm md:text-base text-white/60 leading-relaxed font-light">

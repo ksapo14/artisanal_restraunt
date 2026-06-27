@@ -71,7 +71,7 @@ export default function PrivateEvents() {
 
         window.setTimeout(() => {
             isNavigating.current = false;
-        }, 900);
+        }, 1000);
     }, []);
 
     useSwipeNavigation({
@@ -125,13 +125,13 @@ export default function PrivateEvents() {
             opacity: 0,
             y: 28,
             filter: "blur(8px)",
-            transition: { duration: 0.35, ease: "easeOut" },
+            transition: { duration: 0.5, ease: [0.65, 0, 0.35, 1] },
         },
         active: {
             opacity: 1,
             y: 0,
             filter: "blur(0px)",
-            transition: { duration: 0.75, ease: [0.19, 1, 0.22, 1] },
+            transition: { duration: 0.75, ease: [0.65, 0, 0.35, 1] },
         },
     };
 
@@ -143,7 +143,7 @@ export default function PrivateEvents() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
+            transition={{ duration: 1, ease: "easeInOut" }}
             className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
             style={themeStyles}
         >
@@ -158,7 +158,7 @@ export default function PrivateEvents() {
                 alt=""
                 aria-hidden="true"
                 animate={{ scale: activeIndex === 0 ? 1.08 : 1.14, opacity: activeIndex === 0 ? 0.42 : 0.2 }}
-                transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1] }}
+                transition={{ duration: 1.05, ease: [0.65, 0, 0.35, 1] }}
                 className="fixed inset-0 h-full w-full object-cover brightness-50 -z-20 pointer-events-none"
             />
             <div
@@ -169,7 +169,7 @@ export default function PrivateEvents() {
             />
 
             <div
-                className={`relative transition-all duration-700 ease-out ${
+                className={`relative transition-all duration-[800ms] ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     activeIndex > 0 && !isSiteMapOpen
                         ? "opacity-0 pointer-events-none -translate-y-10 z-0"
                         : "opacity-100 pointer-events-auto translate-y-0 z-[1000]"
@@ -180,7 +180,7 @@ export default function PrivateEvents() {
 
             <div className="flex-1 relative overflow-hidden">
                 <div
-                    className="h-full w-full transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)]"
+                    className="h-full w-full transition-all duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
                     style={{ transform: `translateY(-${activeIndex * 100}%)` }}
                 >
                     <section

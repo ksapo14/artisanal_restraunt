@@ -84,7 +84,7 @@ export default function Home() {
 
             {loading && (
                 <div
-                    className={`fixed inset-0 z-[3000] flex justify-center items-center bg-[#ffe6ac] transition-transform duration-500 ${
+                    className={`fixed inset-0 z-[3000] flex justify-center items-center bg-[#ffe6ac] transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
                         sliding ? "-translate-y-full" : "translate-y-0"
                     }`}
                 >
@@ -134,9 +134,14 @@ export default function Home() {
             <div className="flex-1 relative overflow-hidden">
                 <div className="h-full w-full flex justify-center items-center relative px-4 lg:px-8 pt-20 pb-36 lg:py-0 overflow-y-auto lg:overflow-hidden">
                     <motion.div
-                        initial={{ opacity: 0, y: 24 }}
-                        animate={{ opacity: loading ? 0 : 1, y: loading ? 24 : 0 }}
-                        transition={{ duration: 0.9, ease: [0.19, 1, 0.22, 1] }}
+                        initial={{ opacity: 0, y: 16, scale: 0.985, filter: "blur(4px)" }}
+                        animate={{
+                            opacity: loading ? 0 : 1,
+                            y: loading ? 16 : 0,
+                            scale: loading ? 0.985 : 1,
+                            filter: loading ? "blur(4px)" : "blur(0px)",
+                        }}
+                        transition={{ duration: 1.2, ease: [0.65, 0, 0.35, 1] }}
                         className="flex flex-col items-center justify-center text-center"
                     >
                         <img
