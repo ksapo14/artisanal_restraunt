@@ -17,7 +17,15 @@ body,
   height: 100%;
   overflow: hidden;
   overscroll-behavior-y: none;
+}
+
+html,
+body {
   background-color: #1a0f0f;
+}
+
+#root {
+  background-color: transparent;
 }
 
 body {
