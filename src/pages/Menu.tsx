@@ -32,7 +32,7 @@ export default function Menu() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="relative flex min-h-[100svh] w-screen flex-col overflow-x-hidden selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
+            className="relative flex h-[100svh] w-screen flex-col overflow-hidden selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)] lg:h-screen"
             style={themeStyles}
         >
             <div className="fixed inset-0 -z-30 bg-[var(--color-theme-bg)]" />
@@ -55,13 +55,13 @@ export default function Menu() {
 
             <Navbar compactMobile />
 
-            <main className="flex flex-1 items-center justify-center px-5 pb-10 pt-32 sm:px-8 sm:pt-40 lg:px-16 lg:pb-16 lg:pt-44">
+            <main className="mt-20 flex min-h-0 flex-1 items-start justify-center overflow-y-auto overscroll-contain px-5 py-4 sm:mt-24 sm:px-8 sm:py-6 lg:mt-0 lg:px-16 lg:pb-16 lg:pt-44">
                 <motion.section
                     aria-labelledby="menu-heading"
                     initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
                     animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                     transition={{ duration: 0.85, ease: [0.19, 1, 0.22, 1] }}
-                    className="w-full max-w-4xl text-center"
+                    className="my-auto w-full max-w-4xl text-center"
                 >
                     <p className="mb-5 font-body text-[10px] uppercase tracking-[0.38em] text-[var(--color-theme-primary)] sm:text-xs">
                         Artisanal Dining

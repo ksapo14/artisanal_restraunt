@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import MobileSectionControls from "../components/MobileSectionControls";
 import { useUI } from "../context/UIContext";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { sendContactEmail, isResendConfigured } from "../api/emailService";
@@ -174,8 +175,6 @@ export default function Contact() {
         },
     };
 
-    const currentSection = sections[activeIndex];
-
     return (
         <motion.div
             ref={pageRef}
@@ -210,14 +209,14 @@ export default function Contact() {
             <div
                 className={`relative transition-all duration-[800ms] ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     activeIndex > 0 && !isSiteMapOpen
-                        ? "opacity-0 pointer-events-none -translate-y-10 z-0"
+                        ? "z-[1000] translate-y-0 opacity-100 lg:pointer-events-none lg:z-0 lg:-translate-y-10 lg:opacity-0"
                         : "opacity-100 pointer-events-auto translate-y-0 z-[1000]"
                 }`}
             >
                 <Navbar compactMobile />
             </div>
 
-            <div className="flex-1 relative overflow-hidden">
+            <div className="relative mt-20 min-h-0 flex-1 overflow-hidden sm:mt-24 lg:mt-0">
                 <div
                     className="h-full w-full transition-all duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
                     style={{ transform: `translateY(-${activeIndex * 100}%)` }}
@@ -225,29 +224,29 @@ export default function Contact() {
                     <section
                         aria-labelledby="visit-heading"
                         data-swipe-scroll
-                        className="h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden"
+                        className="relative flex h-full w-full items-start justify-center overflow-y-auto px-5 pt-4 pb-8 sm:px-8 sm:pt-6 lg:items-center lg:overflow-hidden lg:px-32 lg:py-0"
                     >
                         <motion.div
                             variants={contentVariants}
                             initial={false}
                             animate={activeIndex === 0 ? "active" : "inactive"}
-                            className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.82fr_1fr] gap-8 lg:gap-16 items-center"
+                            className="my-auto w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.82fr_1fr] gap-8 lg:gap-16 items-center"
                         >
                             <div className="max-w-xl">
-                                <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
+                                <p className="mb-3 hidden font-body text-[10px] uppercase tracking-[0.32em] text-[var(--color-theme-primary)] sm:mb-5 sm:block sm:text-xs sm:tracking-[0.45em]">
                                     {sections[0].eyebrow}
                                 </p>
                                 <h1
                                     id="visit-heading"
-                                    className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
+                                    className="mb-4 font-display text-5xl leading-none tracking-wide text-white/95 italic sm:mb-6 sm:text-6xl lg:text-7xl"
                                 >
                                     {sections[0].title}
                                 </h1>
-                                <p className="font-body text-xs sm:text-sm md:text-base text-[var(--color-theme-secondary)]/70 leading-relaxed font-light tracking-[0.08em] md:tracking-[0.1em] uppercase italic mb-8">
+                                <p className="mb-5 font-body text-xs leading-relaxed font-light tracking-[0.08em] text-[var(--color-theme-secondary)]/70 uppercase italic sm:mb-8 sm:text-sm md:text-base md:tracking-[0.1em]">
                                     {sections[0].body}
                                 </p>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-white/10 pt-6">
+                                <div className="grid grid-cols-2 gap-3 border-t border-white/10 pt-4 sm:gap-6 sm:pt-6">
                                     <div>
                                         <p className="font-body text-[10px] uppercase tracking-[0.28em] text-[var(--color-theme-primary)] mb-2">Location</p>
                                         <address className="not-italic font-body text-sm text-white/65 leading-relaxed">
@@ -267,7 +266,7 @@ export default function Contact() {
                                 </div>
                             </div>
 
-                            <div className="w-full h-[32svh] min-h-52 sm:min-h-64 lg:h-[58vh] overflow-hidden border border-white/10 bg-black/20">
+                            <div className="h-[26svh] min-h-36 w-full overflow-hidden border border-white/10 bg-black/20 sm:min-h-64 lg:h-[58vh]">
                                 <iframe
                                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.2762039233075!2d-81.87413692348507!3d36.08670417242882!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x885090f777e55555%3A0x6a0c5c4e9c7e0f8!2s1200%20Dobbins%20Rd%2C%20Banner%20Elk%2C%20NC%2028604!5e0!3m2!1sen!2sus!4v1717163829000!5m2!1sen!2sus"
                                     width="100%"
@@ -285,16 +284,16 @@ export default function Contact() {
                     <section
                         aria-labelledby="message-heading"
                         data-swipe-scroll
-                        className="h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden"
+                        className="relative flex h-full w-full flex-col items-stretch overflow-y-auto px-5 pt-4 sm:px-8 sm:pt-6 lg:flex-row lg:items-center lg:justify-center lg:overflow-hidden lg:px-32 lg:py-0"
                     >
                         <motion.div
                             variants={contentVariants}
                             initial={false}
                             animate={activeIndex === 1 ? "active" : "inactive"}
-                            className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.82fr_1fr] gap-8 lg:gap-16 items-center"
+                            className="my-auto grid w-full max-w-6xl shrink-0 grid-cols-1 items-center gap-8 lg:my-0 lg:grid-cols-[0.82fr_1fr] lg:gap-16"
                         >
                             <div className="w-full max-w-xl">
-                                <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
+                                <p className="mb-5 hidden font-body text-[10px] uppercase tracking-[0.32em] text-[var(--color-theme-primary)] sm:block sm:text-xs sm:tracking-[0.45em]">
                                     {sections[1].eyebrow}
                                 </p>
                                 <h2
@@ -406,7 +405,7 @@ export default function Contact() {
                             </div>
                         </motion.div>
 
-                        <div className="absolute bottom-32 left-0 w-full z-20 pointer-events-auto lg:bottom-8">
+                        <div className="relative z-20 w-full shrink-0 pointer-events-auto lg:absolute lg:bottom-8 lg:left-0">
                             <Footer embedded />
                         </div>
                     </section>
@@ -437,35 +436,14 @@ export default function Contact() {
                     </button>
                 </div>
 
-                <div className="lg:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
-                    <button
-                        type="button"
-                        onClick={() => navigateSection("prev")}
-                        disabled={activeIndex === 0}
-                        className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
-                        aria-label="Previous contact section"
-                    >
-                        <span className="text-2xl leading-none" aria-hidden="true">
-                            ↑
-                        </span>
-                    </button>
-                    <div className="pointer-events-auto min-w-0 flex-1 rounded-full border border-white/10 bg-black/45 px-4 py-3 text-center backdrop-blur-md">
-                        <p className="truncate font-body text-[10px] uppercase tracking-[0.28em] text-white/55" aria-live="polite">
-                            {currentSection.title}
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => navigateSection("next")}
-                        disabled={activeIndex === sections.length - 1}
-                        className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
-                        aria-label="Next contact section"
-                    >
-                        <span className="text-2xl leading-none" aria-hidden="true">
-                            ↓
-                        </span>
-                    </button>
-                </div>
+                <MobileSectionControls
+                    previousLabel="Previous contact section"
+                    nextLabel="Next contact section"
+                    previousDisabled={activeIndex === 0}
+                    nextDisabled={activeIndex === sections.length - 1}
+                    onPrevious={() => navigateSection("prev")}
+                    onNext={() => navigateSection("next")}
+                />
             </div>
         </motion.div>
     );

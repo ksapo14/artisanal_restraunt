@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import MobileSectionControls from "../components/MobileSectionControls";
 import { useUI } from "../context/UIContext";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import bgImg from "../assets/restraunt_2.png";
@@ -134,8 +135,6 @@ export default function PrivateEvents() {
             transition: { duration: 0.75, ease: [0.65, 0, 0.35, 1] },
         },
     };
-
-    const currentSection = sections[activeIndex];
 
     return (
         <motion.div
@@ -270,7 +269,7 @@ export default function PrivateEvents() {
                             </div>
                         </motion.div>
 
-                        <div className="absolute bottom-32 left-0 w-full z-20 pointer-events-auto lg:bottom-8">
+                        <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-auto lg:bottom-8">
                             <Footer embedded />
                         </div>
                     </section>
@@ -301,35 +300,14 @@ export default function PrivateEvents() {
                     </button>
                 </div>
 
-                <div className="lg:hidden fixed left-4 right-4 bottom-17 z-50 flex items-center justify-between gap-3 pb-[env(safe-area-inset-bottom)] pointer-events-none">
-                    <button
-                        type="button"
-                        onClick={() => navigateSection("prev")}
-                        disabled={activeIndex === 0}
-                        className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
-                        aria-label="Previous private events section"
-                    >
-                        <span className="text-2xl leading-none" aria-hidden="true">
-                            ↑
-                        </span>
-                    </button>
-                    <div className="pointer-events-auto min-w-0 flex-1 rounded-full border border-white/10 bg-black/45 px-4 py-3 text-center backdrop-blur-md">
-                        <p className="truncate font-body text-[10px] uppercase tracking-[0.28em] text-white/55" aria-live="polite">
-                            {currentSection.title}
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => navigateSection("next")}
-                        disabled={activeIndex === sections.length - 1}
-                        className="pointer-events-auto h-12 w-12 flex items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/70 backdrop-blur-md disabled:opacity-25"
-                        aria-label="Next private events section"
-                    >
-                        <span className="text-2xl leading-none" aria-hidden="true">
-                            ↓
-                        </span>
-                    </button>
-                </div>
+                <MobileSectionControls
+                    previousLabel="Previous private events section"
+                    nextLabel="Next private events section"
+                    previousDisabled={activeIndex === 0}
+                    nextDisabled={activeIndex === sections.length - 1}
+                    onPrevious={() => navigateSection("prev")}
+                    onNext={() => navigateSection("next")}
+                />
             </div>
         </motion.div>
     );

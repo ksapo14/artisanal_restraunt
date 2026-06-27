@@ -29,7 +29,7 @@ export default function Navbar({ compactMobile = false, showLogo = true }: Navba
             <nav
                 className="fixed inset-x-0 top-0 z-[1000] grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 px-5 py-5 transition-all duration-500 sm:gap-x-4 sm:px-6 sm:py-6 md:gap-x-3 md:px-8 lg:gap-x-5 lg:px-10 lg:py-15"
             >
-                <div className="flex min-w-0 items-center justify-start ml-5">
+                <div className="ml-0 flex min-w-0 items-center justify-start sm:ml-5">
                     {showLogo ? (
                         <motion.div
                             className="shrink-0"
@@ -42,13 +42,13 @@ export default function Navbar({ compactMobile = false, showLogo = true }: Navba
                             <Link to="/" onClick={closeSiteMap} aria-label="Artisanal home">
                                 <img
                                     src={logoImg}
-                                    className="h-7 w-auto object-contain transition-all duration-500 sm:h-8 lg:h-9 xl:h-10"
+                                    className="h-5 w-auto object-contain transition-all duration-500 sm:h-8 lg:h-9 xl:h-10"
                                     alt="Artisanal"
                                 />
                             </Link>
                         </motion.div>
                     ) : (
-                        <div className="h-7 sm:h-8 lg:h-9 xl:h-10" aria-hidden="true" />
+                        <div className="h-5 sm:h-8 lg:h-9 xl:h-10" aria-hidden="true" />
                     )}
                 </div>
 

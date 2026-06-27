@@ -52,7 +52,7 @@ export default function FAQ() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="min-h-[100svh] lg:h-screen w-screen overflow-x-hidden lg:overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
+            className="flex h-[100svh] w-screen flex-col overflow-hidden relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)] lg:h-screen"
             style={themeStyles}
         >
             <div
@@ -79,10 +79,10 @@ export default function FAQ() {
 
             <Navbar compactMobile />
 
-            <main className="flex-1 relative overflow-y-auto lg:overflow-hidden">
+            <main className="relative mt-20 min-h-0 flex-1 overflow-y-auto overscroll-contain sm:mt-24 lg:mt-0 lg:overflow-hidden">
                 <section
                     aria-labelledby="faq-heading"
-                    className="min-h-full w-full flex flex-col items-center justify-center px-5 sm:px-8 lg:px-32 pt-24 pb-8 lg:py-0 relative"
+                    className="relative flex min-h-full w-full flex-col items-center justify-center px-5 pt-4 pb-8 sm:px-8 sm:pt-6 lg:px-32 lg:py-0"
                 >
                     <motion.div
                         initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
