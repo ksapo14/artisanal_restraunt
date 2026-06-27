@@ -88,7 +88,7 @@ function AnimatedLayout() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute inset-0 w-full"
+            className="absolute inset-0 isolate w-full"
           >
             {cloneElement(element)}
           </motion.div>
