@@ -91,9 +91,6 @@ export default function FAQ() {
                         className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.78fr_1fr] gap-9 lg:gap-16 items-start lg:items-center"
                     >
                         <div className="max-w-xl">
-                            <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
-                                Before You Visit
-                            </p>
                             <h1
                                 id="faq-heading"
                                 className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none mb-6"

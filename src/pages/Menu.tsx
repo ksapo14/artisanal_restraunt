@@ -63,9 +63,6 @@ export default function Menu() {
                     transition={{ duration: 0.85, ease: [0.19, 1, 0.22, 1] }}
                     className="my-auto w-full max-w-4xl text-center"
                 >
-                    <p className="mb-5 font-body text-[10px] uppercase tracking-[0.38em] text-[var(--color-theme-primary)] sm:text-xs">
-                        Artisanal Dining
-                    </p>
                     <h1
                         id="menu-heading"
                         className="font-display text-6xl leading-none text-white/95 sm:text-7xl lg:text-8xl"

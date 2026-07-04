@@ -29,7 +29,6 @@ type Founder = {
 type AboutSection = {
     id: string;
     title: string;
-    eyebrow: string;
     body: string;
     image: string;
     theme: AboutTheme;
@@ -41,7 +40,6 @@ const sections: AboutSection[] = [
     {
         id: "story",
         title: "Artisanal",
-        eyebrow: "Since 2014",
         body: "A quiet dining room built around seasonal ingredients, deliberate technique, and a measured evening at the table.",
         image: bgImg1,
         theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" },
@@ -49,7 +47,6 @@ const sections: AboutSection[] = [
     {
         id: "philosophy",
         title: "Philosophy",
-        eyebrow: "Ingredient led",
         body: "We believe in the integrity of ingredients and the precision of craft. Age-old techniques meet modern sensibilities to create something timeless.",
         image: bgImg2,
         theme: { bg: "#1b1412", primary: "#a68a7b", secondary: "#f5f0ed" },
@@ -57,7 +54,6 @@ const sections: AboutSection[] = [
     {
         id: "founders",
         title: "Founders",
-        eyebrow: "The hosts",
         body: "Chef Marcus Chen and Sophie Durand shape the food, pacing, and service with a shared focus on care and restraint.",
         image: bgImg3,
         theme: { bg: "#1a0f0f", primary: "#d48888", secondary: "#f5f0ed" },
@@ -77,7 +73,6 @@ const sections: AboutSection[] = [
     {
         id: "community",
         title: "Community",
-        eyebrow: "Local roots",
         body: "Artisanal partners with local farmers, supports urban gardens, and contributes to food security initiatives across the region.",
         image: bgImg1,
         theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" },
@@ -303,9 +298,6 @@ export default function About() {
                                 }`}
                             >
                                 <div className={index === 0 ? "max-w-3xl" : "max-w-xl"}>
-                                    <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
-                                        {section.eyebrow}
-                                    </p>
                                     {index === 0 ? (
                                         <h1
                                             id={`${section.id}-heading`}

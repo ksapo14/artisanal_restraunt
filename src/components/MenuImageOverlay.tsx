@@ -77,9 +77,6 @@ export default function MenuImageOverlay({
                 >
                     <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-6">
                         <div className="min-w-0">
-                            <p className="font-body text-[9px] uppercase tracking-[0.32em] text-[#dac464] sm:text-[10px]">
-                                {category.eyebrow}
-                            </p>
                             <h2
                                 id="menu-overlay-title"
                                 className="truncate font-display text-2xl leading-tight text-white sm:text-3xl"

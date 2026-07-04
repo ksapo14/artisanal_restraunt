@@ -14,7 +14,6 @@ import diningImg from "../assets/restraunt_2.png";
 type ContactSection = {
     id: string;
     title: string;
-    eyebrow: string;
     body: string;
 };
 
@@ -22,13 +21,11 @@ const sections: ContactSection[] = [
     {
         id: "visit",
         title: "Visit Us",
-        eyebrow: "Banner Elk",
         body: "A quiet dining room in the Blue Ridge Mountains for seasonal dinners, private celebrations, and measured evenings at the table.",
     },
     {
         id: "message",
         title: "Contact Us",
-        eyebrow: "Inquiries",
         body: "Send a note for private dining, special requests, or general questions. Our team will respond as soon as possible.",
     },
 ];
@@ -233,9 +230,6 @@ export default function Contact() {
                             className="my-auto grid h-full w-full max-w-6xl grid-cols-1 grid-rows-[auto_minmax(0,1fr)] items-center gap-8 lg:h-auto lg:grid-cols-[0.82fr_1fr] lg:grid-rows-none lg:gap-16"
                         >
                             <div className="max-w-xl">
-                                <p className="mb-3 hidden font-body text-[10px] uppercase tracking-[0.32em] text-[var(--color-theme-primary)] sm:mb-5 sm:block sm:text-xs sm:tracking-[0.45em]">
-                                    {sections[0].eyebrow}
-                                </p>
                                 <h1
                                     id="visit-heading"
                                     className="mb-4 font-display text-5xl leading-none tracking-wide text-white/95 italic sm:mb-6 sm:text-6xl lg:text-7xl"
@@ -293,9 +287,6 @@ export default function Contact() {
                             className="my-auto grid w-full max-w-6xl shrink-0 grid-cols-1 items-center gap-8 lg:my-0 lg:grid-cols-[0.82fr_1fr] lg:gap-16"
                         >
                             <div className="w-full max-w-xl">
-                                <p className="mb-5 hidden font-body text-[10px] uppercase tracking-[0.32em] text-[var(--color-theme-primary)] sm:block sm:text-xs sm:tracking-[0.45em]">
-                                    {sections[1].eyebrow}
-                                </p>
                                 <h2
                                     id="message-heading"
                                     className="font-display text-4xl sm:text-5xl lg:text-6xl text-white/95 italic tracking-wide leading-none mb-5"

@@ -14,7 +14,6 @@ import roomImg from "../assets/artisanal_full_restraunt_pic.jpg";
 type EventSection = {
     id: string;
     title: string;
-    eyebrow: string;
     body: string;
 };
 
@@ -22,13 +21,11 @@ const sections: EventSection[] = [
     {
         id: "gatherings",
         title: "Private Events",
-        eyebrow: "Gather at Artisanal",
         body: "Intimate dinners, milestone celebrations, and polished corporate evenings shaped around seasonal cooking and careful service.",
     },
     {
         id: "details",
         title: "Plan the Evening",
-        eyebrow: "Tailored service",
         body: "Our team can help coordinate menus, pacing, wine, and special requests for a dining room experience that feels considered from arrival to farewell.",
     },
 ];
@@ -194,9 +191,6 @@ export default function PrivateEvents() {
                             className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.78fr_1fr] gap-9 lg:gap-16 items-center"
                         >
                             <div className="max-w-xl">
-                                <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
-                                    {sections[0].eyebrow}
-                                </p>
                                 <h1
                                     id="events-heading"
                                     className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
@@ -231,9 +225,6 @@ export default function PrivateEvents() {
                             className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[0.78fr_1fr] gap-9 lg:gap-16 items-center"
                         >
                             <div className="max-w-xl">
-                                <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.45em] text-[var(--color-theme-primary)] mb-5">
-                                    {sections[1].eyebrow}
-                                </p>
                                 <h2
                                     id="details-heading"
                                     className="font-display text-4xl sm:text-5xl lg:text-6xl text-white/95 italic tracking-wide leading-none mb-6"
