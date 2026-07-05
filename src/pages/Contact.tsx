@@ -221,7 +221,7 @@ export default function Contact() {
                     <section
                         aria-labelledby="visit-heading"
                         data-swipe-scroll
-                        className="relative flex h-full w-full items-start justify-center overflow-y-auto px-5 pt-4 pb-8 sm:px-8 sm:pt-6 lg:items-center lg:overflow-hidden lg:px-32 lg:py-0"
+                        className="relative flex h-full w-full items-start justify-center overflow-y-auto px-5 pb-32 pt-4 sm:px-8 sm:pb-32 sm:pt-6 lg:items-center lg:overflow-hidden lg:px-32 lg:py-0"
                     >
                         <motion.div
                             variants={contentVariants}
@@ -278,7 +278,7 @@ export default function Contact() {
                     <section
                         aria-labelledby="message-heading"
                         data-swipe-scroll
-                        className="relative flex h-full w-full flex-col items-stretch overflow-y-auto px-5 pt-4 sm:px-8 sm:pt-6 lg:flex-row lg:items-center lg:justify-center lg:overflow-hidden lg:px-32 lg:py-0"
+                        className="relative flex h-full w-full flex-col items-stretch overflow-y-auto px-5 pb-32 pt-4 sm:px-8 sm:pb-32 sm:pt-6 lg:flex-row lg:items-center lg:justify-center lg:overflow-hidden lg:px-32 lg:py-0"
                     >
                         <motion.div
                             variants={contentVariants}

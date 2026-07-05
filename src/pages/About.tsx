@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import type { Variants } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import MobileSectionControls from "../components/MobileSectionControls";
-import { useUI } from "../context/UIContext";
-import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import bgImg1 from "../assets/artisanal_full_restraunt_pic.jpg";
 import bgImg2 from "../assets/restraunt_2.png";
 import bgImg3 from "../assets/restraunt_3.png";
 import giving1 from "../assets/giving_1_nobg.png";
 import giving2 from "../assets/giving_2_nobg.png";
 import giving3 from "../assets/giving_3_nobg.png";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type AboutTheme = {
     bg: string;
@@ -31,6 +32,7 @@ type AboutSection = {
     title: string;
     body: string;
     image: string;
+    imageAlt: string;
     theme: AboutTheme;
     founders?: Founder[];
     communityImages?: string[];
@@ -42,6 +44,7 @@ const sections: AboutSection[] = [
         title: "Artisanal",
         body: "A quiet dining room built around seasonal ingredients, deliberate technique, and a measured evening at the table.",
         image: bgImg1,
+        imageAlt: "The timber dining room at Artisanal",
         theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" },
     },
     {
@@ -49,6 +52,7 @@ const sections: AboutSection[] = [
         title: "Philosophy",
         body: "We believe in the integrity of ingredients and the precision of craft. Age-old techniques meet modern sensibilities to create something timeless.",
         image: bgImg2,
+        imageAlt: "The bar and dining room at Artisanal",
         theme: { bg: "#1b1412", primary: "#a68a7b", secondary: "#f5f0ed" },
     },
     {
@@ -56,6 +60,7 @@ const sections: AboutSection[] = [
         title: "Founders",
         body: "Chef Marcus Chen and Sophie Durand shape the food, pacing, and service with a shared focus on care and restraint.",
         image: bgImg3,
+        imageAlt: "Artisanal in the Blue Ridge Mountains",
         theme: { bg: "#1a0f0f", primary: "#d48888", secondary: "#f5f0ed" },
         founders: [
             {
@@ -75,6 +80,7 @@ const sections: AboutSection[] = [
         title: "Community",
         body: "Artisanal partners with local farmers, supports urban gardens, and contributes to food security initiatives across the region.",
         image: bgImg1,
+        imageAlt: "The Artisanal dining room prepared for service",
         theme: { bg: "#1c170a", primary: "#dac464", secondary: "#ffe6ac" },
         communityImages: [giving1, giving2, giving3],
     },
@@ -84,39 +90,15 @@ const sectionCount = sections.length - 1;
 const pageTheme = sections[0].theme;
 
 export default function About() {
-    const { isSiteMapOpen } = useUI();
     const [activeIndex, setActiveIndex] = useState(0);
     const [openFounders, setOpenFounders] = useState<Record<string, boolean>>({});
     const pageRef = useRef<HTMLDivElement | null>(null);
-    const activeIndexRef = useRef(activeIndex);
-    const isNavigating = useRef(false);
+    const sectionsRef = useRef<HTMLDivElement | null>(null);
+    const progressFillRef = useRef<HTMLDivElement | null>(null);
+    const reduceMotion = useReducedMotion();
 
     useEffect(() => {
-        activeIndexRef.current = activeIndex;
-    }, [activeIndex]);
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
-    const navigateSection = useCallback((direction: "next" | "prev" | number) => {
-        if (isNavigating.current) return;
-
-        const next =
-            typeof direction === "number"
-                ? direction
-                : direction === "next"
-                  ? activeIndexRef.current + 1
-                  : activeIndexRef.current - 1;
-
-        if (next < 0 || next >= sections.length) return;
-
-        isNavigating.current = true;
-        setActiveIndex(next);
-
-        window.setTimeout(() => {
-            isNavigating.current = false;
-        }, 1000);
+        pageRef.current?.scrollTo({ top: 0, behavior: "auto" });
     }, []);
 
     const toggleFounder = useCallback((name: string) => {
@@ -126,45 +108,136 @@ export default function About() {
         }));
     }, []);
 
-    useSwipeNavigation({
-        enabled: !isSiteMapOpen,
-        targetRef: pageRef,
-        onSwipeUp: () => navigateSection("next"),
-        onSwipeDown: () => navigateSection("prev"),
+    const scrollToSection = useCallback((index: number) => {
+        const section = pageRef.current?.querySelector<HTMLElement>(`[data-about-index="${index}"]`);
+        section?.scrollIntoView({
+            behavior: reduceMotion ? "auto" : "smooth",
+            block: "start",
+        });
+    }, [reduceMotion]);
+
+    useGSAP(() => {
+        const scroller = pageRef.current;
+        const sectionTrack = sectionsRef.current;
+        if (!scroller || !sectionTrack) return;
+
+        const sectionElements = gsap.utils.toArray<HTMLElement>("[data-about-index]", scroller);
+        const backgrounds = gsap.utils.toArray<HTMLElement>("[data-about-background]", scroller);
+        const progressFill = progressFillRef.current;
+
+        gsap.set(backgrounds, { autoAlpha: 0, scale: 1.08, yPercent: 0 });
+        gsap.set(backgrounds[0], { autoAlpha: 0.42 });
+        if (progressFill) gsap.set(progressFill, { scaleY: 0, transformOrigin: "top center" });
+
+        const activateSection = (index: number) => {
+            setActiveIndex(index);
+            backgrounds.forEach((background, backgroundIndex) => {
+                gsap.to(background, {
+                    autoAlpha: backgroundIndex === index ? 0.42 : 0,
+                    duration: reduceMotion ? 0 : 0.55,
+                    overwrite: "auto",
+                    ease: "power2.out",
+                });
+            });
+        };
+
+        sectionElements.forEach((section, index) => {
+            const background = backgrounds[index];
+            const content = section.querySelector<HTMLElement>("[data-about-content]");
+            const media = section.querySelector<HTMLElement>("[data-about-media]");
+
+            ScrollTrigger.create({
+                trigger: section,
+                scroller,
+                start: "top 52%",
+                end: "bottom 48%",
+                onEnter: () => activateSection(index),
+                onEnterBack: () => activateSection(index),
+            });
+
+            if (reduceMotion) return;
+
+            if (background) {
+                gsap.fromTo(
+                    background,
+                    { yPercent: -5, scale: 1.12 },
+                    {
+                        yPercent: 5,
+                        scale: 1.04,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: section,
+                            scroller,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: 0.8,
+                            invalidateOnRefresh: true,
+                        },
+                    },
+                );
+            }
+
+            if (content) {
+                gsap.timeline({
+                    scrollTrigger: {
+                        trigger: section,
+                        scroller,
+                        start: "top 86%",
+                        end: "bottom 14%",
+                        scrub: 0.65,
+                        invalidateOnRefresh: true,
+                    },
+                })
+                    .fromTo(
+                        content,
+                        { y: 48, autoAlpha: 0.28 },
+                        { y: 0, autoAlpha: 1, duration: 0.44, ease: "none" },
+                    )
+                    .to(content, { y: -30, autoAlpha: 0.5, duration: 0.56, ease: "none" });
+            }
+
+            if (media) {
+                gsap.timeline({
+                    scrollTrigger: {
+                        trigger: section,
+                        scroller,
+                        start: "top 90%",
+                        end: "bottom 10%",
+                        scrub: 0.8,
+                        invalidateOnRefresh: true,
+                    },
+                })
+                    .fromTo(
+                        media,
+                        { scale: 0.88, y: 36, autoAlpha: 0.35 },
+                        { scale: 1, y: 0, autoAlpha: 1, duration: 0.48, ease: "none" },
+                    )
+                    .to(media, { scale: 0.96, y: -24, autoAlpha: 0.4, duration: 0.52, ease: "none" });
+            }
+        });
+
+        if (progressFill) {
+            ScrollTrigger.create({
+                trigger: sectionTrack,
+                scroller,
+                start: "top top",
+                end: "bottom bottom",
+                onUpdate: (self) => {
+                    gsap.set(progressFill, { scaleY: self.progress });
+                },
+                invalidateOnRefresh: true,
+            });
+        }
+    }, {
+        scope: pageRef,
+        dependencies: [reduceMotion],
+        revertOnUpdate: true,
     });
 
     useEffect(() => {
-        const handleWheel = (event: WheelEvent) => {
-            if (isSiteMapOpen) return;
-
-            event.preventDefault();
-            if (Math.abs(event.deltaY) < 30) return;
-
-            navigateSection(event.deltaY > 0 ? "next" : "prev");
-        };
-
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (isSiteMapOpen) return;
-
-            if (event.key === "ArrowDown" || event.key === "PageDown") {
-                event.preventDefault();
-                navigateSection("next");
-            }
-
-            if (event.key === "ArrowUp" || event.key === "PageUp") {
-                event.preventDefault();
-                navigateSection("prev");
-            }
-        };
-
-        window.addEventListener("wheel", handleWheel, { passive: false });
-        window.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            window.removeEventListener("wheel", handleWheel);
-            window.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [isSiteMapOpen, navigateSection]);
+        const frame = window.requestAnimationFrame(() => ScrollTrigger.refresh());
+        return () => window.cancelAnimationFrame(frame);
+    }, [openFounders]);
 
     const themeStyles = {
         "--color-theme-primary": pageTheme.primary,
@@ -172,29 +245,14 @@ export default function About() {
         "--color-theme-bg": pageTheme.bg,
     } as CSSProperties;
 
-    const contentVariants: Variants = {
-        inactive: {
-            opacity: 0,
-            y: 28,
-            filter: "blur(8px)",
-            transition: { duration: 0.5, ease: [0.65, 0, 0.35, 1] },
-        },
-        active: {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            transition: { duration: 0.75, ease: [0.65, 0, 0.35, 1] },
-        },
-    };
-
     return (
         <motion.div
             ref={pageRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1, ease: "easeInOut" }}
-            className="h-[100svh] md:h-screen w-screen overflow-hidden flex flex-col relative selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
+            transition={{ duration: reduceMotion ? 0 : 0.7, ease: "easeInOut" }}
+            className="relative h-[100dvh] w-full max-w-full overflow-x-hidden overflow-y-auto overscroll-y-contain selection:bg-[var(--color-theme-primary)] selection:text-[var(--color-theme-bg)]"
             style={themeStyles}
         >
             <div
@@ -204,239 +262,182 @@ export default function About() {
                 }}
             />
 
-            {sections.map((section, index) => (
-                <motion.img
+            {sections.map((section) => (
+                <img
                     key={section.id}
+                    data-about-background
                     src={section.image}
                     alt=""
                     aria-hidden="true"
-                    animate={{
-                        opacity: activeIndex === index ? 0.42 : 0,
-                        scale: activeIndex === index ? 1.08 : 1.14,
-                    }}
-                    transition={{ duration: 1.05, ease: [0.65, 0, 0.35, 1] }}
-                    className="fixed inset-0 h-full w-full object-cover brightness-50 -z-20 pointer-events-none"
+                    className="pointer-events-none fixed inset-0 -z-20 h-[110%] w-full object-cover brightness-50 will-change-transform"
                 />
             ))}
 
             <div
-                className="fixed inset-0 -z-10 pointer-events-none"
+                className="pointer-events-none fixed inset-0 -z-10"
                 style={{
                     background: "linear-gradient(to bottom, rgba(0,0,0,0.22) 0%, transparent 38%, var(--color-theme-bg) 100%)",
                 }}
             />
 
-            <div
-                className={`relative transition-all duration-[800ms] ease-[cubic-bezier(0.65,0,0.35,1)] ${
-                    activeIndex > 0 && !isSiteMapOpen
-                        ? "opacity-0 pointer-events-none -translate-y-10 z-0"
-                        : "opacity-100 pointer-events-auto translate-y-0 z-[1000]"
-                }`}
+            <Navbar compactMobile />
+
+            <nav
+                aria-label="About sections"
+                className="pointer-events-none fixed bottom-0 left-10 top-0 z-30 hidden items-center lg:flex xl:left-20"
             >
-                <Navbar compactMobile />
-            </div>
-
-            <div className="flex-1 relative overflow-hidden">
-                <div
-                    className={`hidden lg:flex absolute left-8 md:left-36 lg:left-44 top-0 bottom-0 z-30 items-center pointer-events-none transition-all duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)] ${
-                        activeIndex === 0 ? "opacity-0 -translate-x-6" : "opacity-100 translate-x-0"
-                    }`}
-                >
-                    <div className="relative h-[52vh] w-px bg-white/8">
-                        <div
-                            className="absolute top-0 left-0 w-full transition-all duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
-                            style={{
-                                height: `${(activeIndex / sectionCount) * 100}%`,
-                                backgroundColor: "var(--color-theme-primary)",
-                            }}
-                        />
-                        {sections.map((section, index) => (
-                            <button
-                                key={section.id}
-                                type="button"
-                                onClick={() => navigateSection(index)}
-                                aria-label={`View ${section.title} section`}
-                                aria-current={activeIndex === index ? "step" : undefined}
-                                className={`absolute left-0 flex items-center group pointer-events-auto cursor-pointer transition-all duration-500 ${
-                                    activeIndex === index ? "opacity-100" : "opacity-35 hover:opacity-100"
-                                }`}
-                                style={{ top: `${(index / sectionCount) * 100}%` }}
-                            >
-                                <span className="w-2 h-2 -ml-[4px] rounded-full bg-[var(--color-theme-primary)]" />
-                                <span className="absolute right-6 font-display text-sm md:text-base lg:text-lg italic uppercase tracking-[0.14em] lg:tracking-[0.2em] whitespace-nowrap text-[var(--color-theme-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    {section.title}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <div
-                    className="h-full w-full transition-all duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
-                    style={{ transform: `translateY(-${activeIndex * 100}%)` }}
-                >
+                <div className="relative h-[48vh] w-px bg-white/10">
+                    <div
+                        ref={progressFillRef}
+                        className="absolute inset-x-0 top-0 h-full bg-[var(--color-theme-primary)]"
+                    />
                     {sections.map((section, index) => (
-                        <section
+                        <button
                             key={section.id}
-                            aria-labelledby={`${section.id}-heading`}
-                            data-swipe-scroll
-                            className={`h-[100svh] lg:h-full w-full flex items-center justify-center px-5 sm:px-8 pt-24 pb-36 lg:py-0 relative overflow-y-auto lg:overflow-hidden ${
-                                index === 0
-                                    ? "lg:px-32"
-                                    : "lg:px-56 xl:px-64"
+                            type="button"
+                            onClick={() => scrollToSection(index)}
+                            aria-label={`Scroll to ${section.title}`}
+                            aria-current={activeIndex === index ? "step" : undefined}
+                            className={`pointer-events-auto absolute left-0 flex cursor-pointer items-center transition-opacity duration-300 ${
+                                activeIndex === index ? "opacity-100" : "opacity-35 hover:opacity-100"
                             }`}
+                            style={{ top: `${(index / sectionCount) * 100}%` }}
                         >
-                            <motion.div
-                                custom={index}
-                                variants={contentVariants}
-                                initial={false}
-                                animate={activeIndex === index ? "active" : "inactive"}
-                                className={`w-full max-w-5xl ${
-                                    index === 0
-                                        ? "text-center flex flex-col items-center"
-                                        : "grid grid-cols-1 lg:grid-cols-[0.78fr_1fr] gap-9 lg:gap-16 items-center"
-                                }`}
-                            >
-                                <div className={index === 0 ? "max-w-3xl" : "max-w-xl"}>
-                                    {index === 0 ? (
-                                        <h1
-                                            id={`${section.id}-heading`}
-                                            className="font-display text-5xl sm:text-6xl lg:text-7xl text-white/95 italic tracking-wide leading-none mb-6"
-                                        >
-                                            {section.title}
-                                        </h1>
-                                    ) : (
-                                        <h2
-                                            id={`${section.id}-heading`}
-                                            className="font-display text-4xl sm:text-5xl lg:text-6xl text-white/95 italic tracking-wide leading-none mb-6"
-                                        >
-                                            {section.title}
-                                        </h2>
-                                    )}
-                                    <p className="font-body text-xs sm:text-sm md:text-base text-[var(--color-theme-secondary)]/70 leading-relaxed font-light tracking-[0.08em] md:tracking-[0.1em] uppercase italic">
-                                        {section.body}
-                                    </p>
-                                </div>
-
-                                {section.founders ? (
-                                    <div className="grid grid-cols-1 gap-4">
-                                        {section.founders.map((founder) => (
-                                            <article
-                                                key={founder.name}
-                                                className="border-b border-white/10 transition-colors duration-500 hover:border-[var(--color-theme-primary)]/45"
-                                            >
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleFounder(founder.name)}
-                                                    aria-expanded={openFounders[founder.name] ? "true" : "false"}
-                                                    className="group flex w-full items-center justify-between gap-5 py-5 text-left cursor-pointer"
-                                                >
-                                                    <span>
-                                                        <span className="block font-body text-[11px] md:text-xs uppercase tracking-[0.28em] text-[var(--color-theme-primary)] mb-2">
-                                                            {founder.role}
-                                                        </span>
-                                                        <span className="block font-display text-3xl md:text-4xl text-white/90 italic tracking-wide">
-                                                            {founder.name}
-                                                        </span>
-                                                    </span>
-                                                    <span
-                                                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-[var(--color-theme-primary)] transition-all duration-500 ease-in-out group-hover:border-[var(--color-theme-primary)]/55 ${
-                                                            openFounders[founder.name] ? "rotate-180 bg-white/5" : ""
-                                                        }`}
-                                                        aria-hidden="true"
-                                                    >
-                                                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
-                                                        </svg>
-                                                    </span>
-                                                </button>
-                                                <AnimatePresence initial={false}>
-                                                    {openFounders[founder.name] && (
-                                                        <motion.div
-                                                            initial={{ height: 0, opacity: 0 }}
-                                                            animate={{ height: "auto", opacity: 1 }}
-                                                            exit={{ height: 0, opacity: 0 }}
-                                                            transition={{ duration: 0.5, ease: [0.65, 0, 0.35, 1] }}
-                                                            className="overflow-hidden"
-                                                        >
-                                                            <p className="pb-6 font-body text-sm md:text-base text-white/60 leading-relaxed font-light">
-                                                                {founder.bio}
-                                                            </p>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-                                            </article>
-                                        ))}
-                                    </div>
-                                ) : section.communityImages ? (
-                                    <div className="grid w-full max-w-md grid-cols-3 items-center justify-items-center gap-4 sm:gap-6 lg:max-w-lg lg:gap-8 overflow-hidden lg:justify-self-end">
-                                        {section.communityImages.map((image, imageIndex) => (
-                                            <img
-                                                key={image}
-                                                src={image}
-                                                alt=""
-                                                aria-hidden="true"
-                                                className={`h-20 w-full max-w-[6.5rem] object-contain opacity-80 transition-[filter,opacity] duration-500 hover:opacity-100 sm:h-24 sm:max-w-[8rem] lg:h-36 lg:max-w-[10rem] ${
-                                                    imageIndex === 1 ? "" : "grayscale hover:grayscale-0"
-                                                }`}
-                                            />
-                                        ))}
-                                    </div>
-                                ) : index > 0 ? (
-                                    <div className="hidden lg:block justify-self-end w-full max-w-sm overflow-hidden border border-white/8 bg-black/10">
-                                        <img
-                                            src={section.image}
-                                            alt=""
-                                            aria-hidden="true"
-                                            className="aspect-[4/5] w-full object-cover brightness-75 transition-transform duration-700 hover:scale-105"
-                                        />
-                                    </div>
-                                ) : null}
-                            </motion.div>
-
-                            {index === sections.length - 1 && (
-                                <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-auto lg:bottom-8">
-                                    <Footer embedded />
-                                </div>
-                            )}
-                        </section>
+                            <span className="-ml-[4px] h-2 w-2 rounded-full bg-[var(--color-theme-primary)]" />
+                            <span className="absolute left-6 whitespace-nowrap font-display text-base italic tracking-[0.1em] text-[var(--color-theme-primary)]">
+                                {section.title}
+                            </span>
+                        </button>
                     ))}
                 </div>
+            </nav>
 
-                <div className="hidden lg:flex absolute right-4 md:right-8 top-0 bottom-0 z-50 flex-col justify-between py-32 pointer-events-none">
-                    <button
-                        type="button"
-                        onClick={() => navigateSection("prev")}
-                        disabled={activeIndex === 0}
-                        className="group flex items-start justify-center text-white/10 hover:text-white transition-all duration-700 disabled:opacity-0 cursor-pointer pointer-events-auto h-[30vh]"
-                        aria-label="Previous about section"
+            <main ref={sectionsRef} className="w-full max-w-full overflow-x-hidden">
+                {sections.map((section, index) => (
+                    <section
+                        key={section.id}
+                        data-about-index={index}
+                        aria-labelledby={`${section.id}-heading`}
+                        className={`relative flex min-h-[100dvh] w-full flex-col px-5 pb-16 pt-28 sm:px-8 sm:pb-20 sm:pt-32 lg:px-32 lg:py-28 ${
+                            index === sections.length - 1 ? "justify-between pb-0 sm:pb-0" : "justify-center"
+                        }`}
                     >
-                        <svg viewBox="0 0 24 200" className="h-full w-8 md:w-10" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 200V4M12 4L5 11M12 4L19 11" />
-                        </svg>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => navigateSection("next")}
-                        disabled={activeIndex === sections.length - 1}
-                        className="group flex items-end justify-center text-white/10 hover:text-white transition-all duration-700 disabled:opacity-0 cursor-pointer pointer-events-auto h-[30vh]"
-                        aria-label="Next about section"
-                    >
-                        <svg viewBox="0 0 24 200" className="h-full w-8 md:w-10" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 0V196M12 196L5 189M12 196L19 189" />
-                        </svg>
-                    </button>
-                </div>
+                        <div
+                            data-about-content
+                            className={`mx-auto w-full max-w-5xl ${
+                                index === 0
+                                    ? "flex flex-1 flex-col items-center justify-center text-center"
+                                    : "grid grid-cols-1 items-center gap-9 lg:grid-cols-[0.78fr_1fr] lg:gap-16"
+                            }`}
+                        >
+                            <div className={index === 0 ? "max-w-5xl" : "max-w-xl"}>
+                                {index === 0 ? (
+                                    <h1
+                                        id={`${section.id}-heading`}
+                                        className="mb-6 font-display text-5xl leading-none tracking-wide text-white/95 italic sm:text-6xl lg:text-7xl"
+                                    >
+                                        {section.title}
+                                    </h1>
+                                ) : (
+                                    <h2
+                                        id={`${section.id}-heading`}
+                                        className="mb-6 font-display text-4xl leading-none tracking-wide text-white/95 italic sm:text-5xl lg:text-6xl"
+                                    >
+                                        {section.title}
+                                    </h2>
+                                )}
+                                <p className="font-body text-xs font-light leading-relaxed tracking-[0.08em] text-[var(--color-theme-secondary)]/70 uppercase italic sm:text-sm md:text-base md:tracking-[0.1em]">
+                                    {section.body}
+                                </p>
+                            </div>
 
-                <MobileSectionControls
-                    previousLabel="Previous about section"
-                    nextLabel="Next about section"
-                    previousDisabled={activeIndex === 0}
-                    nextDisabled={activeIndex === sections.length - 1}
-                    onPrevious={() => navigateSection("prev")}
-                    onNext={() => navigateSection("next")}
-                />
-            </div>
+                            {section.founders ? (
+                                <div className="grid grid-cols-1 gap-2">
+                                    {section.founders.map((founder) => (
+                                        <article
+                                            key={founder.name}
+                                            className="border-b border-white/10 transition-colors duration-500 hover:border-[var(--color-theme-primary)]/45"
+                                        >
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleFounder(founder.name)}
+                                                aria-expanded={Boolean(openFounders[founder.name])}
+                                                className="group flex min-h-20 w-full cursor-pointer items-center justify-between gap-5 py-4 text-left sm:py-5"
+                                            >
+                                                <span>
+                                                    <span className="mb-2 block font-body text-[11px] tracking-[0.2em] text-[var(--color-theme-primary)] uppercase sm:tracking-[0.28em] md:text-xs">
+                                                        {founder.role}
+                                                    </span>
+                                                    <span className="block font-display text-3xl tracking-wide text-white/90 italic md:text-4xl">
+                                                        {founder.name}
+                                                    </span>
+                                                </span>
+                                                <span
+                                                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-xl text-[var(--color-theme-primary)] transition-all duration-300 group-hover:border-[var(--color-theme-primary)]/55 ${
+                                                        openFounders[founder.name] ? "rotate-45 bg-white/5" : ""
+                                                    }`}
+                                                    aria-hidden="true"
+                                                >
+                                                    +
+                                                </span>
+                                            </button>
+                                            <AnimatePresence initial={false}>
+                                                {openFounders[founder.name] && (
+                                                    <motion.div
+                                                        initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: reduceMotion ? 0 : 0.4, ease: [0.65, 0, 0.35, 1] }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <p className="pb-6 font-body text-sm font-light leading-relaxed text-white/65 md:text-base">
+                                                            {founder.bio}
+                                                        </p>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </article>
+                                    ))}
+                                </div>
+                            ) : section.communityImages ? (
+                                <div
+                                    data-about-media
+                                    className="grid w-full max-w-md grid-cols-3 items-center justify-items-center gap-4 overflow-hidden sm:gap-6 lg:max-w-lg lg:justify-self-end lg:gap-8"
+                                >
+                                    {section.communityImages.map((image, imageIndex) => (
+                                        <img
+                                            key={image}
+                                            src={image}
+                                            alt=""
+                                            aria-hidden="true"
+                                            className={`h-20 w-full max-w-[6.5rem] object-contain opacity-80 transition-[filter,opacity,transform] duration-500 hover:scale-105 hover:opacity-100 sm:h-24 sm:max-w-[8rem] lg:h-36 lg:max-w-[10rem] ${
+                                                imageIndex === 1 ? "" : "grayscale hover:grayscale-0"
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            ) : index > 0 ? (
+                                <div
+                                    data-about-media
+                                    className="group w-full overflow-hidden border border-white/10 bg-black/10 lg:max-w-sm lg:justify-self-end"
+                                >
+                                    <img
+                                        src={section.image}
+                                        alt={section.imageAlt}
+                                        className="aspect-[16/10] w-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 lg:aspect-[4/5]"
+                                    />
+                                </div>
+                            ) : null}
+                        </div>
+
+                        {index === sections.length - 1 && (
+                            <div className="relative z-20 mt-16 w-full shrink-0">
+                                <Footer embedded />
+                            </div>
+                        )}
+                    </section>
+                ))}
+            </main>
         </motion.div>
     );
 }
