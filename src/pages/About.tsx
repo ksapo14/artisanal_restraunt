@@ -284,7 +284,7 @@ export default function About() {
 
             <nav
                 aria-label="About sections"
-                className="pointer-events-none fixed bottom-0 left-10 top-0 z-30 hidden items-center lg:flex xl:left-20"
+                className="pointer-events-none fixed bottom-0 left-36 top-0 z-30 hidden items-center lg:flex xl:left-44"
             >
                 <div className="relative h-[48vh] w-px bg-white/10">
                     <div
@@ -304,7 +304,7 @@ export default function About() {
                             style={{ top: `${(index / sectionCount) * 100}%` }}
                         >
                             <span className="-ml-[4px] h-2 w-2 rounded-full bg-[var(--color-theme-primary)]" />
-                            <span className="absolute left-6 whitespace-nowrap font-display text-base italic tracking-[0.1em] text-[var(--color-theme-primary)]">
+                            <span className="absolute right-6 whitespace-nowrap text-right font-display text-base italic tracking-[0.1em] text-[var(--color-theme-primary)]">
                                 {section.title}
                             </span>
                         </button>
