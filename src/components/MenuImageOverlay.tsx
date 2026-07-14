@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { fetchMenuPages } from "../api/menuAssetService";
+import { useLenisScroll } from "../hooks/useLenisScroll";
 import { MENU_CATEGORIES, type MenuCategoryId, type MenuPage } from "../lib/menuAssets";
 
 type ImageState = "loading" | "loaded" | "error";
@@ -17,8 +18,11 @@ export default function MenuImageOverlay({
 }: MenuImageOverlayProps) {
     const category = MENU_CATEGORIES[categoryId];
     const closeButtonRef = useRef<HTMLButtonElement>(null);
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const contentRef = useRef<HTMLDivElement | null>(null);
     const [pages, setPages] = useState<MenuPage[] | null>(null);
     const [imageStates, setImageStates] = useState<Record<string, ImageState>>({});
+    useLenisScroll({ wrapperRef: scrollRef, contentRef });
 
     useEffect(() => {
         const previousOverflow = document.body.style.overflow;
@@ -67,10 +71,11 @@ export default function MenuImageOverlay({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
+            ref={scrollRef}
             className="fixed inset-0 z-[2500] overflow-y-auto bg-[#100d08]/98 text-white"
             onClick={onClose}
         >
-            <div className="min-h-full">
+            <div ref={contentRef} className="min-h-full">
                 <header
                     className="sticky top-0 z-20 border-b border-white/10 bg-[#100d08]/95 px-5 py-4 backdrop-blur-md sm:px-8"
                     onClick={(event) => event.stopPropagation()}

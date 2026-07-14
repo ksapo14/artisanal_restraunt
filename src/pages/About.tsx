@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useLenisScroll } from "../hooks/useLenisScroll";
 import bgImg1 from "../assets/artisanal_full_restraunt_pic.jpg";
 import bgImg2 from "../assets/restraunt_2.png";
 import bgImg3 from "../assets/restraunt_3.png";
@@ -96,6 +97,12 @@ export default function About() {
     const sectionsRef = useRef<HTMLDivElement | null>(null);
     const progressFillRef = useRef<HTMLDivElement | null>(null);
     const reduceMotion = useReducedMotion();
+    const lenisRef = useLenisScroll({
+        wrapperRef: pageRef,
+        contentRef: sectionsRef,
+        enabled: !reduceMotion,
+        onScroll: () => ScrollTrigger.update(),
+    });
 
     useEffect(() => {
         pageRef.current?.scrollTo({ top: 0, behavior: "auto" });
@@ -110,11 +117,21 @@ export default function About() {
 
     const scrollToSection = useCallback((index: number) => {
         const section = pageRef.current?.querySelector<HTMLElement>(`[data-about-index="${index}"]`);
+        if (!section) return;
+
+        if (!reduceMotion && lenisRef.current) {
+            lenisRef.current.scrollTo(section, {
+                duration: 1,
+                lock: true,
+            });
+            return;
+        }
+
         section?.scrollIntoView({
             behavior: reduceMotion ? "auto" : "smooth",
             block: "start",
         });
-    }, [reduceMotion]);
+    }, [lenisRef, reduceMotion]);
 
     useGSAP(() => {
         const scroller = pageRef.current;
@@ -236,8 +253,9 @@ export default function About() {
 
     useEffect(() => {
         const frame = window.requestAnimationFrame(() => ScrollTrigger.refresh());
+        lenisRef.current?.resize();
         return () => window.cancelAnimationFrame(frame);
-    }, [openFounders]);
+    }, [lenisRef, openFounders]);
 
     const themeStyles = {
         "--color-theme-primary": pageTheme.primary,

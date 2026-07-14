@@ -36,6 +36,49 @@ body {
   user-select: none;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-theme-primary, #dac464) 82%, #f5f0ed 18%)
+    color-mix(in srgb, var(--color-theme-bg, #1c170a) 88%, #000 12%);
+}
+
+*::-webkit-scrollbar {
+  width: 0.72rem;
+  height: 0.72rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--color-theme-bg, #1c170a) 88%, #000 12%);
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid color-mix(in srgb, var(--color-theme-bg, #1c170a) 88%, #000 12%);
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-theme-primary, #dac464) 92%, #fff 8%),
+      color-mix(in srgb, var(--color-theme-primary, #dac464) 68%, #6b4d25 32%)
+    );
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-theme-primary, #dac464) 96%, #fff 4%),
+      color-mix(in srgb, var(--color-theme-primary, #dac464) 78%, #6b4d25 22%)
+    );
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--color-theme-bg, #1c170a);
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] iframe {
+  pointer-events: auto;
+}
+
 /* Allow selection for headings, paragraphs, and descriptions */
 h1, h2, h3, h4, h5, h6, p, span, blockquote, li {
   user-select: text;

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useLenisScroll } from "../hooks/useLenisScroll";
 import "../index.css";
 import bgImg1 from '../assets/artisanal_full_restraunt_pic.jpg';
 import bgImg2 from '../assets/restraunt_2.png';
@@ -38,8 +39,11 @@ export default function Home() {
     const [bgIndex, setBgIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const [sliding, setSliding] = useState(false);
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const contentRef = useRef<HTMLDivElement | null>(null);
 
     const currentTheme = themes[bgIndex];
+    useLenisScroll({ wrapperRef: scrollRef, contentRef });
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -132,8 +136,9 @@ export default function Home() {
             <Navbar compactMobile />
 
             <div className="flex-1 relative overflow-hidden">
-                <div className="h-full w-full flex justify-center items-center relative px-4 lg:px-8 pt-20 pb-36 lg:py-0 overflow-y-auto lg:overflow-hidden">
+                <div ref={scrollRef} className="h-full w-full flex justify-center items-center relative px-4 lg:px-8 pt-20 pb-36 lg:py-0 overflow-y-auto lg:overflow-hidden">
                     <motion.div
+                        ref={contentRef}
                         initial={{ opacity: 0, y: 16, scale: 0.985, filter: "blur(4px)" }}
                         animate={{
                             opacity: loading ? 0 : 1,

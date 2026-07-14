@@ -1,6 +1,8 @@
 import { Link } from 'react-router';
 import { createPortal } from 'react-dom';
+import { useRef } from 'react';
 import { useUI } from '../context/UIContext';
+import { useLenisScroll } from '../hooks/useLenisScroll';
 
 const RESERVATION_URL = "https://www.opentable.com/booking/restref/availability?rid=44458&searchdatetime=2024-04-05T19%3A00&correlationId=555d2496-d57d-436f-9b78-c125559a78c0&restRef=44458&dateTime=2024-04-05T19%3A00&partySize=2";
 const GIFT_CARD_URL = "https://order.toasttab.com/egiftcards/artisanal-restaurant-1200-dobbins-rd";
@@ -8,6 +10,9 @@ const linkClass = "flex min-h-14 w-full flex-1 items-center justify-center text-
 
 export default function SiteMap({ open }: { open: boolean }) {
     const { closeSiteMap } = useUI();
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const contentRef = useRef<HTMLElement | null>(null);
+    useLenisScroll({ wrapperRef: scrollRef, contentRef, enabled: open });
 
     const overlay = (
         <div
@@ -19,11 +24,13 @@ export default function SiteMap({ open }: { open: boolean }) {
             <div className="absolute inset-0 bg-black/90" />
 
             <div
+                ref={scrollRef}
                 className={`relative z-10 flex h-[100svh] flex-col items-center overflow-y-auto px-6 py-24 text-white transition-transform duration-300 ease-out will-change-transform transform-gpu sm:py-28 ${
                     open ? 'translate-y-0 scale-100' : 'translate-y-4 scale-[0.98]'
                 }`}
             >
                 <nav
+                    ref={contentRef}
                     aria-label="Site map"
                     className="flex min-h-[calc(100svh-12rem)] w-full max-w-xl flex-1 flex-col items-stretch justify-between gap-1"
                     onClick={(e) => e.stopPropagation()}

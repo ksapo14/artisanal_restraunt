@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useLenisScroll } from "../hooks/useLenisScroll";
 import bgImg from "../assets/restraunt_3.png";
 
 const faqItems = [
@@ -32,6 +33,9 @@ const pageTheme = {
 
 export default function FAQ() {
     const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({ 0: true });
+    const scrollRef = useRef<HTMLElement | null>(null);
+    const contentRef = useRef<HTMLElement | null>(null);
+    const lenisRef = useLenisScroll({ wrapperRef: scrollRef, contentRef });
 
     const toggleFaq = (index: number) => {
         setFaqOpen((prev) => ({
@@ -45,6 +49,10 @@ export default function FAQ() {
         "--color-theme-secondary": pageTheme.secondary,
         "--color-theme-bg": pageTheme.bg,
     } as CSSProperties;
+
+    useEffect(() => {
+        lenisRef.current?.resize();
+    }, [faqOpen, lenisRef]);
 
     return (
         <motion.div
@@ -79,8 +87,9 @@ export default function FAQ() {
 
             <Navbar compactMobile />
 
-            <main className="relative mt-20 min-h-0 flex-1 overflow-y-auto overscroll-contain sm:mt-24 lg:mt-0 lg:overflow-hidden">
+            <main ref={scrollRef} className="relative mt-20 min-h-0 flex-1 overflow-y-auto overscroll-contain sm:mt-24 lg:mt-0 lg:overflow-hidden">
                 <section
+                    ref={contentRef}
                     aria-labelledby="faq-heading"
                     className="relative flex min-h-full w-full flex-col items-center justify-center px-5 pt-4 pb-8 sm:px-8 sm:pt-6 lg:px-32 lg:py-0"
                 >

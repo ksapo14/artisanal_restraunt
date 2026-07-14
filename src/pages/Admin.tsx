@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
     onAuthStateChanged,
@@ -18,6 +18,7 @@ import {
     type MenuCategoryId,
     type MenuPage,
 } from "../lib/menuAssets";
+import { useLenisScroll } from "../hooks/useLenisScroll";
 import bgImg from "../assets/artisanal_full_restraunt_pic.jpg";
 
 type SelectionState = Record<MenuCategoryId, File[]>;
@@ -316,8 +317,12 @@ export default function Admin() {
 }
 
 function AdminShell({ children }: { children: React.ReactNode }) {
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const contentRef = useRef<HTMLDivElement | null>(null);
+    useLenisScroll({ wrapperRef: scrollRef, contentRef });
+
     return (
-        <div className="relative isolate h-[100svh] overflow-x-hidden overflow-y-auto overscroll-contain bg-[#1c170a] text-white">
+        <div ref={scrollRef} className="relative isolate h-[100svh] overflow-x-hidden overflow-y-auto overscroll-contain bg-[#1c170a] text-white">
             <img
                 src={bgImg}
                 alt=""
@@ -325,7 +330,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover brightness-[0.22]"
             />
             <div className="pointer-events-none fixed inset-0 z-0 bg-[#1c170a]/75" />
-            <div className="relative z-10 min-h-[100svh]">{children}</div>
+            <div ref={contentRef} className="relative z-10 min-h-[100svh]">{children}</div>
         </div>
     );
 }

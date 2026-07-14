@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import MenuImageOverlay from "../components/MenuImageOverlay";
+import { useLenisScroll } from "../hooks/useLenisScroll";
 import type { MenuCategoryId } from "../lib/menuAssets";
 import bgImg from "../assets/artisanal_full_restraunt_pic.jpg";
 
@@ -15,6 +16,9 @@ const pageTheme = {
 
 export default function Menu() {
     const [activeCategory, setActiveCategory] = useState<MenuCategoryId | null>(null);
+    const scrollRef = useRef<HTMLElement | null>(null);
+    const contentRef = useRef<HTMLElement | null>(null);
+    useLenisScroll({ wrapperRef: scrollRef, contentRef });
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -55,8 +59,9 @@ export default function Menu() {
 
             <Navbar compactMobile />
 
-            <main className="mt-20 flex min-h-0 flex-1 items-start justify-center overflow-y-auto overscroll-contain px-5 py-4 sm:mt-24 sm:px-8 sm:py-6 lg:mt-0 lg:px-16 lg:pb-16 lg:pt-44">
+            <main ref={scrollRef} className="mt-20 flex min-h-0 flex-1 items-start justify-center overflow-y-auto overscroll-contain px-5 py-4 sm:mt-24 sm:px-8 sm:py-6 lg:mt-0 lg:px-16 lg:pb-16 lg:pt-44">
                 <motion.section
+                    ref={contentRef}
                     aria-labelledby="menu-heading"
                     initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
                     animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
