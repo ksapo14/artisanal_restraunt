@@ -5,12 +5,6 @@
   --font-body: 'Poppins', sans-serif;
 }
 
-@keyframes fillCircle {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 html,
 body,
 #root {
